@@ -1,11 +1,144 @@
-@import 'tailwindcss';
+/* ------------------------------------------ */
+/* Tailwind Directives */
+/* ------------------------------------------ */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
-@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
-@source '../../storage/framework/views/*.php';
-@source '../**/*.blade.php';
-@source '../**/*.js';
+/* ------------------------------------------ */
+/* Custom Fonts */
+/* ------------------------------------------ */
 
-@theme {
-    --font-sans: 'Instrument Sans', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-        'Segoe UI Symbol', 'Noto Color Emoji';
+/* ELINGA Fonts */
+@font-face {
+    font-family: 'Elinga';
+    src: url('/assets/fonts/Elinga.ttf') format('truetype');
+    font-style: normal;
+    font-weight: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Elinga';
+    src: url('/assets/fonts/Elinga Italic.ttf') format('truetype');
+    font-style: italic;
+    font-weight: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Elinga Outline';
+    src: url('/assets/fonts/Elinga Outline.ttf') format('truetype');
+    font-style: normal;
+    font-weight: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Elinga Outline';
+    src: url('/assets/fonts/Elinga Outline Italic.ttf') format('truetype');
+    font-style: italic;
+    font-weight: normal;
+    font-display: swap;
+}
+
+/* FUTURA Fonts */
+@font-face {
+    font-family: 'Futura';
+    src: url('/assets/fonts/FuturaLight.ttf') format('truetype');
+    font-weight: 100;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Futura';
+    src: url('/assets/fonts/FuturaTMed.ttf') format('truetype');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Futura';
+    src: url('/assets/fonts/FuturaMedium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Futura';
+    src: url('/assets/fonts/FuturaT_Bold.ttf') format('truetype');
+    font-weight: 700;
+    font-style: normal;
+    font-display: swap;
+}
+@font-face {
+    font-family: 'Futura';
+    src: url('/assets/fonts/FuturaHeavy.ttf') format('truetype');
+    font-weight: 900;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* ------------------------------------------ */
+/* Global Resets and Styles */
+/* ------------------------------------------ */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Futura', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    background-color: #F8F4EE; /* cream */
+    color: #252525; /* charcoal */
+    line-height: 1.6;
+    overflow-x: hidden;
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: 'Elinga', 'Futura', serif;
+    font-weight: normal;
+    line-height: 1.2;
+}
+
+/* ------------------------------------------ */
+/* Utility Classes for Font Weights */
+/* ------------------------------------------ */
+.futura-100 { font-weight: 100; }
+.futura-400 { font-weight: 400; }
+.futura-500 { font-weight: 500; }
+.futura-700 { font-weight: 700; }
+.futura-900 { font-weight: 900; }
+
+/* ------------------------------------------ */
+/* Custom Animations */
+/* ------------------------------------------ */
+@keyframes fadeIn {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+    0% { opacity: 0; transform: translateY(30px); }
+    100% { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fadeIn { animation: fadeIn 0.8s ease-in; }
+.animate-slideUp { animation: slideUp 0.8s ease-out; }
+
+/* ------------------------------------------ */
+/* Loading Animation Utility */
+/* ------------------------------------------ */
+.loading {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.6s ease, transform 0.6s ease;
+}
+.loading.visible {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* ------------------------------------------ */
+/* Smooth Scrolling */
+html {
+    scroll-behavior: smooth;
 }

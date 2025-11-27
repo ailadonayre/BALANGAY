@@ -78,73 +78,12 @@
             font-style: normal;
             font-display: swap;
         }
-
-        /* Root colors */
-        :root {
-            --color-cream: #F8F4EE;
-            --color-olive: #5B5843;
-            --color-charcoal: #252525;
-            --color-sand: #E4DDCC;
-        }
-
-        /* Global resets */
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        body {
-            font-family: 'Futura', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background-color: var(--color-cream);
-            color: var(--color-charcoal);
-            line-height: 1.6;
-            overflow-x: hidden;
-        }
-
-        h1, h2, h3, h4, h5, h6 {
-            font-family: 'Elinga', 'Futura', serif;
-            font-weight: normal;
-            line-height: 1.2;
-        }
-
-        .futura-100 { font-weight: 100; }
-        .futura-400 { font-weight: 400; }
-        .futura-500 { font-weight: 500; }
-        .futura-700 { font-weight: 700; }
-        .futura-900 { font-weight: 900; }
-
-        /* Animations */
-        .fade-in { animation: fadeIn 0.8s ease-in; }
-        .slide-up { animation: slideUp 0.8s ease-out; }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        @keyframes slideUp {
-            from { opacity: 0; transform: translateY(30px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Loading */
-        .loading {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s ease, transform 0.6s ease;
-        }
-        .loading.visible {
-            opacity: 1;
-            transform: translateY(0);
-        }
-
-        html { scroll-behavior: smooth; }
     </style>
 
     @stack('styles')
 </head>
-<body>
+<body class="bg-[#F8F4EE] text-[#252525] font-[Futura] overflow-x-hidden">
+
     {{-- Navigation --}}
     @include('components.navigation')
 
