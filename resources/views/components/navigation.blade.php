@@ -51,7 +51,9 @@
                     </button>
                 @endauth
 
-                <a href="{{ route('cart') }}" class="text-gray-700 hover:text-[#5B5843] transition-colors duration-300 relative" aria-label="Cart">
+                <a href="@auth{{ route('cart') }}@else{{ '#' }}@endauth" 
+                   @guest onclick="event.preventDefault(); document.getElementById('auth-modal').classList.remove('hidden');" @endguest
+                   class="text-gray-700 hover:text-[#5B5843] transition-colors duration-300 relative" aria-label="Cart">
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
                     </svg>

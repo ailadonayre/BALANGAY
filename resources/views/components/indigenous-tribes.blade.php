@@ -18,7 +18,7 @@
             @endphp
 
             @foreach($tribes as $index => $tribe)
-            <div class="group cursor-pointer loading" style="animation-delay: {{ $index * 0.15 }}s">
+            <div class="group cursor-pointer loading tribe-card" data-tribe-id="{{ $index + 1 }}" style="animation-delay: {{ $index * 0.15 }}s">
                 <div class="relative overflow-hidden rounded-xl aspect-[3/4] mb-4">
                     <img src="{{ asset('assets/tribes/' . $tribe['image']) }}" 
                          alt="{{ $tribe['name'] }}" 
@@ -34,9 +34,31 @@
         </div>
 
         <div class="text-center mt-12">
-            <button class="inline-block bg-[#252525] text-white px-10 py-4 rounded-full text-sm tracking-widest uppercase futura-500 hover:bg-[#5B5843] transition-all duration-300 transform hover:scale-105">
+            <a href="/communities" class="inline-block bg-[#252525] text-white px-10 py-4 rounded-full text-sm tracking-widest uppercase futura-500 hover:bg-[#5B5843] transition-all duration-300 transform hover:scale-105">
                 Show All Communities
-            </button>
+            </a>
         </div>
     </div>
 </section>
+
+<script>
+// Setup tribe card handlers for modal
+function setupTribeCardHandlers() {
+    const tribeCards = document.querySelectorAll('.tribe-card');
+    tribeCards.forEach(card => {
+        card.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            const communityId = this.getAttribute('data-tribe-id');
+            openCommunityModal(communityId);
+        });
+    });
+}
+
+// Setup when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupTribeCardHandlers);
+} else {
+    setupTribeCardHandlers();
+}
+</script>

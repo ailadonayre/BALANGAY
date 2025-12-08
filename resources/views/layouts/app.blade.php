@@ -95,16 +95,101 @@
     {{-- Auth Modal for Sign In / Sign Up --}}
     @include('components.auth-modal')
 
+    {{-- Community Modal --}}
+    @include('components.community-modal')
+
+    {{-- Shop Product Modal --}}
+    @include('components.shop-product-modal')
+
     @stack('scripts')
 
-    {{-- Optional: trigger auth modal after 10 seconds --}}
+    {{-- Master initialization script for all modals and handlers --}}
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const modal = document.getElementById('auth-modal');
-                if(modal) modal.classList.add('visible');
-            }, 10000);
+    // Wait for all DOM elements and modals to be loaded
+    function initializeAllHandlers() {
+        // Setup featured crafts handlers
+        const craftCards = document.querySelectorAll('.featured-craft');
+        craftCards.forEach(craft => {
+            craft.addEventListener('click', async function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const craftName = this.getAttribute('data-craft-name');
+                
+                try {
+                    const response = await fetch(`/api/products/search?q=${encodeURIComponent(craftName)}`);
+                    const data = await response.json();
+                    
+                    if (data.data && data.data.length > 0) {
+                        openShopProductModal(data.data[0].id);
+                    }
+                } catch (error) {
+                    console.error('Error finding product:', error);
+                }
+            });
         });
+
+        // Setup shop product card handlers
+        const productCards = document.querySelectorAll('.product-card');
+        productCards.forEach(card => {
+            card.addEventListener('click', async function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const productName = this.getAttribute('data-product-name');
+                
+                try {
+                    const response = await fetch(`/api/products/search?q=${encodeURIComponent(productName)}`);
+                    const data = await response.json();
+                    
+                    if (data.data && data.data.length > 0) {
+                        openShopProductModal(data.data[0].id);
+                    }
+                } catch (error) {
+                    console.error('Error finding product:', error);
+                }
+            });
+        });
+
+        // Setup tribe card handlers for modal
+        const tribeCards = document.querySelectorAll('.tribe-card');
+        tribeCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                const communityId = this.getAttribute('data-tribe-id');
+                openCommunityModal(communityId);
+            });
+        });
+
+        // Setup shop product card handlers from shop page
+        const shopCards = document.querySelectorAll('.product-shop-card');
+        shopCards.forEach(card => {
+            card.addEventListener('click', function(e) {
+                if (!e.target.closest('button')) {
+                    const productId = this.getAttribute('data-product-id');
+                    openShopProductModal(productId);
+                }
+            });
+        });
+    }
+
+    // Initialize when DOM is fully loaded
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initializeAllHandlers);
+    } else {
+        initializeAllHandlers();
+    }
+
+    // Re-initialize after any dynamic content changes
+    const originalFetch = window.fetch;
+    window.fetch = function(...args) {
+        return originalFetch.apply(this, args).then(response => {
+            response.clone().json().then(() => {
+                // Re-initialize handlers after API calls
+                setTimeout(initializeAllHandlers, 100);
+            }).catch(() => {});
+            return response;
+        });
+    };
     </script>
 </body>
 </html>

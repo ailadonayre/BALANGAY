@@ -225,7 +225,7 @@ document.getElementById('signin-form').addEventListener('submit', async (e) => {
     const errorDiv = document.getElementById('signin-error');
     
     try {
-        const response = await fetch('/api/login', {
+        const response = await fetch('/auth/login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -255,7 +255,7 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     const errorDiv = document.getElementById('signup-error');
     
     try {
-        const response = await fetch('/api/register', {
+        const response = await fetch('/auth/register', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

@@ -147,7 +147,7 @@ document.getElementById('checkout-form').addEventListener('submit', async (e) =>
     const shipping_address = `${data.address}, ${data.city}, ${data.province} ${data.postal_code}`;
     
     try {
-        const response = await fetch('/api/orders', {
+        const response = await fetch('/api/orders/checkout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -162,7 +162,7 @@ document.getElementById('checkout-form').addEventListener('submit', async (e) =>
         const result = await response.json();
         
         if (result.success) {
-            window.location.href = `/orders/${result.order_id}`;
+            window.location.href = `/orders`;
         } else {
             alert(result.message);
         }

@@ -11,19 +11,19 @@
         <div class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
             @php
                 $products = [
-                    ['name' => 'Margarita Beaded Earrings', 'price' => '₱890', 'image' => 'Margarita-Beaded-Earrings.webp'],
-                    ['name' => 'Itneg Embroidered Jacket', 'price' => '₱3,200', 'image' => 'Itneg-Hand-Embroidered-Cropped-Jacket.webp'],
-                    ['name' => 'Mother of Pearl Plate', 'price' => '₱1,450', 'image' => 'Mother-of-Pearl-Plate.webp'],
-                    ['name' => 'Jusi Fan', 'price' => '₱750', 'image' => 'Jusi-Fan.webp'],
-                    ['name' => 'Bagobo Slip-on', 'price' => '₱2,100', 'image' => 'Bagobo-Slip-on.jpg'],
-                    ['name' => 'Abaca Handbag', 'price' => '₱2,850', 'image' => 'Abaca-Handbag.webp'],
-                    ['name' => 'Capiz Jewelry Box', 'price' => '₱1,650', 'image' => 'Capiz-Square-Diamond-Jewelry-Box.webp'],
-                    ['name' => 'Pearl Necklace', 'price' => '₱4,200', 'image' => 'Fresh-Water-Pearl-Necklace.webp']
+                    ['id' => 1, 'name' => 'Margarita Beaded Earrings', 'price' => '₱890', 'image' => 'Margarita-Beaded-Earrings.webp'],
+                    ['id' => 2, 'name' => 'Itneg Embroidered Jacket', 'price' => '₱3,200', 'image' => 'Itneg-Hand-Embroidered-Cropped-Jacket.webp'],
+                    ['id' => 3, 'name' => 'Mother of Pearl Plate', 'price' => '₱1,450', 'image' => 'Mother-of-Pearl-Plate.webp'],
+                    ['id' => 4, 'name' => 'Jusi Fan', 'price' => '₱750', 'image' => 'Jusi-Fan.webp'],
+                    ['id' => 5, 'name' => 'Bagobo Slip-on', 'price' => '₱2,100', 'image' => 'Bagobo-Slip-on.jpg'],
+                    ['id' => 6, 'name' => 'Abaca Handbag', 'price' => '₱2,850', 'image' => 'Abaca-Handbag.webp'],
+                    ['id' => 7, 'name' => 'Capiz Jewelry Box', 'price' => '₱1,650', 'image' => 'Capiz-Square-Diamond-Jewelry-Box.webp'],
+                    ['id' => 8, 'name' => 'Pearl Necklace', 'price' => '₱4,200', 'image' => 'Fresh-Water-Pearl-Necklace.webp']
                 ];
             @endphp
 
             @foreach($products as $index => $product)
-                <div class="group cursor-pointer loading" style="animation-delay: {{ $index * 0.1 }}s">
+                <div class="group cursor-pointer loading product-card" data-product-name="{{ $product['name'] }}" style="animation-delay: {{ $index * 0.1 }}s">
 
                     <div class="relative overflow-hidden rounded-lg bg-white aspect-square mb-4 shadow-md">
                         <img 
@@ -34,17 +34,22 @@
 
                         <!-- Quick Add Button -->
                         <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-                            <button class="bg-white text-[#252525] px-5 py-2.5 rounded-full text-[10px] sm:text-xs tracking-wider uppercase futura-500 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 flex items-center gap-2">
+                            <button class="view-product-btn bg-white text-[#252525] px-5 py-2.5 rounded-full text-[10px] sm:text-xs tracking-wider uppercase futura-500 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 flex items-center gap-2">
                                 <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path 
                                         stroke-linecap="round" 
                                         stroke-linejoin="round" 
                                         stroke-width="2" 
-                                        d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" 
+                                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" 
+                                    />
+                                    <path 
+                                        stroke-linecap="round" 
+                                        stroke-linejoin="round" 
+                                        stroke-width="2" 
+                                        d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" 
                                     />
                                 </svg>
-                                <span class="hidden sm:inline">Quick Add</span>
-                                <span class="sm:hidden">Add</span>
+                                <span class="hidden sm:inline">View</span>
                             </button>
                         </div>
 
@@ -78,10 +83,9 @@
         </div>
 
         <div class="text-center mt-16">
-            <button class="inline-block bg-[#252525] text-white px-12 py-4 rounded-full text-sm tracking-widest uppercase futura-500 hover:bg-[#5B5843] transition-all duration-300 transform hover:scale-105">
+            <a href="/shop" class="inline-block bg-[#252525] text-white px-12 py-4 rounded-full text-sm tracking-widest uppercase futura-500 hover:bg-[#5B5843] transition-all duration-300 transform hover:scale-105">
                 View All Products
-            </button>
+            </a>
         </div>
-
     </div>
 </section>

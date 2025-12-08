@@ -13,7 +13,7 @@
                     From the mountains of Cordillera to the shores of Mindanao, each community brings 
                     unique artistry that reflects their deep connection to the land and their ancestors.
                 </p>
-                <a href="#" class="inline-block bg-[#5B5843] text-white px-10 py-4 rounded-full text-sm tracking-widest uppercase futura-500 hover:bg-[#252525] transition-all duration-300 transform hover:scale-105">
+                <a href="/stories" class="inline-block bg-[#5B5843] text-white px-10 py-4 rounded-full text-sm tracking-widest uppercase futura-500 hover:bg-[#252525] transition-all duration-300 transform hover:scale-105">
                     Read Their Stories
                 </a>
             </div>
