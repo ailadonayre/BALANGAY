@@ -13,7 +13,10 @@ class OrderController extends Controller
     {
         $request->validate([
             'shipping_address' => 'required|string',
-            'payment_method' => 'required|in:credit_card,paypal,bank_transfer'
+            'payment_method' => 'required|in:cod,gcash,bank_transfer',
+            'customer_name' => 'required|string',
+            'customer_email' => 'required|email',
+            'customer_phone' => 'required|string'
         ]);
 
         $cartItems = Cart::where('user_id', auth()->id())->with('product')->get();
@@ -54,7 +57,7 @@ class OrderController extends Controller
             'success' => true,
             'message' => 'Order placed successfully',
             'order_id' => $order->id,
-            'redirect' => route('orders')
+            'order' => $order
         ]);
     }
 

@@ -114,6 +114,24 @@
     </div>
 </div>
 
+<!-- Order Confirmation Modal -->
+<div id="order-success-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+    <div class="bg-white rounded-2xl p-8 max-w-md w-full mx-4 text-center">
+        <div class="mb-4">
+            <svg class="w-16 h-16 text-green-500 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+        </div>
+        <h2 class="text-2xl font-bold mb-2" style="font-family: 'Elinga', serif;">Order Confirmed!</h2>
+        <p class="text-gray-600 mb-2">Thank you for your order.</p>
+        <p class="text-sm text-gray-500 mb-6">Order ID: <span id="success-order-id" class="font-mono font-bold"></span></p>
+        <p class="text-gray-600 mb-6">We've received your order and will process it shortly. You'll receive an email confirmation with tracking information.</p>
+        <button onclick="window.location.href='/orders'" class="w-full bg-[#5B5843] text-white py-3 rounded-full hover:bg-[#252525] transition-all duration-300 font-medium">
+            View My Orders
+        </button>
+    </div>
+</div>
+
 <script>
 async function loadCheckoutSummary() {
     try {
@@ -146,6 +164,12 @@ document.getElementById('checkout-form').addEventListener('submit', async (e) =>
     // Combine address fields
     const shipping_address = `${data.address}, ${data.city}, ${data.province} ${data.postal_code}`;
     
+    // Show loading state
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.textContent;
+    submitBtn.disabled = true;
+    submitBtn.textContent = 'Processing...';
+    
     try {
         const response = await fetch('/api/orders/checkout', {
             method: 'POST',
@@ -154,7 +178,10 @@ document.getElementById('checkout-form').addEventListener('submit', async (e) =>
                 'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
             },
             body: JSON.stringify({
-                shipping_address,
+                customer_name: `${data.first_name} ${data.last_name}`,
+                customer_email: data.email,
+                customer_phone: data.phone,
+                shipping_address: shipping_address,
                 payment_method: data.payment_method
             })
         });
@@ -162,13 +189,24 @@ document.getElementById('checkout-form').addEventListener('submit', async (e) =>
         const result = await response.json();
         
         if (result.success) {
-            window.location.href = `/orders`;
+            // Show success modal
+            document.getElementById('success-order-id').textContent = `#${result.order_id}`;
+            document.getElementById('order-success-modal').classList.remove('hidden');
+            
+            // Redirect after 3 seconds
+            setTimeout(() => {
+                window.location.href = '/orders';
+            }, 3000);
         } else {
-            alert(result.message);
+            alert(result.message || 'Order failed. Please try again.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = originalText;
         }
     } catch (error) {
         alert('Order failed. Please try again.');
         console.error('Error placing order:', error);
+        submitBtn.disabled = false;
+        submitBtn.textContent = originalText;
     }
 });
 

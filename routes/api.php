@@ -14,8 +14,9 @@ Route::post('/logout', [LoginController::class, 'logout'])->middleware('auth');
 
 // Products
 Route::get('/products', [ProductController::class, 'index']);
-Route::get('/products/{id}', [ProductController::class, 'show']);
+Route::get('/products/search', [ProductController::class, 'search']);
 Route::get('/products/category/{category}', [ProductController::class, 'byCategory']);
+Route::get('/products/{id}', [ProductController::class, 'show']);
 
 // Cart (requires authentication)
 Route::middleware('auth')->group(function () {
