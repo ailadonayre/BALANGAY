@@ -62,7 +62,7 @@
             @endphp
 
             @foreach($stories as $index => $story)
-            <article class="group cursor-pointer loading" style="animation-delay: {{ $index * 0.2 }}s">
+            <article class="group cursor-pointer loading story-card" data-story-index="{{ $index }}" style="animation-delay: {{ $index * 0.2 }}s">
                 <div class="overflow-hidden rounded-xl aspect-[4/3] mb-5">
                     <img src="{{ asset('assets/artisans/' . $story['image']) }}" 
                          alt="{{ $story['title'] }}" 
@@ -70,7 +70,7 @@
                 </div>
                 <h3 class="text-xl md:text-2xl mb-3 futura-500 group-hover:text-[#5B5843] transition-colors duration-300">{{ $story['title'] }}</h3>
                 <p class="text-sm md:text-base text-gray-600 futura-400 mb-4">{{ $story['excerpt'] }}</p>
-                <a href="#" class="inline-flex items-center gap-2 text-[#5B5843] futura-500 text-sm tracking-wide uppercase hover:gap-4 transition-all duration-300">
+                <a href="#" onclick="openHeroStoryModal(event, {{ $index }})" class="inline-flex items-center gap-2 text-[#5B5843] futura-500 text-sm tracking-wide uppercase hover:gap-4 transition-all duration-300">
                     Read More
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

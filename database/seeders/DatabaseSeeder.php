@@ -24,5 +24,8 @@ class DatabaseSeeder extends Seeder
 
         // Run product seeder
         $this->call(ProductSeeder::class);
+        
+        // Run seller seeder
+        $this->call(SellerSeeder::class);
     }
 }

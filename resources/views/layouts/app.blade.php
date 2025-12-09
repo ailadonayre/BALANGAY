@@ -101,6 +101,33 @@
     {{-- Shop Product Modal --}}
     @include('components.shop-product-modal')
 
+    {{-- Story Modal for Hero Stories Section --}}
+    <div id="hero-story-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" role="dialog" aria-modal="true">
+        <!-- Background overlay -->
+        <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300" onclick="closeHeroStoryModal()"></div>
+
+        <!-- Modal Content -->
+        <div class="flex min-h-screen items-center justify-center p-4">
+            <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all duration-300 overflow-hidden max-h-[90vh] overflow-y-auto">
+                <!-- Close Button -->
+                <button onclick="closeHeroStoryModal()" class="fixed top-4 right-4 z-10 text-gray-400 hover:text-gray-600 transition-colors duration-300 bg-white rounded-full p-2">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+
+                <!-- Modal Body -->
+                <div class="p-8">
+                    <div class="mb-6">
+                        <img id="hero-modal-story-image" src="" alt="" class="w-full h-96 object-cover rounded-xl mb-6">
+                        <h2 id="hero-modal-story-title" class="text-3xl font-bold mb-2" style="font-family: 'Elinga', serif;"></h2>
+                    </div>
+                    <div id="hero-modal-story-content" class="text-gray-600 leading-relaxed space-y-4"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     @stack('scripts')
 
     {{-- Master initialization script for all modals and handlers --}}
@@ -200,6 +227,55 @@
             return response;
         });
     };
+
+    // Hero Stories Modal Functions
+    const heroStories = [
+        {
+            title: 'Preserving T\'nalak Traditions',
+            excerpt: 'How T\'boli dreamweavers keep ancient textile art alive',
+            image: 'Amparo-Balansi-Mabanag.jpg',
+            content: 'Amparo Balansi Mabanag is a master T\'boli weaver who has dedicated her life to preserving the ancient art of t\'nalak weaving. For over forty years, she has created intricate patterns that tell stories of her ancestors and spiritual beliefs. Each piece takes months to complete, using traditional tie-dyeing techniques passed down through generations. Amparo\'s work has gained international recognition, yet she remains committed to teaching younger generations the sacred knowledge embedded in every thread. Her t\'nalak pieces are not merely fabric—they are living records of T\'boli history, spirituality, and artistic excellence. Through her dedication, the world has come to recognize the T\'boli people as master artists and guardians of an irreplaceable cultural heritage.'
+        },
+        {
+            title: 'The Art of Metal Smithing',
+            excerpt: 'Eduardo Mutuc\'s journey to becoming a National Living Treasure',
+            image: 'Eduardo-Mutuc.jpg',
+            content: 'Eduardo Mutuc is a legendary Ifugao metal smith who was recognized as a National Living Treasure by the Philippine government. His mastery of traditional metalworking techniques, passed down through his family for countless generations, has made him one of the most respected artisans in the Philippines. Eduardo\'s creations range from traditional ceremonial items to contemporary artistic pieces, all crafted using age-old methods. Despite the availability of modern tools and materials, he continues to work with handforged techniques, believing that the soul of the craft lies in the direct contact between artisan and material. His workshop has become a gathering place for young artisans eager to learn the secrets of Ifugao metalwork. Eduardo\'s legacy extends beyond his creations; he is a living link to an ancient tradition that continues to inspire artists worldwide.'
+        },
+        {
+            title: 'Weaving Community Together',
+            excerpt: 'Inabel weavers creating economic opportunities in Ilocos',
+            image: 'Magdalena-Gamayo.jpeg',
+            content: 'Magdalena Gamayo is a master Inabel weaver from the Ilocos region whose work has transformed her community\'s economic landscape. Inabel, also known as Abel Iloco, is a handwoven textile that represents the cultural heritage of the Ilocano people. Magdalena leads a cooperative of weavers, empowering women in her community to earn sustainable income while preserving their craft. Her commitment to fair wages and ethical production has made her products sought after by conscious consumers worldwide. Magdalena\'s innovative approach blends traditional patterns with contemporary designs, making Inabel relevant to modern markets. Through her leadership, she has helped establish her village as a center of textile excellence, creating opportunities for younger artisans to learn and thrive. Her work demonstrates how traditional crafts can be vehicles for economic empowerment and cultural preservation.'
+        }
+    ];
+
+    function openHeroStoryModal(event, storyIndex) {
+        event.preventDefault();
+        event.stopPropagation();
+        
+        if (heroStories[storyIndex]) {
+            const story = heroStories[storyIndex];
+            document.getElementById('hero-modal-story-title').textContent = story.title;
+            document.getElementById('hero-modal-story-image').src = `/assets/artisans/${story.image}`;
+            document.getElementById('hero-modal-story-image').alt = story.title;
+            document.getElementById('hero-modal-story-content').innerHTML = `<p>${story.content}</p>`;
+            
+            document.getElementById('hero-story-modal').classList.remove('hidden');
+        }
+    }
+
+    function closeHeroStoryModal() {
+        document.getElementById('hero-story-modal').classList.add('hidden');
+    }
+
+    // Close modal when clicking outside
+    document.addEventListener('click', function(event) {
+        const modal = document.getElementById('hero-story-modal');
+        if (event.target === modal) {
+            closeHeroStoryModal();
+        }
+    });
     </script>
 </body>
 </html>

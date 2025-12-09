@@ -52,21 +52,6 @@
                                 <span class="hidden sm:inline">View</span>
                             </button>
                         </div>
-
-                        <!-- Wishlist Icon -->
-                        <button class="absolute top-3 right-3 bg-white/90 backdrop-blur-sm p-1.5 sm:p-2 rounded-full hover:bg-white transition-colors duration-300">
-                            <svg class="w-4 h-4 sm:w-5 sm:h-5 text-gray-700 hover:text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path 
-                                    stroke-linecap="round" 
-                                    stroke-linejoin="round" 
-                                    stroke-width="1.5" 
-                                    d="M4.318 6.318a4.5 4.5 0 000 6.364L12 
-                                       20.364l7.682-7.682a4.5 4.5 0 
-                                       00-6.364-6.364L12 7.636l-1.318-1.318a4.5 
-                                       4.5 0 00-6.364 0z" 
-                                />
-                            </svg>
-                        </button>
                     </div>
 
                     <div class="px-1">

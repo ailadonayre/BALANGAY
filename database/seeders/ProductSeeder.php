@@ -13,16 +13,23 @@ class ProductSeeder extends Seeder
 
     public function run(): void
     {
-        // Create a test seller first
-        $seller = Seller::firstOrCreate(
-            ['email' => 'seller@example.com'],
-            [
-                'artisan_name' => 'Master Artisan',
-                'password' => bcrypt('password'),
-                'phone_number' => '09123456789',
-                'community' => 'Mindanao Weavers'
-            ]
-        );
+        // Get sellers (they should be created by SellerSeeder first)
+        $sellers = Seller::all();
+        
+        if ($sellers->isEmpty()) {
+            // Create a default seller if none exist
+            $sellers = [
+                Seller::firstOrCreate(
+                    ['email' => 'seller@example.com'],
+                    [
+                        'artisan_name' => 'Master Artisan',
+                        'password' => bcrypt('password'),
+                        'phone_number' => '09123456789',
+                        'community' => 'Mindanao Weavers'
+                    ]
+                )
+            ];
+        }
 
         $products = [
             [
@@ -99,7 +106,8 @@ class ProductSeeder extends Seeder
             ],
         ];
 
-        foreach ($products as $product) {
+        foreach ($products as $index => $product) {
+            $seller = $sellers[$index % count($sellers)];
             Product::create(array_merge($product, ['seller_id' => $seller->id]));
         }
     }

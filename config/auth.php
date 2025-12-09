@@ -2,36 +2,6 @@
 
 return [
 
-    'guards' => [
-    'web' => [
-        'driver' => 'session',
-        'provider' => 'users',
-    ],
-    'seller' => [
-        'driver' => 'session',
-        'provider' => 'sellers',
-    ],
-    'admin' => [
-        'driver' => 'session',
-        'provider' => 'admins',
-    ],
-],
-
-'providers' => [
-    'users' => [
-        'driver' => 'eloquent',
-        'model' => App\Models\User::class,
-    ],
-    'sellers' => [
-        'driver' => 'eloquent',
-        'model' => App\Models\Seller::class,
-    ],
-    'admins' => [
-        'driver' => 'eloquent',
-        'model' => App\Models\Admin::class,
-    ],
-],
-
     /*
     |--------------------------------------------------------------------------
     | Authentication Defaults
@@ -70,6 +40,14 @@ return [
             'driver' => 'session',
             'provider' => 'users',
         ],
+        'seller' => [
+            'driver' => 'session',
+            'provider' => 'sellers',
+        ],
+        'admin' => [
+            'driver' => 'session',
+            'provider' => 'admins',
+        ],
     ],
 
     /*
@@ -94,11 +72,14 @@ return [
             'driver' => 'eloquent',
             'model' => env('AUTH_MODEL', App\Models\User::class),
         ],
-
-        // 'users' => [
-        //     'driver' => 'database',
-        //     'table' => 'users',
-        // ],
+        'sellers' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Seller::class,
+        ],
+        'admins' => [
+            'driver' => 'eloquent',
+            'model' => App\Models\Admin::class,
+        ],
     ],
 
     /*

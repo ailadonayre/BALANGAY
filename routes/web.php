@@ -8,6 +8,7 @@ use App\Http\Controllers\ProductController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CommunityController;
+use App\Http\Controllers\SellerController;
 
 // Public Routes
 Route::get('/', function () {
@@ -80,11 +81,19 @@ Route::get('/api/products-communities', [ProductController::class, 'getCommuniti
 Route::get('/api/communities/all', [CommunityController::class, 'index'])->name('api.communities.list');
 Route::get('/api/communities/{id}', [CommunityController::class, 'show'])->name('api.communities.show');
 
+// Seller API Routes
+Route::get('/api/sellers/{sellerId}/products', [SellerController::class, 'getProducts'])->name('api.seller.products');
+
 // Seller Routes
 Route::middleware(['auth:seller'])->prefix('seller')->group(function () {
     Route::get('/dashboard', function () {
         return view('seller.dashboard');
     })->name('seller.dashboard');
+    
+    // Seller Product API Routes
+    Route::post('/api/products', [SellerController::class, 'createProduct'])->name('api.seller.create.product');
+    Route::put('/api/products/{id}', [SellerController::class, 'updateProduct'])->name('api.seller.update.product');
+    Route::delete('/api/products/{id}', [SellerController::class, 'deleteProduct'])->name('api.seller.delete.product');
 });
 
 // Admin Routes
