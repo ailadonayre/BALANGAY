@@ -32,7 +32,6 @@
 @section('content')
     @include('components.impact-numbers')
     @include('components.featured-artisans')
-    @include('components.featured-crafts')
     @include('components.indigenous-tribes')
     @include('components.shop-section')
     @include('components.stories-section')

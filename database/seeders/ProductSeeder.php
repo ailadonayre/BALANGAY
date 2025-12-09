@@ -19,6 +19,7 @@ class ProductSeeder extends Seeder
             [
                 'artisan_name' => 'Master Artisan',
                 'password' => bcrypt('password'),
+                'phone_number' => '09123456789',
                 'community' => 'Mindanao Weavers'
             ]
         );

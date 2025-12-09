@@ -134,17 +134,27 @@
             card.addEventListener('click', async function(e) {
                 e.preventDefault();
                 e.stopPropagation();
-                const productName = this.getAttribute('data-product-name');
                 
-                try {
-                    const response = await fetch(`/api/products/search?q=${encodeURIComponent(productName)}`);
-                    const data = await response.json();
-                    
-                    if (data.data && data.data.length > 0) {
-                        openShopProductModal(data.data[0].id);
+                // If card has data-product-id, use it directly
+                const productId = this.getAttribute('data-product-id');
+                if (productId) {
+                    openShopProductModal(productId);
+                    return;
+                }
+                
+                // Otherwise, search by product name
+                const productName = this.getAttribute('data-product-name');
+                if (productName) {
+                    try {
+                        const response = await fetch(`/api/products/search?q=${encodeURIComponent(productName)}`);
+                        const data = await response.json();
+                        
+                        if (data.data && data.data.length > 0) {
+                            openShopProductModal(data.data[0].id);
+                        }
+                    } catch (error) {
+                        console.error('Error finding product:', error);
                     }
-                } catch (error) {
-                    console.error('Error finding product:', error);
                 }
             });
         });

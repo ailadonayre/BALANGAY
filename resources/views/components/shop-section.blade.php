@@ -23,7 +23,7 @@
             @endphp
 
             @foreach($products as $index => $product)
-                <div class="group cursor-pointer loading product-card" data-product-name="{{ $product['name'] }}" style="animation-delay: {{ $index * 0.1 }}s">
+                <div class="group cursor-pointer loading product-card shop-product-hero" data-product-id="{{ $product['id'] }}" style="animation-delay: {{ $index * 0.1 }}s">
 
                     <div class="relative overflow-hidden rounded-lg bg-white aspect-square mb-4 shadow-md">
                         <img 
@@ -89,3 +89,29 @@
         </div>
     </div>
 </section>
+
+<script>
+// Initialize shop section product modals
+document.addEventListener('DOMContentLoaded', function() {
+    initializeShopSectionProducts();
+});
+
+function initializeShopSectionProducts() {
+    const productCards = document.querySelectorAll('.product-card.shop-product-hero');
+    productCards.forEach(card => {
+        card.removeEventListener('click', handleShopProductCardClick);
+        card.addEventListener('click', handleShopProductCardClick);
+    });
+}
+
+function handleShopProductCardClick(e) {
+    if (e.target.closest('button')) return; // Don't trigger if button clicked
+    const productId = this.getAttribute('data-product-id');
+    if (productId) {
+        openShopProductModal(productId);
+    }
+}
+
+// Re-initialize after page content loads
+window.addEventListener('load', initializeShopSectionProducts);
+</script>

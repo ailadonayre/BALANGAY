@@ -70,9 +70,9 @@ Route::middleware('auth')->group(function () {
 
 // Product API Routes (Public)
 Route::get('/api/products', [ProductController::class, 'index'])->name('api.products.list');
-Route::get('/api/products/{id}', [ProductController::class, 'show'])->name('api.products.show');
 Route::get('/api/products/search', [ProductController::class, 'search'])->name('api.products.search');
 Route::get('/api/products/category/{category}', [ProductController::class, 'getByCategory'])->name('api.products.category');
+Route::get('/api/products/{id}', [ProductController::class, 'show'])->name('api.products.show');
 Route::get('/api/categories', [ProductController::class, 'getCategories'])->name('api.categories');
 Route::get('/api/products-communities', [ProductController::class, 'getCommunities'])->name('api.products.communities');
 
