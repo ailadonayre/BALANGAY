@@ -1,4 +1,5 @@
 <?php
+// app/Models/Seller.php
 
 namespace App\Models;
 
@@ -34,16 +35,12 @@ class Seller extends Authenticatable
 
     protected $casts = [
         'email_verified_at' => 'datetime',
+        'password' => 'hashed',
     ];
 
     public function products()
     {
         return $this->hasMany(Product::class);
-    }
-
-    public function orderItems()
-    {
-        return $this->hasMany(OrderItem::class);
     }
 
     public function approvedProducts()
@@ -54,5 +51,10 @@ class Seller extends Authenticatable
     public function pendingProducts()
     {
         return $this->hasMany(Product::class)->where('approval_status', 'pending');
+    }
+
+    public function orders()
+    {
+        return $this->hasManyThrough(Order::class, Product::class, 'seller_id', 'id', 'id', 'product_id');
     }
 }
