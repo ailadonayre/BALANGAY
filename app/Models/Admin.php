@@ -13,6 +13,7 @@ class Admin extends Authenticatable
         'username',
         'email',
         'password',
+        'full_name',
     ];
 
     protected $hidden = [
@@ -23,4 +24,19 @@ class Admin extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function stories()
+    {
+        return $this->hasMany(Story::class);
+    }
+
+    public function donations()
+    {
+        return $this->hasMany(Donation::class);
+    }
+
+    public function featuredArtists()
+    {
+        return $this->hasMany(FeaturedArtist::class);
+    }
 }

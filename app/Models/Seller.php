@@ -14,7 +14,17 @@ class Seller extends Authenticatable
         'email',
         'phone_number',
         'password',
-        'community',
+        'indigenous_tribe',
+        'seller_type',
+        'shop_name',
+        'shop_description',
+        'profile_picture',
+        'banner_image',
+        'address',
+        'city',
+        'province',
+        'postal_code',
+        'verification_status',
     ];
 
     protected $hidden = [
@@ -29,5 +39,20 @@ class Seller extends Authenticatable
     public function products()
     {
         return $this->hasMany(Product::class);
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class);
+    }
+
+    public function approvedProducts()
+    {
+        return $this->hasMany(Product::class)->where('approval_status', 'approved');
+    }
+
+    public function pendingProducts()
+    {
+        return $this->hasMany(Product::class)->where('approval_status', 'pending');
     }
 }

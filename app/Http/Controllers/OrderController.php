@@ -19,7 +19,9 @@ class OrderController extends Controller
             'customer_phone' => 'required|string'
         ]);
 
-        $cartItems = Cart::where('user_id', auth()->id())->with('product')->get();
+        $cartItems = Cart::where('user_id', auth()->id())
+            ->with('product.seller')
+            ->get();
 
         if ($cartItems->isEmpty()) {
             return response()->json([
@@ -35,15 +37,20 @@ class OrderController extends Controller
             'total_amount' => $total,
             'status' => 'pending',
             'shipping_address' => $request->shipping_address,
-            'payment_method' => $request->payment_method
+            'payment_method' => $request->payment_method,
+            'payment_status' => $request->payment_method === 'cod' ? 'pending' : 'pending',
         ]);
 
         foreach ($cartItems as $cartItem) {
+            $subtotal = $cartItem->quantity * $cartItem->product->price;
+
             OrderItem::create([
                 'order_id' => $order->id,
                 'product_id' => $cartItem->product_id,
+                'seller_id' => $cartItem->product->seller_id,
                 'quantity' => $cartItem->quantity,
-                'unit_price' => $cartItem->product->price
+                'unit_price' => $cartItem->product->price,
+                'subtotal' => $subtotal,
             ]);
 
             // Update stock
@@ -57,7 +64,7 @@ class OrderController extends Controller
             'success' => true,
             'message' => 'Order placed successfully',
             'order_id' => $order->id,
-            'order' => $order
+            'order' => $order->load('items.product')
         ]);
     }
 
@@ -73,8 +80,7 @@ class OrderController extends Controller
 
     public function getOrder($id)
     {
-        $order = Order::with('items.product')
-            ->findOrFail($id);
+        $order = Order::with('items.product')->findOrFail($id);
 
         if ($order->user_id !== auth()->id()) {
             return response()->json(['message' => 'Unauthorized'], 403);

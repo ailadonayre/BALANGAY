@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
@@ -6,19 +7,27 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use App\Models\User;
 use App\Models\Seller;
-use App\Models\Admin;
 
 class RegisterController extends Controller
 {
     public function register(Request $request)
     {
-        $request->validate([
+        $rules = [
             'full_name' => 'required|string|max:255',
-            'email' => 'required|email|unique:users,email|unique:sellers,email|unique:admins,email',
+            'email' => 'required|email|unique:users,email|unique:sellers,email',
             'phone_number' => 'required|string|max:20',
             'password' => 'required|min:8|confirmed',
-            'role' => 'required|in:user,seller,admin'
-        ]);
+            'role' => 'required|in:user,seller',
+        ];
+
+        // Add seller-specific validation
+        if ($request->role === 'seller') {
+            $rules['indigenous_tribe'] = 'required|string|max:100';
+            $rules['seller_type'] = 'required|in:solo,enterprise';
+            $rules['shop_name'] = 'nullable|string|max:255';
+        }
+
+        $request->validate($rules);
 
         $data = [
             'email' => $request->email,
@@ -26,19 +35,30 @@ class RegisterController extends Controller
             'phone_number' => $request->phone_number,
         ];
 
-        $user = match($request->role) {
-            'user' => User::create(array_merge($data, ['full_name' => $request->full_name])),
-            'seller' => Seller::create(array_merge($data, [
-                'artisan_name' => $request->full_name,
-                'community' => $request->community ?? 'Not specified'
-            ])),
-            'admin' => Admin::create(array_merge($data, ['username' => $request->username ?? explode('@', $request->email)[0]])),
-        };
+        if ($request->role === 'user') {
+            $user = User::create(array_merge($data, [
+                'full_name' => $request->full_name,
+            ]));
 
-        return response()->json([
-            'success' => true,
-            'message' => 'Registration successful',
-            'redirect' => route('home')
-        ]);
+            return response()->json([
+                'success' => true,
+                'message' => 'Registration successful',
+                'redirect' => route('home')
+            ]);
+        } else {
+            $seller = Seller::create(array_merge($data, [
+                'artisan_name' => $request->full_name,
+                'indigenous_tribe' => $request->indigenous_tribe,
+                'seller_type' => $request->seller_type,
+                'shop_name' => $request->shop_name ?? $request->full_name . "'s Shop",
+                'verification_status' => 'pending',
+            ]));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Registration successful. Your account is pending verification.',
+                'redirect' => route('seller.dashboard')
+            ]);
+        }
     }
 }

@@ -11,6 +11,7 @@ class ProductController extends Controller
     {
         $products = Product::with('seller')
             ->where('stock', '>', 0)
+            ->where('approval_status', 'approved')
             ->get();
         
         return response()->json($products);
@@ -19,6 +20,7 @@ class ProductController extends Controller
     public function show($id)
     {
         $product = Product::with(['seller', 'orderItems'])
+            ->where('approval_status', 'approved')
             ->findOrFail($id);
         
         return response()->json($product);
@@ -26,7 +28,8 @@ class ProductController extends Controller
 
     public function search(Request $request)
     {
-        $query = Product::with('seller');
+        $query = Product::with('seller')
+            ->where('approval_status', 'approved');
 
         if ($request->filled('q')) {
             $query->where('name', 'like', '%' . $request->q . '%')
@@ -58,13 +61,17 @@ class ProductController extends Controller
 
     public function getCategories()
     {
-        $categories = Product::distinct()->pluck('category');
+        $categories = Product::where('approval_status', 'approved')
+            ->distinct()
+            ->pluck('category');
         return response()->json($categories);
     }
 
     public function getCommunities()
     {
-        $communities = Product::distinct()->pluck('community');
+        $communities = Product::where('approval_status', 'approved')
+            ->distinct()
+            ->pluck('community');
         return response()->json($communities);
     }
 
@@ -73,8 +80,20 @@ class ProductController extends Controller
         $products = Product::with('seller')
             ->where('category', $category)
             ->where('stock', '>', 0)
+            ->where('approval_status', 'approved')
             ->get();
         
         return response()->json(['data' => $products]);
+    }
+
+    public function getFeatured()
+    {
+        $products = Product::with('seller')
+            ->where('featured', true)
+            ->where('approval_status', 'approved')
+            ->where('stock', '>', 0)
+            ->get();
+        
+        return response()->json($products);
     }
 }

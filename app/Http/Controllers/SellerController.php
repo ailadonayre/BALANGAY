@@ -4,19 +4,35 @@ namespace App\Http\Controllers;
 
 use App\Models\Seller;
 use App\Models\Product;
+use App\Models\Order;
+use App\Models\OrderItem;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Hash;
 
 class SellerController extends Controller
 {
-    /**
-     * Get seller's products
-     */
+    public function dashboard()
+    {
+        $seller = Auth::guard('seller')->user();
+        
+        $stats = [
+            'total_products' => $seller->products()->count(),
+            'approved_products' => $seller->approvedProducts()->count(),
+            'pending_products' => $seller->pendingProducts()->count(),
+            'total_sales' => $seller->orderItems()->sum('subtotal'),
+            'orders_count' => $seller->orderItems()->distinct('order_id')->count(),
+            'verification_status' => $seller->verification_status,
+        ];
+
+        return view('seller.dashboard', compact('stats'));
+    }
+
     public function getProducts($sellerId)
     {
         try {
             $seller = Seller::findOrFail($sellerId);
-            $products = $seller->products()->get();
+            $products = $seller->products()->orderBy('created_at', 'desc')->get();
             
             return response()->json($products);
         } catch (\Exception $e) {
@@ -24,17 +40,14 @@ class SellerController extends Controller
         }
     }
 
-    /**
-     * Create a new product
-     */
     public function createProduct(Request $request)
     {
         $request->validate([
-            'name' => 'required|string',
+            'name' => 'required|string|max:255',
             'description' => 'required|string',
             'price' => 'required|numeric|min:0',
             'stock' => 'required|integer|min:0',
-            'category' => 'required|string',
+            'category' => 'required|string|max:100',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
@@ -56,12 +69,14 @@ class SellerController extends Controller
                 'price' => $request->price,
                 'stock' => $request->stock,
                 'category' => $request->category,
+                'community' => $seller->indigenous_tribe,
                 'image' => $imagePath ?? 'default.jpg',
+                'approval_status' => 'pending',
             ]);
 
             return response()->json([
                 'success' => true,
-                'message' => 'Product created successfully',
+                'message' => 'Product created successfully and pending approval',
                 'product' => $product
             ]);
         } catch (\Exception $e) {
@@ -72,17 +87,14 @@ class SellerController extends Controller
         }
     }
 
-    /**
-     * Update a product
-     */
     public function updateProduct(Request $request, $productId)
     {
         $request->validate([
-            'name' => 'sometimes|required|string',
+            'name' => 'sometimes|required|string|max:255',
             'description' => 'sometimes|required|string',
             'price' => 'sometimes|required|numeric|min:0',
             'stock' => 'sometimes|required|integer|min:0',
-            'category' => 'sometimes|required|string',
+            'category' => 'sometimes|required|string|max:100',
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
@@ -91,7 +103,6 @@ class SellerController extends Controller
         try {
             $product = Product::findOrFail($productId);
 
-            // Verify seller owns this product
             if ($product->seller_id !== $seller->id) {
                 return response()->json([
                     'success' => false,
@@ -100,7 +111,6 @@ class SellerController extends Controller
             }
 
             if ($request->hasFile('image')) {
-                // Delete old image if it exists
                 if ($product->image && $product->image !== 'default.jpg') {
                     $oldPath = public_path('assets/products/' . $product->image);
                     if (file_exists($oldPath)) {
@@ -115,10 +125,14 @@ class SellerController extends Controller
             }
 
             $product->update($request->only('name', 'description', 'price', 'stock', 'category'));
+            
+            // Reset approval status when product is edited
+            $product->approval_status = 'pending';
+            $product->save();
 
             return response()->json([
                 'success' => true,
-                'message' => 'Product updated successfully',
+                'message' => 'Product updated successfully and pending re-approval',
                 'product' => $product
             ]);
         } catch (\Exception $e) {
@@ -129,9 +143,6 @@ class SellerController extends Controller
         }
     }
 
-    /**
-     * Delete a product
-     */
     public function deleteProduct($productId)
     {
         $seller = Auth::guard('seller')->user();
@@ -139,7 +150,6 @@ class SellerController extends Controller
         try {
             $product = Product::findOrFail($productId);
 
-            // Verify seller owns this product
             if ($product->seller_id !== $seller->id) {
                 return response()->json([
                     'success' => false,
@@ -147,7 +157,6 @@ class SellerController extends Controller
                 ], 403);
             }
 
-            // Delete image if it exists
             if ($product->image && $product->image !== 'default.jpg') {
                 $imagePath = public_path('assets/products/' . $product->image);
                 if (file_exists($imagePath)) {
@@ -167,5 +176,121 @@ class SellerController extends Controller
                 'message' => 'Error deleting product: ' . $e->getMessage()
             ], 500);
         }
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $seller = Auth::guard('seller')->user();
+
+        $request->validate([
+            'artisan_name' => 'sometimes|required|string|max:255',
+            'shop_name' => 'sometimes|required|string|max:255',
+            'shop_description' => 'nullable|string',
+            'phone_number' => 'sometimes|required|string|max:20',
+            'address' => 'nullable|string',
+            'city' => 'nullable|string|max:100',
+            'province' => 'nullable|string|max:100',
+            'postal_code' => 'nullable|string|max:20',
+            'profile_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'banner_image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        try {
+            if ($request->hasFile('profile_picture')) {
+                if ($seller->profile_picture && file_exists(public_path('assets/sellers/profiles/' . $seller->profile_picture))) {
+                    unlink(public_path('assets/sellers/profiles/' . $seller->profile_picture));
+                }
+
+                $file = $request->file('profile_picture');
+                $filename = 'profile_' . $seller->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('assets/sellers/profiles'), $filename);
+                $seller->profile_picture = $filename;
+            }
+
+            if ($request->hasFile('banner_image')) {
+                if ($seller->banner_image && file_exists(public_path('assets/sellers/banners/' . $seller->banner_image))) {
+                    unlink(public_path('assets/sellers/banners/' . $seller->banner_image));
+                }
+
+                $file = $request->file('banner_image');
+                $filename = 'banner_' . $seller->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+                $file->move(public_path('assets/sellers/banners'), $filename);
+                $seller->banner_image = $filename;
+            }
+
+            $seller->update($request->only([
+                'artisan_name',
+                'shop_name',
+                'shop_description',
+                'phone_number',
+                'address',
+                'city',
+                'province',
+                'postal_code',
+            ]));
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile updated successfully',
+                'seller' => $seller
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating profile: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function getAnalytics()
+    {
+        $seller = Auth::guard('seller')->user();
+
+        $analytics = [
+            'total_products' => $seller->products()->count(),
+            'approved_products' => $seller->approvedProducts()->count(),
+            'pending_products' => $seller->pendingProducts()->count(),
+            'rejected_products' => $seller->products()->where('approval_status', 'rejected')->count(),
+            
+            'total_sales' => $seller->orderItems()->sum('subtotal'),
+            'total_orders' => $seller->orderItems()->distinct('order_id')->count(),
+            'total_items_sold' => $seller->orderItems()->sum('quantity'),
+            
+            'sales_this_month' => $seller->orderItems()
+                ->whereHas('order', function($query) {
+                    $query->whereMonth('created_at', now()->month);
+                })
+                ->sum('subtotal'),
+            
+            'orders_this_month' => $seller->orderItems()
+                ->whereHas('order', function($query) {
+                    $query->whereMonth('created_at', now()->month);
+                })
+                ->distinct('order_id')
+                ->count(),
+
+            'best_selling_products' => $seller->products()
+                ->withCount(['orderItems as total_sold' => function($query) {
+                    $query->selectRaw('sum(quantity)');
+                }])
+                ->orderBy('total_sold', 'desc')
+                ->take(5)
+                ->get(),
+        ];
+
+        return response()->json($analytics);
+    }
+
+    public function getOrders()
+    {
+        $seller = Auth::guard('seller')->user();
+
+        $orders = OrderItem::with(['order.user', 'product'])
+            ->where('seller_id', $seller->id)
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy('order_id');
+
+        return response()->json($orders);
     }
 }

@@ -44,15 +44,12 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3">I am a:</label>
-                        <div class="grid grid-cols-3 gap-2">
+                        <div class="grid grid-cols-2 gap-2">
                             <button type="button" class="role-signin-btn py-2 px-3 text-sm border-2 border-[#5B5843] bg-[#5B5843] text-white rounded-lg transition-all duration-300" data-role="user">
                                 User
                             </button>
                             <button type="button" class="role-signin-btn py-2 px-3 text-sm border-2 border-gray-300 rounded-lg hover:border-[#5B5843] transition-all duration-300" data-role="seller">
                                 Seller
-                            </button>
-                            <button type="button" class="role-signin-btn py-2 px-3 text-sm border-2 border-gray-300 rounded-lg hover:border-[#5B5843] transition-all duration-300" data-role="admin">
-                                Admin
                             </button>
                         </div>
                         <input type="hidden" name="role" id="signin-role" value="user" required>
@@ -75,15 +72,12 @@
                     @csrf
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3">I want to join as:</label>
-                        <div class="grid grid-cols-3 gap-2">
+                        <div class="grid grid-cols-2 gap-2">
                             <button type="button" class="role-signup-btn py-2 px-3 text-sm border-2 border-[#5B5843] bg-[#5B5843] text-white rounded-lg transition-all duration-300" data-role="user">
                                 User
                             </button>
                             <button type="button" class="role-signup-btn py-2 px-3 text-sm border-2 border-gray-300 rounded-lg hover:border-[#5B5843] transition-all duration-300" data-role="seller">
                                 Seller
-                            </button>
-                            <button type="button" class="role-signup-btn py-2 px-3 text-sm border-2 border-gray-300 rounded-lg hover:border-[#5B5843] transition-all duration-300" data-role="admin">
-                                Admin
                             </button>
                         </div>
                         <input type="hidden" name="role" id="signup-role" value="user" required>
@@ -100,9 +94,43 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2">Phone Number</label>
                         <input type="tel" name="phone_number" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent transition-all duration-300" placeholder="+63 912 345 6789">
                     </div>
-                    <div id="community-field" class="hidden">
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Community</label>
-                        <input type="text" name="community" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent transition-all duration-300" placeholder="Indigenous Community">
+                    <!-- Seller-specific fields -->
+                    <div id="seller-fields" class="hidden space-y-4">
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Indigenous Tribe *</label>
+                            <select name="indigenous_tribe" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent transition-all duration-300">
+                                <option value="">Select your tribe</option>
+                                <option value="Ati">Ati</option>
+                                <option value="Igorot">Igorot</option>
+                                <option value="Lumad">Lumad</option>
+                                <option value="Mangyan">Mangyan</option>
+                                <option value="T'boli">T'boli</option>
+                                <option value="Kalinga">Kalinga</option>
+                                <option value="Ifugao">Ifugao</option>
+                                <option value="Maguindanao">Maguindanao</option>
+                                <option value="Bagobo">Bagobo</option>
+                                <option value="Yakan">Yakan</option>
+                                <option value="Isnag">Isnag</option>
+                                <option value="Manobo">Manobo</option>
+                                <option value="Other">Other</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Seller Type *</label>
+                            <div class="grid grid-cols-2 gap-2">
+                                <button type="button" class="seller-type-btn py-2 px-3 text-sm border-2 border-[#5B5843] bg-[#5B5843] text-white rounded-lg transition-all duration-300" data-type="solo">
+                                    Solo Seller
+                                </button>
+                                <button type="button" class="seller-type-btn py-2 px-3 text-sm border-2 border-gray-300 rounded-lg hover:border-[#5B5843] transition-all duration-300" data-type="enterprise">
+                                    Enterprise
+                                </button>
+                            </div>
+                            <input type="hidden" name="seller_type" id="seller-type-input" value="solo">
+                        </div>
+                        <div>
+                            <label class="block text-sm font-medium text-gray-700 mb-2">Shop Name (Optional)</label>
+                            <input type="text" name="shop_name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent transition-all duration-300" placeholder="Your Shop Name">
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
@@ -206,15 +234,30 @@ document.querySelectorAll('.role-signup-btn').forEach(btn => {
         this.classList.remove('border-gray-300', 'text-gray-700');
         document.getElementById('signup-role').value = this.dataset.role;
         
-        // Show community field for sellers
-        const communityField = document.getElementById('community-field');
+        // Show/hide seller fields
+        const sellerFields = document.getElementById('seller-fields');
+        const indigenousTribeSelect = document.querySelector('select[name="indigenous_tribe"]');
+        
         if (this.dataset.role === 'seller') {
-            communityField.classList.remove('hidden');
-            communityField.querySelector('input').required = true;
+            sellerFields.classList.remove('hidden');
+            indigenousTribeSelect.required = true;
         } else {
-            communityField.classList.add('hidden');
-            communityField.querySelector('input').required = false;
+            sellerFields.classList.add('hidden');
+            indigenousTribeSelect.required = false;
         }
+    });
+});
+
+// Seller type selection
+document.querySelectorAll('.seller-type-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        document.querySelectorAll('.seller-type-btn').forEach(b => {
+            b.classList.remove('border-[#5B5843]', 'bg-[#5B5843]', 'text-white');
+            b.classList.add('border-gray-300', 'text-gray-700');
+        });
+        this.classList.add('border-[#5B5843]', 'bg-[#5B5843]', 'text-white');
+        this.classList.remove('border-gray-300', 'text-gray-700');
+        document.getElementById('seller-type-input').value = this.dataset.type;
     });
 });
 
@@ -277,4 +320,11 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
         errorDiv.classList.remove('hidden');
     }
 });
+
+// Auto-open modal after 20 seconds if not logged in
+@guest
+setTimeout(() => {
+    document.getElementById('auth-modal').classList.remove('hidden');
+}, 20000);
+@endguest
 </script>

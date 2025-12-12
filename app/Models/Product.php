@@ -18,11 +18,15 @@ class Product extends Model
         'seller_id',
         'community',
         'stock',
+        'approval_status',
+        'rejection_reason',
+        'featured',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'stock' => 'integer',
+        'featured' => 'boolean',
     ];
 
     public function seller()
@@ -38,5 +42,20 @@ class Product extends Model
     public function orderItems()
     {
         return $this->hasMany(OrderItem::class);
+    }
+
+    public function scopeApproved($query)
+    {
+        return $query->where('approval_status', 'approved');
+    }
+
+    public function scopePending($query)
+    {
+        return $query->where('approval_status', 'pending');
+    }
+
+    public function scopeFeatured($query)
+    {
+        return $query->where('featured', true);
     }
 }
