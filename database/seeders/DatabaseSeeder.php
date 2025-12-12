@@ -22,6 +22,9 @@ class DatabaseSeeder extends Seeder
             'email' => 'test@example.com',
         ]);
 
+        // Run admin seeder
+        $this->call(AdminSeeder::class);
+        
         // Run product seeder
         $this->call(ProductSeeder::class);
         

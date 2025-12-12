@@ -44,12 +44,15 @@
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3">I am a:</label>
-                        <div class="grid grid-cols-2 gap-2">
+                        <div class="grid grid-cols-3 gap-2">
                             <button type="button" class="role-signin-btn py-2 px-3 text-sm border-2 border-[#5B5843] bg-[#5B5843] text-white rounded-lg transition-all duration-300" data-role="user">
                                 User
                             </button>
                             <button type="button" class="role-signin-btn py-2 px-3 text-sm border-2 border-gray-300 rounded-lg hover:border-[#5B5843] transition-all duration-300" data-role="seller">
                                 Seller
+                            </button>
+                            <button type="button" class="role-signin-btn py-2 px-3 text-sm border-2 border-gray-300 rounded-lg hover:border-[#5B5843] transition-all duration-300" data-role="admin">
+                                Admin
                             </button>
                         </div>
                         <input type="hidden" name="role" id="signin-role" value="user" required>
