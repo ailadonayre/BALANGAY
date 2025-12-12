@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Order;
 use App\Models\OrderItem;
 use App\Models\Cart;
+use Illuminate\Support\Facades\Auth;
 
 class OrderController extends Controller
 {
@@ -19,7 +20,7 @@ class OrderController extends Controller
             'customer_phone' => 'required|string'
         ]);
 
-        $cartItems = Cart::where('user_id', auth()->id())
+        $cartItems = Cart::where('user_id', Auth::id())
             ->with('product.seller')
             ->get();
 
@@ -33,7 +34,7 @@ class OrderController extends Controller
         $total = $cartItems->sum(fn($item) => $item->quantity * $item->product->price);
 
         $order = Order::create([
-            'user_id' => auth()->id(),
+            'user_id' => Auth::id(),
             'total_amount' => $total,
             'status' => 'pending',
             'shipping_address' => $request->shipping_address,
@@ -58,7 +59,7 @@ class OrderController extends Controller
         }
 
         // Clear cart
-        Cart::where('user_id', auth()->id())->delete();
+        Cart::where('user_id', Auth::id())->delete();
 
         return response()->json([
             'success' => true,
@@ -70,7 +71,7 @@ class OrderController extends Controller
 
     public function getOrders()
     {
-        $orders = Order::where('user_id', auth()->id())
+        $orders = Order::where('user_id', Auth::id())
             ->with('items.product')
             ->orderBy('created_at', 'desc')
             ->get();
@@ -82,7 +83,7 @@ class OrderController extends Controller
     {
         $order = Order::with('items.product')->findOrFail($id);
 
-        if ($order->user_id !== auth()->id()) {
+        if ($order->user_id !== Auth::id()) {
             return response()->json(['message' => 'Unauthorized'], 403);
         }
 

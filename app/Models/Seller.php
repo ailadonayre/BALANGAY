@@ -5,7 +5,16 @@ namespace App\Models;
 
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
+/**
+ * @property-read HasMany $products
+ * @property-read HasMany $approvedProducts
+ * @property-read HasMany $pendingProducts
+ * @property-read HasMany $orderItems
+ * @property-read HasManyThrough $orders
+ */
 class Seller extends Authenticatable
 {
     use Notifiable;
@@ -56,5 +65,10 @@ class Seller extends Authenticatable
     public function orders()
     {
         return $this->hasManyThrough(Order::class, Product::class, 'seller_id', 'id', 'id', 'product_id');
+    }
+
+    public function orderItems()
+    {
+        return $this->hasMany(OrderItem::class, 'seller_id');
     }
 }

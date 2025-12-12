@@ -14,6 +14,7 @@ class SellerController extends Controller
 {
     public function dashboard()
     {
+        /** @var Seller $seller */
         $seller = Auth::guard('seller')->user();
         
         $stats = [
@@ -180,6 +181,7 @@ class SellerController extends Controller
 
     public function updateProfile(Request $request)
     {
+        /** @var Seller $seller */
         $seller = Auth::guard('seller')->user();
 
         $request->validate([
@@ -244,6 +246,7 @@ class SellerController extends Controller
 
     public function getAnalytics()
     {
+        /** @var Seller $seller */
         $seller = Auth::guard('seller')->user();
 
         $analytics = [
@@ -283,6 +286,7 @@ class SellerController extends Controller
 
     public function getOrders()
     {
+        /** @var Seller $seller */
         $seller = Auth::guard('seller')->user();
 
         $orders = OrderItem::with(['order.user', 'product'])
