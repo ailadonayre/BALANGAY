@@ -9,6 +9,7 @@ use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\CommunityController;
 use App\Http\Controllers\SellerController;
+use App\Http\Controllers\AdminController;
 
 // Public Routes
 Route::get('/', function () {

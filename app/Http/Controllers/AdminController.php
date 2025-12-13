@@ -36,46 +36,56 @@ class AdminController extends Controller
 
     public function getAnalytics()
     {
-        $analytics = [
-            // User Analytics
-            'total_users' => User::count(),
-            
-            // Seller Analytics
-            'total_sellers' => Seller::count(),
-            'verified_sellers' => Seller::where('verification_status', 'approved')->count(),
-            'pending_sellers' => Seller::where('verification_status', 'pending')->count(),
-            'sellers_by_tribe' => Seller::selectRaw('indigenous_tribe, count(*) as count')
-                ->groupBy('indigenous_tribe')
-                ->get(),
-            
-            // Product Analytics
-            'total_products' => Product::count(),
-            'approved_products' => Product::where('approval_status', 'approved')->count(),
-            'pending_products' => Product::where('approval_status', 'pending')->count(),
-            
-            // Order Analytics
-            'total_orders' => Order::count(),
-            'orders_this_month' => Order::whereMonth('created_at', now()->month)->count(),
-            'total_revenue' => Order::where('payment_status', 'paid')->sum('total_amount'),
-            'revenue_this_month' => Order::whereMonth('created_at', now()->month)
-                ->where('payment_status', 'paid')
-                ->sum('total_amount'),
-            
-            // Homepage Stats
-            'artisans_supported' => Seller::where('verification_status', 'approved')->count(),
-            'products_sold' => OrderItem::sum('quantity'),
-            'income_provided' => OrderItem::sum('subtotal'),
-            'orders_count' => Order::count(),
-        ];
+        try {
+            $analytics = [
+                // User Analytics
+                'total_users' => User::count(),
+                
+                // Seller Analytics
+                'total_sellers' => Seller::count(),
+                'verified_sellers' => Seller::where('verification_status', 'approved')->count(),
+                'pending_sellers' => Seller::where('verification_status', 'pending')->count(),
+                'sellers_by_tribe' => Seller::selectRaw('indigenous_tribe, count(*) as count')
+                    ->groupBy('indigenous_tribe')
+                    ->get(),
+                
+                // Product Analytics
+                'total_products' => Product::count(),
+                'approved_products' => Product::where('approval_status', 'approved')->count(),
+                'pending_products' => Product::where('approval_status', 'pending')->count(),
+                
+                // Order Analytics
+                'total_orders' => Order::count(),
+                'orders_this_month' => Order::whereMonth('created_at', now()->month)->count(),
+                'total_revenue' => Order::where('payment_status', 'paid')->sum('total_amount') ?? 0,
+                'revenue_this_month' => Order::whereMonth('created_at', now()->month)
+                    ->where('payment_status', 'paid')
+                    ->sum('total_amount') ?? 0,
+                
+                // Homepage Stats
+                'artisans_supported' => Seller::where('verification_status', 'approved')->count(),
+                'products_sold' => OrderItem::sum('quantity') ?? 0,
+                'income_provided' => OrderItem::sum('subtotal') ?? 0,
+                'orders_count' => Order::count(),
+            ];
 
-        return response()->json($analytics);
+            return response()->json($analytics);
+        } catch (\Exception $e) {
+            \Log::error('Analytics Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     // User Management
     public function getUsers()
     {
-        $users = User::orderBy('created_at', 'desc')->get();
-        return response()->json($users);
+        try {
+            $users = User::orderBy('created_at', 'desc')->get();
+            return response()->json($users);
+        } catch (\Exception $e) {
+            \Log::error('Get Users Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function deleteUser($id)
@@ -88,18 +98,23 @@ class AdminController extends Controller
     // Seller Management
     public function getSellers(Request $request)
     {
-        $query = Seller::query();
+        try {
+            $query = Seller::query();
 
-        if ($request->has('status')) {
-            $query->where('verification_status', $request->status);
+            if ($request->has('status')) {
+                $query->where('verification_status', $request->status);
+            }
+
+            if ($request->has('tribe')) {
+                $query->where('indigenous_tribe', $request->tribe);
+            }
+
+            $sellers = $query->orderBy('created_at', 'desc')->get();
+            return response()->json($sellers);
+        } catch (\Exception $e) {
+            \Log::error('Get Sellers Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        if ($request->has('tribe')) {
-            $query->where('indigenous_tribe', $request->tribe);
-        }
-
-        $sellers = $query->orderBy('created_at', 'desc')->get();
-        return response()->json($sellers);
     }
 
     public function updateSellerStatus(Request $request, $id)
@@ -128,14 +143,19 @@ class AdminController extends Controller
     // Product Management
     public function getProducts(Request $request)
     {
-        $query = Product::with('seller');
+        try {
+            $query = Product::with('seller');
 
-        if ($request->has('status')) {
-            $query->where('approval_status', $request->status);
+            if ($request->has('status')) {
+                $query->where('approval_status', $request->status);
+            }
+
+            $products = $query->orderBy('created_at', 'desc')->get();
+            return response()->json($products);
+        } catch (\Exception $e) {
+            \Log::error('Get Products Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        $products = $query->orderBy('created_at', 'desc')->get();
-        return response()->json($products);
     }
 
     public function updateProductStatus(Request $request, $id)
@@ -191,8 +211,13 @@ class AdminController extends Controller
     // Story Management
     public function getStories()
     {
-        $stories = Story::with('admin')->orderBy('created_at', 'desc')->get();
-        return response()->json($stories);
+        try {
+            $stories = Story::orderBy('created_at', 'desc')->get();
+            return response()->json($stories);
+        } catch (\Exception $e) {
+            \Log::error('Get Stories Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function createStory(Request $request)
@@ -291,8 +316,13 @@ class AdminController extends Controller
     // Donation Management
     public function getDonations()
     {
-        $donations = Donation::orderBy('created_at', 'desc')->get();
-        return response()->json($donations);
+        try {
+            $donations = Donation::orderBy('created_at', 'desc')->get();
+            return response()->json($donations);
+        } catch (\Exception $e) {
+            \Log::error('Get Donations Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function createDonation(Request $request)
@@ -386,10 +416,15 @@ class AdminController extends Controller
     // Featured Artist Management
     public function getFeaturedArtists()
     {
-        $artists = FeaturedArtist::with(['seller', 'admin'])
-            ->orderBy('display_order')
-            ->get();
-        return response()->json($artists);
+        try {
+            $artists = FeaturedArtist::with(['seller', 'admin'])
+                ->orderBy('display_order')
+                ->get();
+            return response()->json($artists);
+        } catch (\Exception $e) {
+            \Log::error('Get Featured Artists Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
     }
 
     public function createFeaturedArtist(Request $request)
