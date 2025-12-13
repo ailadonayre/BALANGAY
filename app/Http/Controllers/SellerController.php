@@ -70,7 +70,7 @@ class SellerController extends Controller
                 'price' => $request->price,
                 'stock' => $request->stock,
                 'category' => $request->category,
-                'community' => $seller->indigenous_tribe,
+                'community' => $seller->indigenous_tribe ?? $seller->shop_name ?? 'Independent Artisan',
                 'image' => $imagePath ?? 'default.jpg',
                 'approval_status' => 'pending',
             ]);

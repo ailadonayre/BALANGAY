@@ -34,7 +34,7 @@ Route::get('/stories', function () {
 // Auth Routes
 Route::post('/auth/login', [LoginController::class, 'login'])->name('login');
 Route::post('/auth/register', [RegisterController::class, 'register'])->name('register');
-Route::post('/auth/logout', [LoginController::class, 'logout'])->name('logout')->middleware('auth');
+Route::post('/auth/logout', [LoginController::class, 'logout'])->name('logout')->middleware(['auth:web,seller,admin']);
 
 // Protected Routes - User Only
 Route::middleware('auth')->group(function () {
