@@ -23,31 +23,44 @@
                     <a href="{{ route('seller.dashboard') }}" class="text-gray-700 hover:text-[#5B5843] transition-colors duration-300 text-sm font-medium">
                         Dashboard
                     </a>
-                @endauth('seller')
-                
-                @auth
-                    <!-- Logged In User -->
-                    <a href="{{ route('profile') }}" class="text-gray-700 hover:text-[#5B5843] transition-colors duration-300" aria-label="Profile">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                    </a>
                 @else
-                    <!-- Not Logged In -->
-                    <button onclick="document.getElementById('auth-modal').classList.remove('hidden')" class="text-gray-700 hover:text-[#5B5843] transition-colors duration-300" aria-label="Account">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                        </svg>
-                    </button>
-                @endauth
+                    @auth
+                        <!-- Logged In User - Profile Icon Links to Profile -->
+                        <a href="{{ route('profile') }}" class="text-gray-700 hover:text-[#5B5843] transition-colors duration-300" aria-label="Profile">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </a>
+                    @else
+                        <!-- Not Logged In - Profile Icon Opens Auth Modal -->
+                        <button onclick="openAuthModal()" class="text-gray-700 hover:text-[#5B5843] transition-colors duration-300" aria-label="Account">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                            </svg>
+                        </button>
+                    @endauth
+                @endauth('seller')
 
-                <button onclick="handleCartClick()" 
-                   class="text-gray-700 hover:text-[#5B5843] transition-colors duration-300 relative" aria-label="Cart">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-                    </svg>
-                    <span id="cart-count" class="absolute -top-2 -right-2 bg-[#5B5843] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
-                </button>
+                <!-- Cart Icon - Only for Non-Sellers -->
+                @if (!auth('seller')->check())
+                    @auth
+                        <!-- Logged In User - Cart Icon Links to Cart -->
+                        <a href="{{ route('cart') }}" class="text-gray-700 hover:text-[#5B5843] transition-colors duration-300 relative" aria-label="Cart">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                            <span id="cart-count" class="absolute -top-2 -right-2 bg-[#5B5843] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                        </a>
+                    @else
+                        <!-- Not Logged In - Cart Icon Opens Auth Modal -->
+                        <button onclick="openAuthModal()" class="text-gray-700 hover:text-[#5B5843] transition-colors duration-300 relative" aria-label="Cart">
+                            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                            </svg>
+                            <span id="cart-count" class="absolute -top-2 -right-2 bg-[#5B5843] text-white text-xs rounded-full h-5 w-5 flex items-center justify-center">0</span>
+                        </button>
+                    @endauth
+                @endif
 
                 <!-- Mobile Menu Button -->
                 <button class="md:hidden text-gray-700" id="mobile-menu-button">
@@ -93,6 +106,14 @@ function setupNavLinks() {
             }
         });
     });
+}
+
+// Open auth modal
+function openAuthModal() {
+    const modal = document.getElementById('auth-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+    }
 }
 
 // Handle cart click with auth check

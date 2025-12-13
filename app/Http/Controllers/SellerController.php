@@ -297,4 +297,88 @@ class SellerController extends Controller
 
         return response()->json($orders);
     }
+
+    public function getProfile()
+    {
+        $seller = Auth::guard('seller')->user();
+        return response()->json($seller);
+    }
+
+    public function updateBanner(Request $request)
+    {
+        $request->validate([
+            'banner_image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        $seller = Auth::guard('seller')->user();
+
+        try {
+            // Delete old banner if exists
+            if ($seller->banner_image && file_exists(public_path('assets/sellers/banners/' . $seller->banner_image))) {
+                unlink(public_path('assets/sellers/banners/' . $seller->banner_image));
+            }
+
+            // Create directories if they don't exist
+            if (!file_exists(public_path('assets/sellers/banners'))) {
+                mkdir(public_path('assets/sellers/banners'), 0755, true);
+            }
+
+            $file = $request->file('banner_image');
+            $filename = 'banner_' . $seller->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/sellers/banners'), $filename);
+
+            $seller->banner_image = $filename;
+            $seller->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Banner updated successfully',
+                'banner_url' => asset('assets/sellers/banners/' . $filename)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating banner: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    public function updateProfilePicture(Request $request)
+    {
+        $request->validate([
+            'profile_picture' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
+        ]);
+
+        $seller = Auth::guard('seller')->user();
+
+        try {
+            // Delete old profile picture if exists
+            if ($seller->profile_picture && file_exists(public_path('assets/sellers/profiles/' . $seller->profile_picture))) {
+                unlink(public_path('assets/sellers/profiles/' . $seller->profile_picture));
+            }
+
+            // Create directories if they don't exist
+            if (!file_exists(public_path('assets/sellers/profiles'))) {
+                mkdir(public_path('assets/sellers/profiles'), 0755, true);
+            }
+
+            $file = $request->file('profile_picture');
+            $filename = 'profile_' . $seller->id . '_' . time() . '.' . $file->getClientOriginalExtension();
+            $file->move(public_path('assets/sellers/profiles'), $filename);
+
+            $seller->profile_picture = $filename;
+            $seller->save();
+
+            return response()->json([
+                'success' => true,
+                'message' => 'Profile picture updated successfully',
+                'profile_url' => asset('assets/sellers/profiles/' . $filename)
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error updating profile picture: ' . $e->getMessage()
+            ], 500);
+        }
+    }
 }

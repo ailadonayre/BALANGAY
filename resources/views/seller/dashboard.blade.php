@@ -156,13 +156,13 @@
         <div class="bg-white rounded-xl shadow-lg mb-6 overflow-hidden">
             <div class="border-b border-gray-200">
                 <nav class="flex -mb-px overflow-x-auto">
-                    <button onclick="switchSellerTab('products')" class="seller-tab active px-6 py-4 text-sm font-medium border-b-2 border-[#5B5843] text-[#5B5843] whitespace-nowrap">
+                    <button onclick="switchSellerTab(event, 'products')" class="seller-tab products-tab active px-6 py-4 text-sm font-medium border-b-2 border-[#5B5843] text-[#5B5843] whitespace-nowrap">
                         Products
                     </button>
-                    <button onclick="switchSellerTab('analytics')" class="seller-tab px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap">
+                    <button onclick="switchSellerTab(event, 'analytics')" class="seller-tab analytics-tab px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap">
                         Analytics
                     </button>
-                    <button onclick="switchSellerTab('orders')" class="seller-tab px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap">
+                    <button onclick="switchSellerTab(event, 'orders')" class="seller-tab orders-tab px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 whitespace-nowrap">
                         Orders
                     </button>
                 </nav>
@@ -394,26 +394,217 @@
     </div>
 </div>
 
-@endsection
-
-@push('scripts')
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-    // ----------------------
-    // Tab Switching
-    // ----------------------
-    function switchSellerTab(tab) {
-        document.querySelectorAll('.seller-content').forEach(el => el.classList.add('hidden'));
-        document.getElementById(`${tab}-tab`).classList.remove('hidden');
-
-        document.querySelectorAll('.seller-tab').forEach(btn => btn.classList.remove('active', 'border-[#5B5843]', 'text-[#5B5843]'));
-        document.querySelector(`.seller-tab[onclick="switchSellerTab('${tab}')"]`).classList.add('active', 'border-[#5B5843]', 'text-[#5B5843]');
+    // Seller ID (from Auth)
+    const sellerId = {{ Auth::guard('seller')->user()?->id ?? 0 }};
+    
+    // Verify seller is logged in
+    if (!sellerId || sellerId === 0) {
+        console.error('Seller not authenticated');
+        window.location.href = '/';
     }
 
-    // ----------------------
-    // Product Modal Functions
-    // ----------------------
+    // ===== TAB SWITCHING =====
+    function switchSellerTab(event, tabName) {
+        event.preventDefault();
+        
+        // Hide all content tabs
+        document.querySelectorAll('.seller-content').forEach(el => el.classList.add('hidden'));
+        
+        // Show selected content tab
+        const selectedTab = document.getElementById(`${tabName}-tab`);
+        if (selectedTab) {
+            selectedTab.classList.remove('hidden');
+        }
+
+        // Update tab button styling - remove active state from all
+        document.querySelectorAll('.seller-tab').forEach(btn => {
+            btn.classList.remove('active', 'border-[#5B5843]', 'text-[#5B5843]');
+            btn.classList.add('border-transparent', 'text-gray-500');
+        });
+        
+        // Mark current tab button as active
+        if (event.target && event.target.classList) {
+            event.target.classList.add('border-[#5B5843]', 'text-[#5B5843]');
+            event.target.classList.remove('border-transparent', 'text-gray-500');
+        }
+        
+        // Load content for specific tabs
+        if (tabName === 'analytics') {
+            loadAnalytics();
+        } else if (tabName === 'orders') {
+            loadOrders();
+        }
+    }
+
+    // ===== NOTIFICATION TOAST =====
+    function showNotification(message, type = 'success') {
+        const toast = document.getElementById('notification-toast');
+        const icon = document.getElementById('notification-icon');
+        const msg = document.getElementById('notification-message');
+
+        msg.textContent = message;
+
+        // Update icon color
+        icon.classList.remove('text-green-600', 'text-red-600');
+        if (type === 'success') {
+            icon.classList.add('text-green-600');
+        } else if (type === 'error') {
+            icon.classList.add('text-red-600');
+        }
+
+        toast.classList.remove('hidden');
+        setTimeout(() => {
+            toast.classList.add('hidden');
+        }, 3000);
+    }
+
+    // ===== BANNER AND PROFILE UPLOAD =====
+    function uploadBanner(input) {
+        if (!input.files || !input.files[0]) return;
+
+        const formData = new FormData();
+        formData.append('banner_image', input.files[0]);
+
+        fetch('/api/seller/update-banner', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            return res.json();
+        })
+        .then(data => {
+            if (data.success) {
+                document.getElementById('banner-preview').src = data.banner_url + '?t=' + new Date().getTime();
+                showNotification('Banner updated successfully!');
+                // Reset the file input
+                input.value = '';
+            } else {
+                showNotification(data.message || 'Failed to update banner', 'error');
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            showNotification('Error uploading banner: ' + err.message, 'error');
+        });
+    }
+
+    function uploadProfile(input) {
+        if (!input.files || !input.files[0]) return;
+
+        const formData = new FormData();
+        formData.append('profile_picture', input.files[0]);
+
+        fetch('/api/seller/update-profile-picture', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            return res.json();
+        })
+        .then(data => {
+            if (data.success) {
+                document.getElementById('profile-preview').src = data.profile_url + '?t=' + new Date().getTime();
+                showNotification('Profile picture updated successfully!');
+                input.value = '';
+            } else {
+                showNotification('Failed to update profile picture', 'error');
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            showNotification('Error uploading profile picture: ' + err.message, 'error');
+        });
+    }
+
+    // ===== EDIT PROFILE MODAL =====
+    function openEditProfileModal() {
+        document.getElementById('edit-profile-modal').classList.remove('hidden');
+        // Pre-fill current values
+        fetch('/api/seller/profile', {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                document.getElementById('edit-artisan-name').value = data.artisan_name || '';
+                document.getElementById('edit-shop-name').value = data.shop_name || '';
+                document.getElementById('edit-shop-description').value = data.shop_description || '';
+                document.getElementById('edit-phone').value = data.phone_number || '';
+                document.getElementById('edit-city').value = data.city || '';
+                document.getElementById('edit-province').value = data.province || '';
+            })
+            .catch(err => {
+                console.error('Error loading profile:', err);
+                showNotification('Error loading profile data', 'error');
+            });
+    }
+
+    function closeEditProfileModal() {
+        document.getElementById('edit-profile-modal').classList.add('hidden');
+    }
+
+    // Setup event listeners when DOM is ready
+    function setupFormListeners() {
+        // Handle edit profile form submission
+        const editProfileForm = document.getElementById('edit-profile-form');
+        if (editProfileForm) {
+            editProfileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData(editProfileForm);
+                
+                try {
+                    const response = await fetch('/api/seller/update-profile', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        showNotification('Profile updated successfully!');
+                        closeEditProfileModal();
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showNotification(data.message || 'Failed to update profile', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showNotification('Error updating profile: ' + error.message, 'error');
+                }
+            });
+        }
+    }
+
+    // ===== PRODUCT MODAL =====
+    let editingProductId = null;
+
     function openAddProductModal() {
+        editingProductId = null;
         document.getElementById('product-modal-title').textContent = 'Add New Product';
         document.getElementById('product-form').reset();
         document.getElementById('product-id').value = '';
@@ -422,38 +613,388 @@
 
     function closeProductModal() {
         document.getElementById('product-modal').classList.add('hidden');
+        editingProductId = null;
     }
 
-    // ----------------------
-    // Edit Profile Modal
-    // ----------------------
-    function openEditProfileModal() {
-        document.getElementById('edit-profile-modal').classList.remove('hidden');
-    }
+    // ===== LOAD AND DISPLAY PRODUCTS =====
+    async function loadProducts() {
+        try {
+            console.log('loadProducts() called, sellerId:', sellerId);
+            const response = await fetch(`/api/sellers/${sellerId}/products`);
+            
+            console.log('Products API response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const products = await response.json();
+            console.log('Products data:', products);
+            
+            // Ensure products is an array
+            const productList = Array.isArray(products) ? products : (products.data || []);
+            console.log('Product list:', productList);
 
-    function closeEditProfileModal() {
-        document.getElementById('edit-profile-modal').classList.add('hidden');
-    }
+            const tbody = document.getElementById('products-table-body');
+            
+            if (!tbody) {
+                console.error('Products table body not found');
+                return;
+            }
+            
+            tbody.innerHTML = '';
 
-    // ----------------------
-    // Banner & Profile Image Preview
-    // ----------------------
-    function uploadBanner(input) {
-        if (input.files && input.files[0]) {
-            let reader = new FileReader();
-            reader.onload = e => document.getElementById('banner-preview').src = e.target.result;
-            reader.readAsDataURL(input.files[0]);
+            if (!productList || productList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                            No products yet. <a href="#" onclick="openAddProductModal(); return false;" class="text-[#5B5843] hover:underline">Add your first product</a>
+                        </td>
+                    </tr>
+                `;
+                updateStats([]);
+                return;
+            }
+
+            productList.forEach(product => {
+                const statusColor = product.approval_status === 'approved' ? 'text-green-600' : 'text-yellow-600';
+                const statusBg = product.approval_status === 'approved' ? 'bg-green-50' : 'bg-yellow-50';
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <img src="/assets/products/${product.image || 'default.jpg'}" alt="${product.name}" class="w-10 h-10 rounded object-cover bg-gray-100" onerror="this.src='/assets/logo/dark-green-logo.png'">
+                                <span class="font-medium text-gray-900">${product.name}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">₱${parseFloat(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</td>
+                        <td class="px-6 py-4">${product.stock}</td>
+                        <td class="px-6 py-4">${product.category}</td>
+                        <td class="px-6 py-4">
+                            <span class="${statusColor} ${statusBg} px-3 py-1 rounded-full text-sm font-medium">
+                                ${product.approval_status.charAt(0).toUpperCase() + product.approval_status.slice(1)}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 flex gap-2">
+                            <button onclick="editProduct(${product.id})" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors">Edit</button>
+                            <button onclick="deleteProduct(${product.id})" class="text-red-600 hover:text-red-800 font-medium text-sm transition-colors">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // Update stats with loaded products
+            updateStats(productList);
+        } catch (error) {
+            console.error('Error loading products:', error);
+            const tbody = document.getElementById('products-table-body');
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-red-500">
+                            Error loading products. Please try refreshing the page.
+                        </td>
+                    </tr>
+                `;
+            }
         }
     }
 
-    function uploadProfile(input) {
-        if (input.files && input.files[0]) {
-            let reader = new FileReader();
-            reader.onload = e => document.getElementById('profile-preview').src = e.target.result;
-            reader.readAsDataURL(input.files[0]);
+    async function editProduct(productId) {
+        try {
+            const response = await fetch(`/api/products/${productId}`);
+            const product = await response.json();
+
+            document.getElementById('product-modal-title').textContent = 'Edit Product';
+            document.getElementById('product-id').value = product.id;
+            document.getElementById('product-name').value = product.name;
+            document.getElementById('product-description').value = product.description;
+            document.getElementById('product-price').value = product.price;
+            document.getElementById('product-stock').value = product.stock;
+            document.getElementById('product-category').value = product.category;
+            
+            editingProductId = product.id;
+            document.getElementById('product-modal').classList.remove('hidden');
+        } catch (error) {
+            console.error('Error loading product:', error);
+            showNotification('Error loading product details', 'error');
         }
     }
 
+    async function deleteProduct(productId) {
+        if (!confirm('Are you sure you want to delete this product?')) return;
+
+        try {
+            const response = await fetch(`/seller/api/products/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showNotification('Product deleted successfully!');
+                loadProducts();
+            } else {
+                showNotification(data.message || 'Error deleting product', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification('Error deleting product', 'error');
+        }
+    }
+
+    // ===== UPDATE STATS =====
+    function updateStats(products) {
+        const totalProducts = products.length;
+        const approvedProducts = products.filter(p => p.approval_status === 'approved').length;
+        const pendingProducts = products.filter(p => p.approval_status === 'pending').length;
+
+        document.getElementById('stat-total-products').textContent = totalProducts;
+        document.getElementById('stat-approved-products').textContent = `${approvedProducts} approved`;
+        document.getElementById('stat-pending-products').textContent = `${pendingProducts} pending`;
+    }
+
+    async function loadAnalytics() {
+        try {
+            const response = await fetch('/api/seller/analytics');
+            const analytics = await response.json();
+            
+            const bestSellingContainer = document.getElementById('best-selling-products');
+            if (!bestSellingContainer) return;
+            
+            bestSellingContainer.innerHTML = '';
+            
+            if (!analytics.best_selling_products || analytics.best_selling_products.length === 0) {
+                bestSellingContainer.innerHTML = '<p class="text-gray-500 text-sm">No sales data yet</p>';
+                return;
+            }
+            
+            analytics.best_selling_products.forEach(product => {
+                bestSellingContainer.innerHTML += `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <img src="/assets/products/${product.image || 'default.jpg'}" alt="${product.name}" class="w-8 h-8 rounded object-cover" onerror="this.src='/assets/logo/dark-green-logo.png'">
+                            <span class="text-sm font-medium text-gray-900">${product.name}</span>
+                        </div>
+                        <span class="text-sm text-gray-600">${product.total_sold || 0} sold</span>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            console.error('Error loading analytics:', error);
+        }
+    }
+
+    async function loadOrders() {
+        try {
+            const response = await fetch('/api/seller/orders');
+            const orders = await response.json();
+            
+            const ordersList = document.getElementById('orders-list');
+            if (!ordersList) return;
+            
+            ordersList.innerHTML = '';
+            
+            if (!orders || Object.keys(orders).length === 0) {
+                ordersList.innerHTML = `
+                    <div class="px-6 py-12 text-center text-gray-500">
+                        No orders yet
+                    </div>
+                `;
+                return;
+            }
+            
+            Object.keys(orders).forEach(orderId => {
+                const orderItems = orders[orderId];
+                const firstItem = orderItems[0];
+                const totalAmount = orderItems.reduce((sum, item) => sum + parseFloat(item.subtotal), 0);
+                
+                ordersList.innerHTML += `
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <div class="flex items-center justify-between mb-2">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Order #${orderId}</p>
+                                <p class="text-xs text-gray-500">${new Date(firstItem.order?.created_at || Date.now()).toLocaleDateString()}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-semibold text-gray-900">₱${parseFloat(totalAmount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                                <p class="text-xs text-gray-500">${orderItems.length} item${orderItems.length !== 1 ? 's' : ''}</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600">By: ${firstItem.order?.user?.full_name || 'Customer'}</p>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            console.error('Error loading orders:', error);
+        }
+    }
+
+    // ===== LOGOUT =====
+    function logoutSeller() {
+        if (!confirm('Are you sure you want to logout?')) return;
+        
+        fetch('/auth/logout', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        }).then(() => {
+            window.location.href = '/';
+        });
+    }
+
+    // ===== INITIALIZE ON LOAD =====
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', function() {
+            try {
+                console.log('Dashboard DOMContentLoaded fired, sellerId:', sellerId);
+                
+                setupFormListeners();
+                console.log('Form listeners setup complete');
+                
+                const productForm = document.getElementById('product-form');
+                if (productForm) {
+                    productForm.addEventListener('submit', async (e) => {
+                        e.preventDefault();
+                        console.log('Product form submitted');
+
+                        const formData = new FormData(productForm);
+                        const productId = document.getElementById('product-id').value;
+                        
+                        const url = productId ? `/seller/api/products/${productId}` : '/seller/api/products';
+                        const method = productId ? 'PUT' : 'POST';
+                        
+                        console.log('Submitting product to:', url, 'Method:', method);
+
+                        try {
+                            const response = await fetch(url, {
+                                method: method,
+                                body: formData,
+                                headers: {
+                                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                                }
+                            });
+
+                            console.log('Product response status:', response.status);
+                            const data = await response.json();
+                            console.log('Product response data:', data);
+
+                            if (data.success) {
+                                showNotification(productId ? 'Product updated successfully!' : 'Product added successfully!');
+                                closeProductModal();
+                                loadProducts();
+                            } else {
+                                showNotification(data.message || 'Error saving product', 'error');
+                            }
+                        } catch (error) {
+                            console.error('Error:', error);
+                            showNotification('Error saving product: ' + error.message, 'error');
+                        }
+                    });
+                    console.log('Product form listener attached');
+                }
+                
+                console.log('Loading products...');
+                loadProducts();
+            } catch (error) {
+                console.error('Dashboard initialization error:', error);
+                alert('Dashboard initialization error. Check console for details.');
+            }
+        });
+    } else {
+        // DOM is already loaded
+        try {
+            console.log('DOM already loaded, sellerId:', sellerId);
+            setupFormListeners();
+            const productForm = document.getElementById('product-form');
+            if (productForm) {
+                productForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    const formData = new FormData(productForm);
+                    const productId = document.getElementById('product-id').value;
+                    const url = productId ? `/seller/api/products/${productId}` : '/seller/api/products';
+                    const method = productId ? 'PUT' : 'POST';
+                    try {
+                        const response = await fetch(url, {
+                            method: method,
+                            body: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            }
+                        });
+                        const data = await response.json();
+                        if (data.success) {
+                            showNotification(productId ? 'Product updated successfully!' : 'Product added successfully!');
+                            closeProductModal();
+                            loadProducts();
+                        } else {
+                            showNotification(data.message || 'Error saving product', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showNotification('Error saving product: ' + error.message, 'error');
+                    }
+                });
+            }
+            loadProducts();
+        } catch (error) {
+            console.error('Dashboard initialization error:', error);
+        }
+    }
+</script>
+
+@endsection
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Seller ID (from Auth)
+    const sellerId = {{ Auth::guard('seller')->user()?->id ?? 0 }};
+    
+    // Verify seller is logged in
+    if (!sellerId || sellerId === 0) {
+        console.error('Seller not authenticated');
+        window.location.href = '/';
+    }
+
+    // ===== TAB SWITCHING =====
+    function switchSellerTab(event, tabName) {
+        event.preventDefault();
+        
+        // Hide all content tabs
+        document.querySelectorAll('.seller-content').forEach(el => el.classList.add('hidden'));
+        
+        // Show selected content tab
+        const selectedTab = document.getElementById(`${tabName}-tab`);
+        if (selectedTab) {
+            selectedTab.classList.remove('hidden');
+        }
+
+        // Update tab button styling - remove active state from all
+        document.querySelectorAll('.seller-tab').forEach(btn => {
+            btn.classList.remove('active', 'border-[#5B5843]', 'text-[#5B5843]');
+            btn.classList.add('border-transparent', 'text-gray-500');
+        });
+        
+        // Mark current tab button as active
+        if (event.target && event.target.classList) {
+            event.target.classList.add('border-[#5B5843]', 'text-[#5B5843]');
+            event.target.classList.remove('border-transparent', 'text-gray-500');
+        }
+        
+        // Load content for specific tabs
+        if (tabName === 'analytics') {
+            loadAnalytics();
+        } else if (tabName === 'orders') {
+            loadOrders();
+        }
+    }
+
+    // ===== NOTIFICATION TOAST =====
     function showNotification(message, type = 'success') {
         const toast = document.getElementById('notification-toast');
         const icon = document.getElementById('notification-icon');
@@ -461,148 +1002,471 @@
 
         msg.textContent = message;
 
-        // Change icon color based on type
-        if (type === 'success') icon.classList.replace('text-red-600', 'text-green-600');
-        else if (type === 'error') icon.classList.replace('text-green-600', 'text-red-600');
+        // Update icon color
+        icon.classList.remove('text-green-600', 'text-red-600');
+        if (type === 'success') {
+            icon.classList.add('text-green-600');
+        } else if (type === 'error') {
+            icon.classList.add('text-red-600');
+        }
 
         toast.classList.remove('hidden');
-        toast.classList.add('opacity-100');
-
         setTimeout(() => {
             toast.classList.add('hidden');
-            toast.classList.remove('opacity-100');
         }, 3000);
     }
 
-    // ----------------------
-    // Dummy Data (Replace with AJAX)
-    // ----------------------
-    const products = [
-        {id: 1, name: 'Beaded Necklace', price: 500, stock: 10, category: 'Jewelry', status: 'Approved'},
-        {id: 2, name: 'Handwoven Basket', price: 1200, stock: 5, category: 'Home Decor', status: 'Pending'},
-    ];
+    // ===== BANNER AND PROFILE UPLOAD =====
+    function uploadBanner(input) {
+        if (!input.files || !input.files[0]) return;
 
-    const orders = [
-        {id: 101, product: 'Beaded Necklace', qty: 2, total: 1000, status: 'Pending'},
-        {id: 102, product: 'Handwoven Basket', qty: 1, total: 1200, status: 'Shipped'},
-    ];
+        const formData = new FormData();
+        formData.append('banner_image', input.files[0]);
 
-    const stats = {
-        totalProducts: products.length,
-        approvedProducts: products.filter(p => p.status === 'Approved').length,
-        pendingProducts: products.filter(p => p.status === 'Pending').length,
-        totalSales: orders.reduce((sum, o) => sum + o.total, 0),
-        salesThisMonth: 2200, // example
-        totalOrders: orders.length,
-        ordersThisMonth: 1, // example
-        itemsSold: orders.reduce((sum, o) => sum + o.qty, 0)
-    };
+        fetch('/api/seller/update-banner', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            return res.json();
+        })
+        .then(data => {
+            if (data.success) {
+                document.getElementById('banner-preview').src = data.banner_url + '?t=' + new Date().getTime();
+                showNotification('Banner updated successfully!');
+                // Reset the file input
+                input.value = '';
+            } else {
+                showNotification(data.message || 'Failed to update banner', 'error');
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            showNotification('Error uploading banner: ' + err.message, 'error');
+        });
+    }
 
-    // ----------------------
-    // Populate Stats
-    // ----------------------
-    document.getElementById('stat-total-products').textContent = stats.totalProducts;
-    document.getElementById('stat-approved-products').textContent = `${stats.approvedProducts} approved`;
-    document.getElementById('stat-pending-products').textContent = `${stats.pendingProducts} pending`;
+    function uploadProfile(input) {
+        if (!input.files || !input.files[0]) return;
 
-    document.getElementById('stat-total-sales').textContent = `₱${stats.totalSales}`;
-    document.getElementById('stat-sales-this-month').textContent = `₱${stats.salesThisMonth} this month`;
+        const formData = new FormData();
+        formData.append('profile_picture', input.files[0]);
 
-    document.getElementById('stat-total-orders').textContent = stats.totalOrders;
-    document.getElementById('stat-orders-this-month').textContent = `${stats.ordersThisMonth} this month`;
+        fetch('/api/seller/update-profile-picture', {
+            method: 'POST',
+            body: formData,
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                'Accept': 'application/json'
+            }
+        })
+        .then(res => {
+            if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+            return res.json();
+        })
+        .then(data => {
+            if (data.success) {
+                document.getElementById('profile-preview').src = data.profile_url + '?t=' + new Date().getTime();
+                showNotification('Profile picture updated successfully!');
+                // Reset the file input
+                input.value = '';
+            } else {
+                showNotification(data.message || 'Failed to update profile picture', 'error');
+            }
+        })
+        .catch(err => {
+            console.error('Error:', err);
+            showNotification('Error uploading profile picture: ' + err.message, 'error');
+        });
+    }
 
-    document.getElementById('stat-items-sold').textContent = stats.itemsSold;
+    // ===== EDIT PROFILE MODAL =====
+    function openEditProfileModal() {
+        document.getElementById('edit-profile-modal').classList.remove('hidden');
+        // Pre-fill current values
+        fetch('/api/seller/profile', {
+            headers: {
+                'Accept': 'application/json'
+            }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error(`HTTP error! status: ${res.status}`);
+                return res.json();
+            })
+            .then(data => {
+                document.getElementById('edit-artisan-name').value = data.artisan_name || '';
+                document.getElementById('edit-shop-name').value = data.shop_name || '';
+                document.getElementById('edit-shop-description').value = data.shop_description || '';
+                document.getElementById('edit-phone').value = data.phone_number || '';
+                document.getElementById('edit-city').value = data.city || '';
+                document.getElementById('edit-province').value = data.province || '';
+            })
+            .catch(err => {
+                console.error('Error loading profile:', err);
+                showNotification('Error loading profile data', 'error');
+            });
+    }
 
-    // ----------------------
-    // Populate Products Table
-    // ----------------------
-    const productsTable = document.getElementById('products-table-body');
-    productsTable.innerHTML = '';
-    products.forEach(p => {
-        productsTable.innerHTML += `
-            <tr>
-                <td class="px-6 py-4">${p.name}</td>
-                <td class="px-6 py-4">₱${p.price}</td>
-                <td class="px-6 py-4">${p.stock}</td>
-                <td class="px-6 py-4">${p.category}</td>
-                <td class="px-6 py-4">${p.status}</td>
-                <td class="px-6 py-4 flex gap-2">
-                    <button onclick="editProduct(${p.id})" class="text-blue-600 hover:underline">Edit</button>
-                    <button onclick="deleteProduct(${p.id})" class="text-red-600 hover:underline">Delete</button>
-                </td>
-            </tr>
-        `;
-    });
+    function closeEditProfileModal() {
+        document.getElementById('edit-profile-modal').classList.add('hidden');
+    }
 
-    function editProduct(id) {
-        const product = products.find(p => p.id === id);
-        document.getElementById('product-modal-title').textContent = 'Edit Product';
-        document.getElementById('product-id').value = product.id;
-        document.getElementById('product-name').value = product.name;
-        document.getElementById('product-price').value = product.price;
-        document.getElementById('product-stock').value = product.stock;
-        document.getElementById('product-category').value = product.category;
+    // Setup event listeners when DOM is ready
+    function setupFormListeners() {
+        // Handle edit profile form submission
+        const editProfileForm = document.getElementById('edit-profile-form');
+        if (editProfileForm) {
+            editProfileForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                
+                const formData = new FormData(e);
+                
+                try {
+                    const response = await fetch('/api/seller/update-profile', {
+                        method: 'POST',
+                        body: formData,
+                        headers: {
+                            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                            'Accept': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`HTTP error! status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (data.success) {
+                        showNotification('Profile updated successfully!');
+                        closeEditProfileModal();
+                        // Reload page to reflect changes
+                        setTimeout(() => location.reload(), 1500);
+                    } else {
+                        showNotification(data.message || 'Failed to update profile', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error:', error);
+                    showNotification('Error updating profile: ' + error.message, 'error');
+                }
+            });
+        }
+    }
+
+    // ===== PRODUCT MODAL =====
+    let editingProductId = null;
+
+    function openAddProductModal() {
+        editingProductId = null;
+        document.getElementById('product-modal-title').textContent = 'Add New Product';
+        document.getElementById('product-form').reset();
+        document.getElementById('product-id').value = '';
         document.getElementById('product-modal').classList.remove('hidden');
     }
 
-    function deleteProduct(id) {
-        alert('Delete functionality not implemented yet.');
+    function closeProductModal() {
+        document.getElementById('product-modal').classList.add('hidden');
+        editingProductId = null;
     }
 
-    // ----------------------
-    // Populate Orders Tab
-    // ----------------------
-    const ordersList = document.getElementById('orders-list');
-    ordersList.innerHTML = '';
-    orders.forEach(o => {
-        ordersList.innerHTML += `
-            <div class="px-6 py-4 flex flex-col sm:flex-row justify-between items-start sm:items-center">
-                <p class="text-gray-900 font-medium">Order #${o.id} - ${o.product}</p>
-                <p class="text-gray-600">Qty: ${o.qty} | Total: ₱${o.total} | Status: ${o.status}</p>
-            </div>
-        `;
-    });
+    // Product form submission is handled in setupFormListeners()
 
-    // ----------------------
-    // Sales Chart (Analytics Tab)
-    // ----------------------
-    const ctx = document.createElement('canvas');
-    ctx.id = 'sales-chart';
-    const analyticsTab = document.getElementById('analytics-tab');
-    analyticsTab.querySelector('.bg-white.rounded-xl.shadow-lg.p-6').appendChild(ctx);
+    // ===== LOAD AND DISPLAY PRODUCTS =====
+    async function loadProducts() {
+        try {
+            console.log('loadProducts() called, sellerId:', sellerId);
+            const response = await fetch(`/api/sellers/${sellerId}/products`);
+            
+            console.log('Products API response status:', response.status);
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            
+            const products = await response.json();
+            console.log('Products data:', products);
+            
+            // Ensure products is an array
+            const productList = Array.isArray(products) ? products : (products.data || []);
+            console.log('Product list:', productList);
 
-    const chart = new Chart(ctx, {
-        type: 'line',
-        data: {
-            labels: ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'],
-            datasets: [{
-                label: 'Revenue (₱)',
-                data: [500,1200,800,900,1500,700,1300,1100,900,1400,1000,1600],
-                backgroundColor: 'rgba(37,37,37,0.2)',
-                borderColor: '#252525',
-                borderWidth: 2,
-                fill: true,
-                tension: 0.3
-            }]
-        },
-        options: {
-            responsive: true,
-            plugins: { legend: { display: false } },
+            const tbody = document.getElementById('products-table-body');
+            
+            if (!tbody) {
+                console.error('Products table body not found');
+                return;
+            }
+            
+            tbody.innerHTML = '';
+
+            if (!productList || productList.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-gray-500">
+                            No products yet. <a href="#" onclick="openAddProductModal(); return false;" class="text-[#5B5843] hover:underline">Add your first product</a>
+                        </td>
+                    </tr>
+                `;
+                updateStats([]);
+                return;
+            }
+
+            productList.forEach(product => {
+                const statusColor = product.approval_status === 'approved' ? 'text-green-600' : 'text-yellow-600';
+                const statusBg = product.approval_status === 'approved' ? 'bg-green-50' : 'bg-yellow-50';
+                
+                tbody.innerHTML += `
+                    <tr class="hover:bg-gray-50 transition-colors">
+                        <td class="px-6 py-4">
+                            <div class="flex items-center gap-3">
+                                <img src="/assets/products/${product.image || 'default.jpg'}" alt="${product.name}" class="w-10 h-10 rounded object-cover bg-gray-100" onerror="this.src='/assets/logo/dark-green-logo.png'">
+                                <span class="font-medium text-gray-900">${product.name}</span>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4">₱${parseFloat(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</td>
+                        <td class="px-6 py-4">${product.stock}</td>
+                        <td class="px-6 py-4">${product.category}</td>
+                        <td class="px-6 py-4">
+                            <span class="${statusColor} ${statusBg} px-3 py-1 rounded-full text-sm font-medium">
+                                ${product.approval_status.charAt(0).toUpperCase() + product.approval_status.slice(1)}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 flex gap-2">
+                            <button onclick="editProduct(${product.id})" class="text-blue-600 hover:text-blue-800 font-medium text-sm transition-colors">Edit</button>
+                            <button onclick="deleteProduct(${product.id})" class="text-red-600 hover:text-red-800 font-medium text-sm transition-colors">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            // Update stats with loaded products
+            updateStats(productList);
+        } catch (error) {
+            console.error('Error loading products:', error);
+            const tbody = document.getElementById('products-table-body');
+            if (tbody) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="6" class="px-6 py-12 text-center text-red-500">
+                            Error loading products. Please try refreshing the page.
+                        </td>
+                    </tr>
+                `;
+            }
+        }
+    }
+
+    async function loadAnalytics() {
+        try {
+            const response = await fetch('/api/seller/analytics');
+            const analytics = await response.json();
+            
+            const bestSellingContainer = document.getElementById('best-selling-products');
+            if (!bestSellingContainer) return;
+            
+            bestSellingContainer.innerHTML = '';
+            
+            if (!analytics.best_selling_products || analytics.best_selling_products.length === 0) {
+                bestSellingContainer.innerHTML = '<p class="text-gray-500 text-sm">No sales data yet</p>';
+                return;
+            }
+            
+            analytics.best_selling_products.forEach(product => {
+                bestSellingContainer.innerHTML += `
+                    <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                        <div class="flex items-center gap-3">
+                            <img src="/assets/products/${product.image || 'default.jpg'}" alt="${product.name}" class="w-8 h-8 rounded object-cover" onerror="this.src='/assets/logo/dark-green-logo.png'">
+                            <span class="text-sm font-medium text-gray-900">${product.name}</span>
+                        </div>
+                        <span class="text-sm text-gray-600">${product.total_sold || 0} sold</span>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            console.error('Error loading analytics:', error);
+        }
+    }
+
+    async function loadOrders() {
+        try {
+            const response = await fetch('/api/seller/orders');
+            const orders = await response.json();
+            
+            const ordersList = document.getElementById('orders-list');
+            if (!ordersList) return;
+            
+            ordersList.innerHTML = '';
+            
+            if (!orders || Object.keys(orders).length === 0) {
+                ordersList.innerHTML = `
+                    <div class="px-6 py-12 text-center text-gray-500">
+                        No orders yet
+                    </div>
+                `;
+                return;
+            }
+            
+            Object.keys(orders).forEach(orderId => {
+                const orderItems = orders[orderId];
+                const firstItem = orderItems[0];
+                const totalAmount = orderItems.reduce((sum, item) => sum + parseFloat(item.subtotal), 0);
+                
+                ordersList.innerHTML += `
+                    <div class="px-6 py-4 border-b border-gray-200">
+                        <div class="flex items-center justify-between mb-2">
+                            <div>
+                                <p class="text-sm font-medium text-gray-900">Order #${orderId}</p>
+                                <p class="text-xs text-gray-500">${new Date(firstItem.order?.created_at || Date.now()).toLocaleDateString()}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-sm font-semibold text-gray-900">₱${parseFloat(totalAmount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                                <p class="text-xs text-gray-500">${orderItems.length} item${orderItems.length !== 1 ? 's' : ''}</p>
+                            </div>
+                        </div>
+                        <p class="text-sm text-gray-600">By: ${firstItem.order?.user?.full_name || 'Customer'}</p>
+                    </div>
+                `;
+            });
+        } catch (error) {
+            console.error('Error loading orders:', error);
+        }
+    }
+
+    async function editProduct(productId) {
+        try {
+            const response = await fetch(`/api/products/${productId}`);
+            const product = await response.json();
+
+            document.getElementById('product-modal-title').textContent = 'Edit Product';
+            document.getElementById('product-id').value = product.id;
+            document.getElementById('product-name').value = product.name;
+            document.getElementById('product-description').value = product.description;
+            document.getElementById('product-price').value = product.price;
+            document.getElementById('product-stock').value = product.stock;
+            document.getElementById('product-category').value = product.category;
+            
+            editingProductId = product.id;
+            document.getElementById('product-modal').classList.remove('hidden');
+        } catch (error) {
+            console.error('Error loading product:', error);
+            showNotification('Error loading product details', 'error');
+        }
+    }
+
+    async function deleteProduct(productId) {
+        if (!confirm('Are you sure you want to delete this product?')) return;
+
+        try {
+            const response = await fetch(`/seller/api/products/${productId}`, {
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+
+            const data = await response.json();
+
+            if (data.success) {
+                showNotification('Product deleted successfully!');
+                loadProducts();
+            } else {
+                showNotification(data.message || 'Error deleting product', 'error');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            showNotification('Error deleting product', 'error');
+        }
+    }
+
+    // ===== UPDATE STATS =====
+    function updateStats(products) {
+        const totalProducts = products.length;
+        const approvedProducts = products.filter(p => p.approval_status === 'approved').length;
+        const pendingProducts = products.filter(p => p.approval_status === 'pending').length;
+
+        document.getElementById('stat-total-products').textContent = totalProducts;
+        document.getElementById('stat-approved-products').textContent = `${approvedProducts} approved`;
+        document.getElementById('stat-pending-products').textContent = `${pendingProducts} pending`;
+    }
+
+    // ===== LOGOUT =====
+    function logoutSeller() {
+        if (!confirm('Are you sure you want to logout?')) return;
+        
+        fetch('/auth/logout', {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            }
+        }).then(() => {
+            window.location.href = '/';
+        });
+    }
+
+    // ===== INITIALIZE ON LOAD =====
+    document.addEventListener('DOMContentLoaded', function() {
+        try {
+            console.log('Dashboard DOMContentLoaded fired, sellerId:', sellerId);
+            
+            // Setup form listeners
+            setupFormListeners();
+            console.log('Form listeners setup complete');
+            
+            // Setup product form listener
+            const productForm = document.getElementById('product-form');
+            if (productForm) {
+                productForm.addEventListener('submit', async (e) => {
+                    e.preventDefault();
+                    console.log('Product form submitted');
+
+                    const formData = new FormData(productForm);
+                    const productId = document.getElementById('product-id').value;
+                    
+                    const url = productId ? `/seller/api/products/${productId}` : '/seller/api/products';
+                    const method = productId ? 'PUT' : 'POST';
+                    
+                    console.log('Submitting product to:', url, 'Method:', method);
+
+                    try {
+                        const response = await fetch(url, {
+                            method: method,
+                            body: formData,
+                            headers: {
+                                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                            }
+                        });
+
+                        console.log('Product response status:', response.status);
+                        const data = await response.json();
+                        console.log('Product response data:', data);
+
+                        if (data.success) {
+                            showNotification(productId ? 'Product updated successfully!' : 'Product added successfully!');
+                            closeProductModal();
+                            loadProducts(); // Reload products table
+                        } else {
+                            showNotification(data.message || 'Error saving product', 'error');
+                        }
+                    } catch (error) {
+                        console.error('Error:', error);
+                        showNotification('Error saving product: ' + error.message, 'error');
+                    }
+                });
+                console.log('Product form listener attached');
+            } else {
+                console.warn('Product form not found in DOM');
+            }
+            
+            // Load initial products
+            console.log('Loading products...');
+            loadProducts();
+        } catch (error) {
+            console.error('Dashboard initialization error:', error);
+            alert('Dashboard initialization error. Check console for details.');
         }
     });
-
-    // ----------------------
-    // Dummy Best Selling Products
-    // ----------------------
-    const bestSellingContainer = document.getElementById('best-selling-products');
-    const bestSelling = products.slice(0,3); // top 3
-    bestSelling.forEach(p => {
-        bestSellingContainer.innerHTML += `
-            <div class="flex items-center justify-between bg-gray-50 px-4 py-2 rounded-lg">
-                <span>${p.name}</span>
-                <span class="text-gray-600">₱${p.price}</span>
-            </div>
-        `;
-    });
 </script>
-@endpush

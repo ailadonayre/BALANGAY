@@ -44,10 +44,10 @@
 
         <!-- CTA Buttons -->
         <div class="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center items-center loading" style="animation-delay: 0.6s">
-            <a href="#shop" class="inline-block bg-white text-[#252525] px-10 md:px-12 py-3.5 md:py-4 rounded-full text-xs md:text-sm tracking-widest uppercase futura-500 hover:bg-[#E4DDCC] transition-all duration-300 transform hover:scale-105 w-full sm:w-auto text-center">
+            <a href="/shop" class="inline-block bg-white text-[#252525] px-10 md:px-12 py-3.5 md:py-4 rounded-full text-xs md:text-sm tracking-widest uppercase futura-500 hover:bg-[#E4DDCC] transition-all duration-300 transform hover:scale-105 w-full sm:w-auto text-center">
                 Start Shopping
             </a>
-            <a href="#" class="inline-block bg-transparent border-2 border-white text-white px-10 md:px-12 py-3.5 md:py-4 rounded-full text-xs md:text-sm tracking-widest uppercase futura-500 hover:bg-white hover:text-[#252525] transition-all duration-300 transform hover:scale-105 w-full sm:w-auto text-center">
+            <a href="#" onclick="openDonationModal(event)" class="inline-block bg-transparent border-2 border-white text-white px-10 md:px-12 py-3.5 md:py-4 rounded-full text-xs md:text-sm tracking-widest uppercase futura-500 hover:bg-white hover:text-[#252525] transition-all duration-300 transform hover:scale-105 w-full sm:w-auto text-center">
                 Make a Donation
             </a>
         </div>

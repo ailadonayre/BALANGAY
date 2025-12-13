@@ -96,6 +96,16 @@ Route::middleware(['auth:seller'])->prefix('seller')->group(function () {
     Route::delete('/api/products/{id}', [SellerController::class, 'deleteProduct'])->name('api.seller.delete.product');
 });
 
+// Seller API Routes (Protected)
+Route::middleware(['auth:seller'])->group(function () {
+    Route::get('/api/seller/profile', [SellerController::class, 'getProfile'])->name('api.seller.profile');
+    Route::post('/api/seller/update-profile', [SellerController::class, 'updateProfile'])->name('api.seller.update.profile');
+    Route::post('/api/seller/update-banner', [SellerController::class, 'updateBanner'])->name('api.seller.update.banner');
+    Route::post('/api/seller/update-profile-picture', [SellerController::class, 'updateProfilePicture'])->name('api.seller.update.picture');
+    Route::get('/api/seller/analytics', [SellerController::class, 'getAnalytics'])->name('api.seller.analytics');
+    Route::get('/api/seller/orders', [SellerController::class, 'getOrders'])->name('api.seller.orders');
+});
+
 // Admin Routes
 Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {

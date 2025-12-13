@@ -101,8 +101,15 @@ function loadProducts(params = {}) {
             const grid = document.getElementById('products-grid');
             grid.innerHTML = '';
             
-            // Check if data.data exists and has items
-            const products = data.data || [];
+            // Handle both paginated and non-paginated responses
+            let products = [];
+            if (data.data) {
+                // Paginated response
+                products = Array.isArray(data.data) ? data.data : [];
+            } else if (Array.isArray(data)) {
+                // Non-paginated response
+                products = data;
+            }
             
             if (!products || products.length === 0) {
                 grid.innerHTML = '<div class="col-span-full text-center py-8 text-gray-500">No products found</div>';
@@ -141,8 +148,10 @@ function loadProducts(params = {}) {
                 grid.appendChild(productCard);
                 
                 // Add click handler to open modal
-                productCard.addEventListener('click', () => {
-                    openShopProductModal(product.id);
+                productCard.addEventListener('click', (e) => {
+                    if (!e.target.closest('button')) {
+                        openShopProductModal(product.id);
+                    }
                 });
             });
         })

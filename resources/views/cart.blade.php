@@ -167,8 +167,13 @@ async function removeFromCart(cartId) {
 async function updateCartCount() {
     try {
         const response = await fetch('/api/cart');
-        const data = await response.json();
-        document.getElementById('cart-count').textContent = data.count;
+        if (response.ok) {
+            const data = await response.json();
+            const countElement = document.getElementById('cart-count');
+            if (countElement) {
+                countElement.textContent = data.count || 0;
+            }
+        }
     } catch (error) {
         console.error('Error updating cart count:', error);
     }

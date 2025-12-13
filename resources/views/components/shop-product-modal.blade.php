@@ -188,13 +188,16 @@ function showShopNotification(message, type = 'success') {
 async function updateCartCount() {
     try {
         const response = await fetch('/api/cart');
-        const data = await response.json();
-        const cartCountEl = document.getElementById('cart-count');
-        if (cartCountEl) {
-            cartCountEl.textContent = data.count;
+        if (response.ok) {
+            const data = await response.json();
+            const cartCountEl = document.getElementById('cart-count');
+            if (cartCountEl) {
+                cartCountEl.textContent = data.count || 0;
+            }
         }
     } catch (error) {
         console.error('Error updating cart count:', error);
     }
+}
 }
 </script>

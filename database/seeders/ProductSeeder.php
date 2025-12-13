@@ -108,7 +108,10 @@ class ProductSeeder extends Seeder
 
         foreach ($products as $index => $product) {
             $seller = $sellers[$index % count($sellers)];
-            Product::create(array_merge($product, ['seller_id' => $seller->id]));
+            Product::create(array_merge($product, [
+                'seller_id' => $seller->id,
+                'approval_status' => 'approved'  // Mark as approved so it shows in shop
+            ]));
         }
     }
 }
