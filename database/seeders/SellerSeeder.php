@@ -19,6 +19,7 @@ class SellerSeeder extends Seeder
             'phone_number' => '09123456789',
             'password' => Hash::make('password123'),
             'community' => 'Ifugao',
+            'indigenous_tribe' => 'Ifugao',
             'verification_status' => 'approved',
         ]);
 
@@ -28,6 +29,7 @@ class SellerSeeder extends Seeder
             'phone_number' => '09987654321',
             'password' => Hash::make('password123'),
             'community' => 'Ilocos',
+            'indigenous_tribe' => 'Ilocano',
             'verification_status' => 'approved',
         ]);
 
@@ -37,6 +39,17 @@ class SellerSeeder extends Seeder
             'phone_number' => '09111111111',
             'password' => Hash::make('password123'),
             'community' => 'Mindanao',
+            'indigenous_tribe' => 'B\'laan',
+            'verification_status' => 'approved',
+        ]);
+
+        Seller::create([
+            'artisan_name' => 'Master Artisan',
+            'email' => 'master@seller.com',
+            'phone_number' => '09222222222',
+            'password' => Hash::make('password123'),
+            'community' => 'Cordillera',
+            'indigenous_tribe' => 'Bontoc',
             'verification_status' => 'approved',
         ]);
     }
