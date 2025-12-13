@@ -83,14 +83,14 @@ class RegisterController extends Controller
             'seller_type' => $request->seller_type,
             'shop_name' => $request->shop_name,
             'password' => Hash::make($request->password),
-            'verification_status' => 'pending',
+            'verification_status' => 'approved',
         ]);
 
         Auth::guard('seller')->login($seller);
 
         return response()->json([
             'success' => true,
-            'message' => 'Seller registration successful! Your account is pending approval.',
+            'message' => 'Seller registration successful!',
             'redirect' => route('seller.dashboard'),
         ]);
     }

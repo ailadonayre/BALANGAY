@@ -25,9 +25,8 @@ return new class extends Migration
                 $table->string('tribe')->nullable();
                 $table->string('image')->nullable();
 
-                // status (active, completed, paused) with CHECK constraint
+                // status (active, completed, paused)
                 $table->string('status')->default('active');
-                $table->check("status IN ('active', 'completed', 'paused')");
 
                 $table->timestamps();
             });
