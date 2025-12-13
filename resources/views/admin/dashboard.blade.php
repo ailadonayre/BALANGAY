@@ -452,6 +452,10 @@ function switchAdminTab(tab) {
 async function loadAnalytics() {
     try {
         const response = await fetch('/admin/api/analytics');
+        if (!response.ok) {
+            console.error('API Error:', response.status, response.statusText);
+            return;
+        }
         const analytics = await response.json();
         
         document.getElementById('stat-users').textContent = analytics.total_users;
@@ -484,18 +488,21 @@ async function loadAnalytics() {
 async function loadUsers() {
     try {
         const response = await fetch('/admin/api/users');
+        if (!response.ok) {
+            console.error('Users API Error:', response.status);
+            return;
+        }
         const users = await response.json();
         
         const tbody = document.getElementById('users-table');
         tbody.innerHTML = users.map(user => `
             <tr>
-                <td class="px-6 py-4 text-sm text-gray-900">${user.full_name}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">${user.full_name || user.name || 'N/A'}</td>
                 <td class="px-6 py-4 text-sm text-gray-900">${user.email}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">${user.phone}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">${user.phone_number || '-'}</td>
                 <td class="px-6 py-4 text-sm text-gray-900">${new Date(user.created_at).toLocaleDateString()}</td>
                 <td class="px-6 py-4 text-sm text-gray-900">
-                    <button class="text-blue-600 hover:underline" onclick="editUser(${user.id})">Edit</button>
-                    <button class="text-red-600 hover:underline ml-2" onclick="deleteUser(${user.id})">Delete</button>
+                    <button class="text-red-600 hover:underline" onclick="deleteUser(${user.id})">Delete</button>
                 </td>
             </tr>
         `).join('');
@@ -508,16 +515,20 @@ async function loadUsers() {
 async function loadSellers() {
     try {
         const response = await fetch('/admin/api/sellers');
+        if (!response.ok) {
+            console.error('Sellers API Error:', response.status);
+            return;
+        }
         const sellers = await response.json();
         
         const tbody = document.getElementById('sellers-table');
         tbody.innerHTML = sellers.map(seller => `
             <tr>
-                <td class="px-6 py-4 text-sm text-gray-900">${seller.full_name}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">${seller.artisan_name || seller.shop_name}</td>
                 <td class="px-6 py-4 text-sm text-gray-900">${seller.email}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">${seller.tribe || '-'}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">${seller.type}</td>
-                <td class="px-6 py-4 text-sm text-gray-900">${seller.status}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">${seller.indigenous_tribe || '-'}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">${seller.seller_type || 'Artisan'}</td>
+                <td class="px-6 py-4 text-sm text-gray-900">${seller.verification_status}</td>
                 <td class="px-6 py-4 text-sm text-gray-900">
                     <button class="text-blue-600 hover:underline" onclick="viewSeller(${seller.id})">View</button>
                     <button class="text-green-600 hover:underline ml-2" onclick="approveSeller(${seller.id})">Approve</button>
@@ -534,19 +545,24 @@ async function loadSellers() {
 async function loadProducts() {
     try {
         const response = await fetch('/admin/api/products');
+        if (!response.ok) {
+            console.error('Products API Error:', response.status);
+            return;
+        }
         const products = await response.json();
 
         const grid = document.getElementById('products-grid');
         grid.innerHTML = products.map(product => `
             <div class="bg-white rounded-lg shadow p-4">
-                <img src="/storage/products/${product.image}" class="w-full h-48 object-cover rounded-lg mb-2">
+                <img src="/assets/products/${product.image || 'default.jpg'}" class="w-full h-48 object-cover rounded-lg mb-2" onerror="this.src='/assets/logo/dark-green-logo.png'">
                 <h4 class="text-lg font-semibold text-gray-900">${product.name}</h4>
                 <p class="text-gray-600">${product.category}</p>
                 <p class="text-gray-800 font-bold mt-2">₱${parseFloat(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-                <p class="text-gray-500 mt-1 text-sm">Status: ${product.approval_status}</p>
+                <p class="text-gray-500 mt-1 text-sm">Status: <span class="font-medium">${product.approval_status}</span></p>
+                <p class="text-gray-500 text-sm">By: ${product.seller?.artisan_name || 'Unknown'}</p>
                 <div class="flex gap-2 mt-3">
-                    <button class="flex-1 text-blue-600 hover:underline" onclick="editProduct(${product.id})">Edit</button>
-                    <button class="flex-1 text-red-600 hover:underline" onclick="deleteProduct(${product.id})">Delete</button>
+                    <button class="flex-1 text-blue-600 hover:underline text-sm" onclick="approveProduct(${product.id})">Approve</button>
+                    <button class="flex-1 text-red-600 hover:underline text-sm" onclick="deleteProduct(${product.id})">Delete</button>
                 </div>
             </div>
         `).join('');
@@ -559,6 +575,10 @@ async function loadProducts() {
 async function loadStories() {
     try {
         const response = await fetch('/admin/api/stories');
+        if (!response.ok) {
+            console.error('Stories API Error:', response.status);
+            return;
+        }
         const stories = await response.json();
 
         const container = document.getElementById('stories-list');
@@ -578,6 +598,10 @@ async function loadStories() {
 async function loadDonations() {
     try {
         const response = await fetch('/admin/api/donations');
+        if (!response.ok) {
+            console.error('Donations API Error:', response.status);
+            return;
+        }
         const donations = await response.json();
 
         const container = document.getElementById('donations-list');
@@ -598,20 +622,289 @@ async function loadDonations() {
 async function loadFeaturedArtists() {
     try {
         const response = await fetch('/admin/api/featured-artists');
+        if (!response.ok) {
+            console.error('Featured Artists API Error:', response.status);
+            return;
+        }
         const artists = await response.json();
 
         const container = document.getElementById('featured-artists-list');
         container.innerHTML = artists.map(artist => `
             <div class="p-4 bg-gray-50 rounded-lg shadow">
-                <img src="/storage/featured/${artist.image}" class="w-full h-40 object-cover rounded-lg mb-2">
+                <img src="/assets/artisans/${artist.image || 'default.jpg'}" class="w-full h-40 object-cover rounded-lg mb-2" onerror="this.src='/assets/logo/dark-green-logo.png'">
                 <h4 class="text-lg font-semibold">${artist.name}</h4>
                 <p class="text-gray-600">${artist.tribe} - ${artist.craft}</p>
-                <p class="text-gray-800 mt-2">${artist.description}</p>
+                <p class="text-gray-800 mt-2">${artist.description || 'No description'}</p>
             </div>
         `).join('');
     } catch (error) {
         console.error('Error loading featured artists:', error);
     }
 }
+
+// Action Functions
+function approveSeller(sellerId) {
+    if (!confirm('Approve this seller?')) return;
+    
+    fetch(`/admin/api/sellers/${sellerId}/status`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ verification_status: 'approved' })
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            alert('Seller approved!');
+            loadSellers();
+        }
+    });
+}
+
+function rejectSeller(sellerId) {
+    if (!confirm('Reject this seller?')) return;
+    
+    fetch(`/admin/api/sellers/${sellerId}/status`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ verification_status: 'rejected' })
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            alert('Seller rejected!');
+            loadSellers();
+        }
+    });
+}
+
+function deleteUser(userId) {
+    if (!confirm('Delete this user? This action cannot be undone.')) return;
+    
+    fetch(`/admin/api/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            alert('User deleted!');
+            loadUsers();
+        }
+    });
+}
+
+function approveProduct(productId) {
+    if (!confirm('Approve this product?')) return;
+    
+    fetch(`/admin/api/products/${productId}/status`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ approval_status: 'approved' })
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            alert('Product approved!');
+            loadProducts();
+        }
+    });
+}
+
+function deleteProduct(productId) {
+    if (!confirm('Delete this product? This action cannot be undone.')) return;
+    
+    fetch(`/admin/api/products/${productId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            alert('Product deleted!');
+            loadProducts();
+        }
+    });
+}
+
+function logoutAdmin() {
+    if (!confirm('Logout?')) return;
+    
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '/auth/logout';
+    
+    const token = document.createElement('input');
+    token.type = 'hidden';
+    token.name = '_token';
+    token.value = document.querySelector('meta[name="csrf-token"]').content;
+    
+    form.appendChild(token);
+    document.body.appendChild(form);
+    form.submit();
+}
+
+function closeDonationModal() {
+    document.getElementById('donation-modal').classList.add('hidden');
+}
+
+function closeFeaturedArtistModal() {
+    document.getElementById('featured-artist-modal').classList.add('hidden');
+}
+
+function viewSeller(sellerId) {
+    alert('Seller details view to be implemented');
+}
+
+function filterSellers(status) {
+    // Update active button
+    document.querySelectorAll('.seller-filter-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-[#5B5843]', 'text-white');
+        btn.classList.add('bg-gray-200', 'text-gray-700');
+    });
+    event.target.classList.add('active', 'bg-[#5B5843]', 'text-white');
+    event.target.classList.remove('bg-gray-200', 'text-gray-700');
+    
+    // Load filtered sellers
+    fetch(`/admin/api/sellers?status=${status}`)
+        .then(res => res.json())
+        .then(sellers => {
+            const tbody = document.getElementById('sellers-table');
+            tbody.innerHTML = sellers.map(seller => `
+                <tr>
+                    <td class="px-6 py-4 text-sm text-gray-900">${seller.artisan_name || seller.shop_name}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${seller.email}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${seller.indigenous_tribe || '-'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${seller.seller_type || 'Artisan'}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">${seller.verification_status}</td>
+                    <td class="px-6 py-4 text-sm text-gray-900">
+                        <button class="text-blue-600 hover:underline" onclick="viewSeller(${seller.id})">View</button>
+                        <button class="text-green-600 hover:underline ml-2" onclick="approveSeller(${seller.id})">Approve</button>
+                        <button class="text-red-600 hover:underline ml-2" onclick="rejectSeller(${seller.id})">Reject</button>
+                    </td>
+                </tr>
+            `).join('');
+        });
+}
+
+function filterProducts(status) {
+    // Update active button
+    document.querySelectorAll('.product-filter-btn').forEach(btn => {
+        btn.classList.remove('active', 'bg-[#5B5843]', 'text-white');
+        btn.classList.add('bg-gray-200', 'text-gray-700');
+    });
+    event.target.classList.add('active', 'bg-[#5B5843]', 'text-white');
+    event.target.classList.remove('bg-gray-200', 'text-gray-700');
+    
+    // Load filtered products
+    const url = status === 'all' ? '/admin/api/products' : `/admin/api/products?status=${status}`;
+    fetch(url)
+        .then(res => res.json())
+        .then(products => {
+            const grid = document.getElementById('products-grid');
+            grid.innerHTML = products.map(product => `
+                <div class="bg-white rounded-lg shadow p-4">
+                    <img src="/assets/products/${product.image || 'default.jpg'}" class="w-full h-48 object-cover rounded-lg mb-2" onerror="this.src='/assets/logo/dark-green-logo.png'">
+                    <h4 class="text-lg font-semibold text-gray-900">${product.name}</h4>
+                    <p class="text-gray-600">${product.category}</p>
+                    <p class="text-gray-800 font-bold mt-2">₱${parseFloat(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                    <p class="text-gray-500 mt-1 text-sm">Status: <span class="font-medium">${product.approval_status}</span></p>
+                    <p class="text-gray-500 text-sm">By: ${product.seller?.artisan_name || 'Unknown'}</p>
+                    <div class="flex gap-2 mt-3">
+                        <button class="flex-1 text-blue-600 hover:underline text-sm" onclick="approveProduct(${product.id})">Approve</button>
+                        <button class="flex-1 text-red-600 hover:underline text-sm" onclick="deleteProduct(${product.id})">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        });
+}
+
+// Form Submit Handlers
+document.addEventListener('DOMContentLoaded', function() {
+    // Story Form
+    const storyForm = document.getElementById('story-form');
+    if (storyForm) {
+        storyForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(storyForm);
+            
+            try {
+                const response = await fetch('/admin/api/stories', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Story created successfully!');
+                    storyForm.reset();
+                    loadStories();
+                }
+            } catch (error) {
+                console.error('Error creating story:', error);
+            }
+        });
+    }
+    
+    // Donation Form
+    const donationForm = document.getElementById('donation-form');
+    if (donationForm) {
+        donationForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(donationForm);
+            
+            try {
+                const response = await fetch('/admin/api/donations', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Donation initiative created successfully!');
+                    donationForm.reset();
+                    closeDonationModal();
+                    loadDonations();
+                }
+            } catch (error) {
+                console.error('Error creating donation:', error);
+            }
+        });
+    }
+    
+    // Featured Artist Form
+    const artistForm = document.getElementById('featured-artist-form');
+    if (artistForm) {
+        artistForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(artistForm);
+            
+            try {
+                const response = await fetch('/admin/api/featured-artists', {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.success) {
+                    alert('Featured artist added successfully!');
+                    artistForm.reset();
+                    closeFeaturedArtistModal();
+                    loadFeaturedArtists();
+                }
+            } catch (error) {
+                console.error('Error creating featured artist:', error);
+            }
+        });
+    }
+});
 </script>
 @endsection

@@ -111,4 +111,33 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
     Route::get('/dashboard', function () {
         return view('admin.dashboard');
     })->name('admin.dashboard');
+    
+    // Admin API Routes
+    Route::get('/api/analytics', [AdminController::class, 'getAnalytics']);
+    Route::get('/api/users', [AdminController::class, 'getUsers']);
+    Route::delete('/api/users/{id}', [AdminController::class, 'deleteUser']);
+    
+    Route::get('/api/sellers', [AdminController::class, 'getSellers']);
+    Route::post('/api/sellers/{id}/status', [AdminController::class, 'updateSellerStatus']);
+    Route::delete('/api/sellers/{id}', [AdminController::class, 'deleteSeller']);
+    
+    Route::get('/api/products', [AdminController::class, 'getProducts']);
+    Route::post('/api/products/{id}/status', [AdminController::class, 'updateProductStatus']);
+    Route::post('/api/products/{id}/featured', [AdminController::class, 'toggleFeaturedProduct']);
+    Route::delete('/api/products/{id}', [AdminController::class, 'deleteProduct']);
+    
+    Route::get('/api/stories', [AdminController::class, 'getStories']);
+    Route::post('/api/stories', [AdminController::class, 'createStory']);
+    Route::post('/api/stories/{id}', [AdminController::class, 'updateStory']);
+    Route::delete('/api/stories/{id}', [AdminController::class, 'deleteStory']);
+    
+    Route::get('/api/donations', [AdminController::class, 'getDonations']);
+    Route::post('/api/donations', [AdminController::class, 'createDonation']);
+    Route::post('/api/donations/{id}', [AdminController::class, 'updateDonation']);
+    Route::delete('/api/donations/{id}', [AdminController::class, 'deleteDonation']);
+    
+    Route::get('/api/featured-artists', [AdminController::class, 'getFeaturedArtists']);
+    Route::post('/api/featured-artists', [AdminController::class, 'createFeaturedArtist']);
+    Route::post('/api/featured-artists/{id}', [AdminController::class, 'updateFeaturedArtist']);
+    Route::delete('/api/featured-artists/{id}', [AdminController::class, 'deleteFeaturedArtist']);
 });

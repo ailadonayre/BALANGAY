@@ -19,6 +19,7 @@ class SellerSeeder extends Seeder
             'phone_number' => '09123456789',
             'password' => Hash::make('password123'),
             'community' => 'Ifugao',
+            'verification_status' => 'approved',
         ]);
 
         Seller::create([
@@ -27,6 +28,7 @@ class SellerSeeder extends Seeder
             'phone_number' => '09987654321',
             'password' => Hash::make('password123'),
             'community' => 'Ilocos',
+            'verification_status' => 'approved',
         ]);
 
         Seller::create([
@@ -35,6 +37,7 @@ class SellerSeeder extends Seeder
             'phone_number' => '09111111111',
             'password' => Hash::make('password123'),
             'community' => 'Mindanao',
+            'verification_status' => 'approved',
         ]);
     }
 }

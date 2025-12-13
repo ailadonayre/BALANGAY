@@ -34,6 +34,43 @@ class AdminController extends Controller
         return view('admin.dashboard', compact('stats'));
     }
 
+    public function getAnalytics()
+    {
+        $analytics = [
+            // User Analytics
+            'total_users' => User::count(),
+            
+            // Seller Analytics
+            'total_sellers' => Seller::count(),
+            'verified_sellers' => Seller::where('verification_status', 'approved')->count(),
+            'pending_sellers' => Seller::where('verification_status', 'pending')->count(),
+            'sellers_by_tribe' => Seller::selectRaw('indigenous_tribe, count(*) as count')
+                ->groupBy('indigenous_tribe')
+                ->get(),
+            
+            // Product Analytics
+            'total_products' => Product::count(),
+            'approved_products' => Product::where('approval_status', 'approved')->count(),
+            'pending_products' => Product::where('approval_status', 'pending')->count(),
+            
+            // Order Analytics
+            'total_orders' => Order::count(),
+            'orders_this_month' => Order::whereMonth('created_at', now()->month)->count(),
+            'total_revenue' => Order::where('payment_status', 'paid')->sum('total_amount'),
+            'revenue_this_month' => Order::whereMonth('created_at', now()->month)
+                ->where('payment_status', 'paid')
+                ->sum('total_amount'),
+            
+            // Homepage Stats
+            'artisans_supported' => Seller::where('verification_status', 'approved')->count(),
+            'products_sold' => OrderItem::sum('quantity'),
+            'income_provided' => OrderItem::sum('subtotal'),
+            'orders_count' => Order::count(),
+        ];
+
+        return response()->json($analytics);
+    }
+
     // User Management
     public function getUsers()
     {
@@ -128,6 +165,26 @@ class AdminController extends Controller
         return response()->json([
             'success' => true,
             'message' => 'Product featured status updated'
+        ]);
+    }
+
+    public function deleteProduct($id)
+    {
+        $product = Product::findOrFail($id);
+        
+        // Delete image if exists
+        if ($product->image && $product->image !== 'default.jpg') {
+            $imagePath = public_path('assets/products/' . $product->image);
+            if (file_exists($imagePath)) {
+                unlink($imagePath);
+            }
+        }
+        
+        $product->delete();
+        
+        return response()->json([
+            'success' => true,
+            'message' => 'Product deleted successfully'
         ]);
     }
 
@@ -427,43 +484,5 @@ class AdminController extends Controller
 
         $artist->delete();
         return response()->json(['success' => true, 'message' => 'Featured artist deleted successfully']);
-    }
-
-    public function getAnalytics()
-    {
-        $analytics = [
-            // User Analytics
-            'total_users' => User::count(),
-            'new_users_this_month' => User::whereMonth('created_at', now()->month)->count(),
-            
-            // Seller Analytics
-            'total_sellers' => Seller::count(),
-            'verified_sellers' => Seller::where('verification_status', 'approved')->count(),
-            'pending_sellers' => Seller::where('verification_status', 'pending')->count(),
-            'sellers_by_tribe' => Seller::selectRaw('indigenous_tribe, count(*) as count')
-                ->groupBy('indigenous_tribe')
-                ->get(),
-            
-            // Product Analytics
-            'total_products' => Product::count(),
-            'approved_products' => Product::where('approval_status', 'approved')->count(),
-            'pending_products' => Product::where('approval_status', 'pending')->count(),
-            
-            // Order Analytics
-            'total_orders' => Order::count(),
-            'orders_this_month' => Order::whereMonth('created_at', now()->month)->count(),
-            'total_revenue' => Order::where('payment_status', 'paid')->sum('total_amount'),
-            'revenue_this_month' => Order::whereMonth('created_at', now()->month)
-                ->where('payment_status', 'paid')
-                ->sum('total_amount'),
-            
-            // Homepage Stats
-            'artisans_supported' => Seller::where('verification_status', 'approved')->count(),
-            'products_sold' => OrderItem::sum('quantity'),
-            'income_provided' => OrderItem::sum('subtotal'),
-            'orders_count' => Order::count(),
-        ];
-
-        return response()->json($analytics);
     }
 }

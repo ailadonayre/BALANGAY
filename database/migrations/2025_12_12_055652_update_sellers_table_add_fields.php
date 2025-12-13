@@ -13,7 +13,6 @@ return new class extends Migration
             // seller_type (solo, enterprise)
             if (!Schema::hasColumn('sellers', 'seller_type')) {
                 $table->string('seller_type')->default('solo')->after('indigenous_tribe');
-                $table->check("seller_type IN ('solo', 'enterprise')");
             }
 
             // shop_name
@@ -39,7 +38,6 @@ return new class extends Migration
             // verification_status (pending, approved, rejected)
             if (!Schema::hasColumn('sellers', 'verification_status')) {
                 $table->string('verification_status')->default('pending')->after('banner_image');
-                $table->check("verification_status IN ('pending', 'approved', 'rejected')");
             }
         });
     }

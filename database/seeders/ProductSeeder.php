@@ -108,9 +108,11 @@ class ProductSeeder extends Seeder
 
         foreach ($products as $index => $product) {
             $seller = $sellers[$index % count($sellers)];
+            // Make the last product pending for admin to review
+            $status = ($index === count($products) - 1) ? 'pending' : 'approved';
             Product::create(array_merge($product, [
                 'seller_id' => $seller->id,
-                'approval_status' => 'approved'  // Mark as approved so it shows in shop
+                'approval_status' => $status
             ]));
         }
     }

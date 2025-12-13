@@ -14,7 +14,6 @@ return new class extends Migration
             // approval_status (pending, approved, rejected)
             if (!Schema::hasColumn('products', 'approval_status')) {
                 $table->string('approval_status')->default('pending')->after('stock');
-                $table->check("approval_status IN ('pending', 'approved', 'rejected')");
             }
 
             // rejection_reason
