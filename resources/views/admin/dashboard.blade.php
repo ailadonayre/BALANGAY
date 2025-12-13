@@ -451,25 +451,46 @@ function switchAdminTab(tab) {
 // Load Analytics
 async function loadAnalytics() {
     try {
+        console.log('Loading analytics...');
         const response = await fetch('/admin/api/analytics');
         if (!response.ok) {
             console.error('API Error:', response.status, response.statusText);
             return;
         }
         const analytics = await response.json();
+        console.log('Analytics data:', analytics);
         
         document.getElementById('stat-users').textContent = analytics.total_users;
         document.getElementById('stat-sellers').textContent = analytics.verified_sellers;
         document.getElementById('stat-products').textContent = analytics.total_products;
         document.getElementById('stat-revenue').textContent = '₱' + parseFloat(analytics.total_revenue).toLocaleString('en-PH', { minimumFractionDigits: 2 });
         
+        console.log('Updated stat boxes:', {
+            users: analytics.total_users,
+            sellers: analytics.verified_sellers,
+            products: analytics.total_products,
+            revenue: analytics.total_revenue
+        });
+        
         document.getElementById('homepage-artisans').textContent = analytics.artisans_supported;
         document.getElementById('homepage-products-sold').textContent = analytics.products_sold;
         document.getElementById('homepage-income').textContent = '₱' + parseFloat(analytics.income_provided).toLocaleString('en-PH', { minimumFractionDigits: 2 });
         document.getElementById('homepage-orders').textContent = analytics.orders_count;
         
+        console.log('Updated homepage stats:', {
+            artisans: analytics.artisans_supported,
+            productsSold: analytics.products_sold,
+            income: analytics.income_provided,
+            orders: analytics.orders_count
+        });
+        
         document.getElementById('pending-sellers-count').textContent = analytics.pending_sellers;
         document.getElementById('pending-products-count').textContent = analytics.pending_products;
+        
+        console.log('Updated pending approvals:', {
+            sellers: analytics.pending_sellers,
+            products: analytics.pending_products
+        });
         
         // Sellers by tribe
         const tribeContainer = document.getElementById('sellers-by-tribe');
