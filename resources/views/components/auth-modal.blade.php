@@ -35,8 +35,8 @@
                 <form id="signin-form" class="space-y-4">
                     @csrf
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Email Address</label>
-                        <input type="email" name="email" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent transition-all duration-300" placeholder="your@email.com">
+                        <label class="block text-sm font-medium text-gray-700 mb-2" id="email-label">Email Address</label>
+                        <input type="text" name="email" id="email-input" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent transition-all duration-300" placeholder="your@email.com">
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
@@ -222,7 +222,21 @@ document.querySelectorAll('.role-signin-btn').forEach(btn => {
         });
         this.classList.add('border-[#5B5843]', 'bg-[#5B5843]', 'text-white');
         this.classList.remove('border-gray-300', 'text-gray-700');
-        document.getElementById('signin-role').value = this.dataset.role;
+        const role = this.dataset.role;
+        document.getElementById('signin-role').value = role;
+        
+        // Update label and placeholder for admin
+        const emailLabel = document.getElementById('email-label');
+        const emailInput = document.getElementById('email-input');
+        if (role === 'admin') {
+            emailLabel.textContent = 'Username';
+            emailInput.placeholder = 'admin';
+            emailInput.type = 'text';
+        } else {
+            emailLabel.textContent = 'Email Address';
+            emailInput.placeholder = 'your@email.com';
+            emailInput.type = 'email';
+        }
     });
 });
 
