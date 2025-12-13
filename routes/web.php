@@ -77,7 +77,10 @@ Route::get('/api/products/category/{category}', [ProductController::class, 'getB
 Route::get('/api/products/{id}', [ProductController::class, 'show'])->name('api.products.show');
 Route::get('/api/categories', [ProductController::class, 'getCategories'])->name('api.categories');
 Route::get('/api/products-communities', [ProductController::class, 'getCommunities'])->name('api.products.communities');
-
+// Public API for Stories and Featured Artists
+Route::get('/api/public/stories', [ProductController::class, 'getPublicStories'])->name('api.public.stories');
+Route::get('/api/public/featured-artists', [ProductController::class, 'getPublicFeaturedArtists'])->name('api.public.featured-artists');
+Route::get('/api/public/featured-communities', [ProductController::class, 'getPublicFeaturedCommunities'])->name('api.public.featured-communities');
 // Community API Routes (Public)
 Route::get('/api/communities/all', [CommunityController::class, 'index'])->name('api.communities.list');
 Route::get('/api/communities/{id}', [CommunityController::class, 'show'])->name('api.communities.show');
@@ -141,4 +144,9 @@ Route::middleware(['auth:admin'])->prefix('admin')->group(function () {
     Route::post('/api/featured-artists', [AdminController::class, 'createFeaturedArtist']);
     Route::post('/api/featured-artists/{id}', [AdminController::class, 'updateFeaturedArtist']);
     Route::delete('/api/featured-artists/{id}', [AdminController::class, 'deleteFeaturedArtist']);
+    
+    Route::get('/api/featured-communities', [AdminController::class, 'getFeaturedCommunities']);
+    Route::post('/api/featured-communities', [AdminController::class, 'createFeaturedCommunity']);
+    Route::post('/api/featured-communities/{id}', [AdminController::class, 'updateFeaturedCommunity']);
+    Route::delete('/api/featured-communities/{id}', [AdminController::class, 'deleteFeaturedCommunity']);
 });

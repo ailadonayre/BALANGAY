@@ -18,12 +18,21 @@
 
             <!-- Right Icons -->
             <div class="flex items-center space-x-6">
+                @auth('admin')
+                    <!-- Admin Dashboard Link - No Profile/Cart Icons -->
+                    <a href="{{ route('admin.dashboard') }}" class="text-gray-700 hover:text-[#5B5843] transition-colors duration-300 text-sm font-medium">
+                        Admin Dashboard
+                    </a>
+                @endauth
+                
                 @auth('seller')
                     <!-- Seller Dashboard Link -->
                     <a href="{{ route('seller.dashboard') }}" class="text-gray-700 hover:text-[#5B5843] transition-colors duration-300 text-sm font-medium">
                         Dashboard
                     </a>
-                @else
+                @endauth
+                
+                @if(!auth('admin')->check() && !auth('seller')->check())
                     @auth
                         <!-- Logged In User - Profile Icon Links to Profile -->
                         <a href="{{ route('profile') }}" class="text-gray-700 hover:text-[#5B5843] transition-colors duration-300" aria-label="Profile">
@@ -39,10 +48,10 @@
                             </svg>
                         </button>
                     @endauth
-                @endauth('seller')
+                @endif
 
-                <!-- Cart Icon - Only for Non-Sellers -->
-                @if (!auth('seller')->check())
+                <!-- Cart Icon - Only for Regular Users (Not Sellers or Admins) -->
+                @if (!auth('seller')->check() && !auth('admin')->check())
                     @auth
                         <!-- Logged In User - Cart Icon Links to Cart -->
                         <a href="{{ route('cart') }}" class="text-gray-700 hover:text-[#5B5843] transition-colors duration-300 relative" aria-label="Cart">

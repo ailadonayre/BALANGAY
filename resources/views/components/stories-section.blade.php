@@ -40,44 +40,75 @@
         </div>
 
         <!-- Featured Story Cards -->
-        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-8 lg:gap-10 mt-20 lg:mt-24">
-            @php
-            $stories = [
-                [
-                    'title' => 'Preserving T\'nalak Traditions',
-                    'excerpt' => 'How T\'boli dreamweavers keep ancient textile art alive',
-                    'image' => 'Amparo-Balansi-Mabanag.jpg'
-                ],
-                [
-                    'title' => 'The Art of Metal Smithing',
-                    'excerpt' => 'Eduardo Mutuc\'s journey to becoming a National Living Treasure',
-                    'image' => 'Eduardo-Mutuc.jpg'
-                ],
-                [
-                    'title' => 'Weaving Community Together',
-                    'excerpt' => 'Inabel weavers creating economic opportunities in Ilocos',
-                    'image' => 'Magdalena-Gamayo.jpeg'
-                ]
-            ];
-            @endphp
+        <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-8 lg:gap-10 mt-20 lg:mt-24" id="hero-stories-grid">
+            <!-- Stories will be loaded dynamically -->
+            <div class="col-span-full text-center py-8 text-gray-400">
+                <div class="animate-pulse">Loading stories...</div>
+            </div>
+        </div>
+    </div>
+</section>
 
-            @foreach($stories as $index => $story)
-            <article class="group cursor-pointer loading story-card" data-story-index="{{ $index }}" style="animation-delay: {{ $index * 0.2 }}s">
+<script>
+// Load published stories from database for hero section
+async function loadHeroStories() {
+    try {
+        const response = await fetch('/api/public/stories');
+        const stories = await response.json();
+        
+        const grid = document.getElementById('hero-stories-grid');
+        
+        if (!stories || stories.length === 0) {
+            grid.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">No stories available at the moment.</div>';
+            return;
+        }
+        
+        // Show only first 3 stories
+        const displayStories = stories.slice(0, 3);
+        
+        grid.innerHTML = displayStories.map((story, index) => `
+            <article class="group cursor-pointer loading story-card" data-story-index="${index}" style="animation-delay: ${index * 0.2}s" onclick="openHeroStoryModalFromDB(${story.id})">
                 <div class="overflow-hidden rounded-xl aspect-[4/3] mb-5">
-                    <img src="{{ asset('assets/artisans/' . $story['image']) }}" 
-                         alt="{{ $story['title'] }}" 
-                         class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110">
+                    <img src="/assets/stories/${story.image || 'default.jpg'}" 
+                         alt="${story.title}" 
+                         class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
+                         onerror="this.src='/assets/logo/dark-green-logo.png'">
                 </div>
-                <h3 class="text-xl md:text-2xl mb-3 futura-500 group-hover:text-[#5B5843] transition-colors duration-300">{{ $story['title'] }}</h3>
-                <p class="text-sm md:text-base text-gray-600 futura-400 mb-4">{{ $story['excerpt'] }}</p>
-                <a href="#" onclick="openHeroStoryModal(event, {{ $index }})" class="inline-flex items-center gap-2 text-[#5B5843] futura-500 text-sm tracking-wide uppercase hover:gap-4 transition-all duration-300">
+                <h3 class="text-xl md:text-2xl mb-3 futura-500 group-hover:text-[#5B5843] transition-colors duration-300">${story.title}</h3>
+                <p class="text-sm md:text-base text-gray-600 futura-400 mb-4">${story.excerpt}</p>
+                <a href="#" class="inline-flex items-center gap-2 text-[#5B5843] futura-500 text-sm tracking-wide uppercase hover:gap-4 transition-all duration-300">
                     Read More
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
                 </a>
             </article>
-            @endforeach
-        </div>
-    </div>
-</section>
+        `).join('');
+        
+        // Store stories globally for modal access
+        window.heroStoriesFromDB = stories;
+    } catch (error) {
+        console.error('Error loading hero stories:', error);
+        document.getElementById('hero-stories-grid').innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">Error loading stories.</div>';
+    }
+}
+
+// Open modal with database story
+function openHeroStoryModalFromDB(storyId) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    const story = window.heroStoriesFromDB?.find(s => s.id === storyId);
+    if (story) {
+        document.getElementById('hero-modal-story-title').textContent = story.title;
+        document.getElementById('hero-modal-story-image').src = `/assets/stories/${story.image || 'default.jpg'}`;
+        document.getElementById('hero-modal-story-image').alt = story.title;
+        document.getElementById('hero-modal-story-content').innerHTML = story.content.split('\n').map(p => `<p class="mb-4">${p}</p>`).join('');
+        
+        document.getElementById('hero-story-modal').classList.remove('hidden');
+    }
+}
+
+// Load stories when page loads
+document.addEventListener('DOMContentLoaded', loadHeroStories);
+</script>

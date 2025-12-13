@@ -31,5 +31,14 @@ class DatabaseSeeder extends Seeder
         
         // Run seller seeder
         $this->call(SellerSeeder::class);
+        
+        // Run featured artists seeder
+        $this->call(FeaturedArtistSeeder::class);
+        
+        // Run featured communities seeder
+        $this->call(FeaturedCommunitySeeder::class);
+        
+        // Run hero stories seeder
+        $this->call(HeroStoriesSeeder::class);
     }
 }

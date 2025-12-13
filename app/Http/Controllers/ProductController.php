@@ -4,6 +4,9 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Product;
+use App\Models\Story;
+use App\Models\FeaturedArtist;
+use App\Models\FeaturedCommunity;
 
 class ProductController extends Controller
 {
@@ -95,5 +98,35 @@ class ProductController extends Controller
             ->get();
         
         return response()->json($products);
+    }
+
+    public function getPublicStories()
+    {
+        $stories = \App\Models\Story::where('published', true)
+            ->orderBy('published_at', 'desc')
+            ->get();
+        
+        return response()->json($stories);
+    }
+
+    public function getPublicFeaturedArtists()
+    {
+        $artists = \App\Models\FeaturedArtist::where('active', true)
+            ->orderBy('display_order')
+            ->orderBy('created_at', 'desc')
+            ->limit(3)
+            ->get();
+        
+        return response()->json($artists);
+    }
+
+    public function getPublicFeaturedCommunities()
+    {
+        $communities = FeaturedCommunity::where('active', true)
+            ->orderBy('display_order')
+            ->orderBy('created_at', 'desc')
+            ->get();
+        
+        return response()->json($communities);
     }
 }

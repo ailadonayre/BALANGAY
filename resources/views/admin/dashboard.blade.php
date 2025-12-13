@@ -1,6 +1,24 @@
 @extends('layouts.app')
 
 @section('content')
+<style>
+    .line-clamp-2 {
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .line-clamp-3 {
+        display: -webkit-box;
+        -webkit-line-clamp: 3;
+        -webkit-box-orient: vertical;
+        overflow: hidden;
+    }
+    .admin-tab.active {
+        border-color: #5B5843 !important;
+        color: #5B5843 !important;
+    }
+</style>
 <div class="min-h-screen bg-gray-50 pt-24 pb-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
@@ -97,6 +115,9 @@
                     </button>
                     <button onclick="switchAdminTab('featured')" class="admin-tab px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                         Featured Artists
+                    </button>
+                    <button onclick="switchAdminTab('communities')" class="admin-tab px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
+                        Communities
                     </button>
                 </nav>
             </div>
@@ -254,7 +275,7 @@
                     </button>
                 </div>
                 <div class="p-6">
-                    <div id="stories-list" class="space-y-4">
+                    <div id="stories-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- Stories will be loaded here -->
                     </div>
                 </div>
@@ -282,7 +303,7 @@
         <div id="featured-tab" class="admin-content hidden">
             <div class="bg-white rounded-lg shadow">
                 <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                    <h3 class="text-xl font-semibold">Featured Artists</h3>
+                    <h3 class="text-xl font-semibold">Featured Artists <span class="text-sm text-gray-500">(Limit: 3 Active)</span></h3>
                     <button onclick="openFeaturedArtistModal()" class="bg-[#5B5843] text-white px-6 py-2 rounded-lg hover:bg-[#4a4735]">
                         + Add Featured Artist
                     </button>
@@ -290,6 +311,23 @@
                 <div class="p-6">
                     <div id="featured-artists-list" class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         <!-- Featured artists will be loaded here -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Featured Communities Tab -->
+        <div id="communities-tab" class="admin-content hidden">
+            <div class="bg-white rounded-lg shadow">
+                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
+                    <h3 class="text-xl font-semibold">Featured Communities</h3>
+                    <button onclick="openFeaturedCommunityModal()" class="bg-[#5B5843] text-white px-6 py-2 rounded-lg hover:bg-[#4a4735]">
+                        + Add Featured Community
+                    </button>
+                </div>
+                <div class="p-6">
+                    <div id="featured-communities-list" class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                        <!-- Featured communities will be loaded here -->
                     </div>
                 </div>
             </div>
@@ -360,9 +398,23 @@
                     <label class="block text-sm font-medium mb-2">Tribe</label>
                     <input type="text" name="tribe" class="w-full px-4 py-2 border rounded-lg">
                 </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Target Amount (Optional)</label>
+                        <input type="number" name="target_amount" step="0.01" class="w-full px-4 py-2 border rounded-lg">
+                    </div>
+                    <div>
+                        <label class="block text-sm font-medium mb-2">Current Amount</label>
+                        <input type="number" name="current_amount" step="0.01" value="0" class="w-full px-4 py-2 border rounded-lg">
+                    </div>
+                </div>
                 <div>
-                    <label class="block text-sm font-medium mb-2">Target Amount (Optional)</label>
-                    <input type="number" name="target_amount" step="0.01" class="w-full px-4 py-2 border rounded-lg">
+                    <label class="block text-sm font-medium mb-2">Status</label>
+                    <select name="status" class="w-full px-4 py-2 border rounded-lg">
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="paused">Paused</option>
+                    </select>
                 </div>
                 <div>
                     <label class="block text-sm font-medium mb-2">Image</label>
@@ -417,6 +469,43 @@
     </div>
 </div>
 
+<!-- Featured Community Modal -->
+<div id="featured-community-modal" class="hidden fixed inset-0 z-50 overflow-y-auto">
+    <div class="fixed inset-0 bg-black/50" onclick="closeFeaturedCommunityModal()"></div>
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative bg-white rounded-xl shadow-2xl w-full max-w-2xl p-8">
+            <h3 class="text-2xl font-bold mb-6">Add Featured Community</h3>
+            <form id="community-form" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium mb-2">Community Name</label>
+                    <input type="text" name="name" required class="w-full px-4 py-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Region</label>
+                    <input type="text" name="region" required class="w-full px-4 py-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Description</label>
+                    <textarea name="description" rows="4" class="w-full px-4 py-2 border rounded-lg"></textarea>
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Image</label>
+                    <input type="file" name="image" accept="image/*" class="w-full px-4 py-2 border rounded-lg">
+                </div>
+                <div>
+                    <label class="block text-sm font-medium mb-2">Display Order</label>
+                    <input type="number" name="display_order" value="0" class="w-full px-4 py-2 border rounded-lg">
+                </div>
+                <div class="flex gap-4">
+                    <button type="submit" class="flex-1 bg-[#5B5843] text-white py-2 rounded-lg hover:bg-[#4a4735]">Save Community</button>
+                    <button type="button" onclick="closeFeaturedCommunityModal()" class="flex-1 bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+
 <script>
 let currentSellerFilter = 'all';
 let currentProductFilter = 'all';
@@ -446,6 +535,11 @@ function switchAdminTab(tab) {
     event.target.classList.remove('border-transparent', 'text-gray-500');
     
     document.getElementById(`${tab}-tab`).classList.remove('hidden');
+    
+    // Load data for specific tabs
+    if (tab === 'communities') {
+        loadFeaturedCommunities();
+    }
 }
 
 // Load Analytics
@@ -579,11 +673,15 @@ async function loadProducts() {
                 <h4 class="text-lg font-semibold text-gray-900">${product.name}</h4>
                 <p class="text-gray-600">${product.category}</p>
                 <p class="text-gray-800 font-bold mt-2">₱${parseFloat(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-                <p class="text-gray-500 mt-1 text-sm">Status: <span class="font-medium">${product.approval_status}</span></p>
+                <p class="text-gray-500 mt-1 text-sm">Status: <span class="font-medium capitalize ${product.approval_status === 'approved' ? 'text-green-600' : product.approval_status === 'pending' ? 'text-yellow-600' : 'text-red-600'}">${product.approval_status}</span></p>
                 <p class="text-gray-500 text-sm">By: ${product.seller?.artisan_name || 'Unknown'}</p>
                 <div class="flex gap-2 mt-3">
-                    <button class="flex-1 text-blue-600 hover:underline text-sm" onclick="approveProduct(${product.id})">Approve</button>
-                    <button class="flex-1 text-red-600 hover:underline text-sm" onclick="deleteProduct(${product.id})">Delete</button>
+                    ${product.approval_status === 'approved' 
+                        ? `<span class="flex-1 text-center py-2 px-3 bg-green-50 text-green-700 rounded text-sm font-medium">✓ Approved</span>` 
+                        : `<button class="flex-1 text-blue-600 hover:bg-blue-50 py-2 px-3 rounded text-sm font-medium transition-colors" onclick="approveProduct(${product.id})">Approve</button>
+                           <button class="flex-1 text-yellow-600 hover:bg-yellow-50 py-2 px-3 rounded text-sm font-medium transition-colors" onclick="rejectProduct(${product.id})">Reject</button>`
+                    }
+                    <button class="flex-1 text-red-600 hover:bg-red-50 py-2 px-3 rounded text-sm font-medium transition-colors" onclick="deleteProduct(${product.id})">Delete</button>
                 </div>
             </div>
         `).join('');
@@ -603,11 +701,31 @@ async function loadStories() {
         const stories = await response.json();
 
         const container = document.getElementById('stories-list');
+        if (stories.length === 0) {
+            container.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">No stories yet. Click "Add Story" to create one.</div>';
+            return;
+        }
         container.innerHTML = stories.map(story => `
-            <div class="p-4 bg-gray-50 rounded-lg shadow">
-                <h4 class="text-lg font-semibold">${story.title}</h4>
-                <p class="text-gray-600 text-sm">${story.author_name} - ${story.tribe || 'N/A'}</p>
-                <p class="text-gray-800 mt-2">${story.excerpt}</p>
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                ${story.image ? `<img src="/assets/stories/${story.image}" class="w-full h-48 object-cover" onerror="this.src='/assets/logo/dark-green-logo.png'">` : '<div class="w-full h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400">No Image</span></div>'}
+                <div class="p-4">
+                    <div class="flex items-start justify-between mb-2">
+                        <h4 class="text-lg font-semibold text-gray-900">${story.title}</h4>
+                        <span class="px-2 py-1 text-xs rounded ${story.published ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'}">
+                            ${story.published ? 'Published' : 'Draft'}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">By ${story.author_name}</p>
+                    <p class="text-sm text-gray-500 mb-2">${story.tribe || 'No tribe specified'}</p>
+                    <p class="text-gray-700 text-sm line-clamp-3 mb-4">${story.excerpt}</p>
+                    <div class="flex gap-2">
+                        <button onclick="editStory(${story.id})" class="flex-1 text-blue-600 hover:bg-blue-50 py-2 px-3 rounded text-sm font-medium transition-colors">Edit</button>
+                        <button onclick="deleteStory(${story.id})" class="flex-1 text-red-600 hover:bg-red-50 py-2 px-3 rounded text-sm font-medium transition-colors">Delete</button>
+                        <button onclick="togglePublishStory(${story.id}, ${story.published})" class="flex-1 text-green-600 hover:bg-green-50 py-2 px-3 rounded text-sm font-medium transition-colors">
+                            ${story.published ? 'Unpublish' : 'Publish'}
+                        </button>
+                    </div>
+                </div>
             </div>
         `).join('');
     } catch (error) {
@@ -626,14 +744,48 @@ async function loadDonations() {
         const donations = await response.json();
 
         const container = document.getElementById('donations-list');
-        container.innerHTML = donations.map(donation => `
-            <div class="p-4 bg-gray-50 rounded-lg shadow">
-                <h4 class="text-lg font-semibold">${donation.title}</h4>
-                <p class="text-gray-600">${donation.tribe || 'N/A'}</p>
-                <p class="text-gray-800 mt-2">${donation.description}</p>
-                <p class="text-gray-700 mt-1 font-bold">Target: ${donation.target_amount ? '₱' + parseFloat(donation.target_amount).toLocaleString('en-PH') : 'N/A'}</p>
+        if (donations.length === 0) {
+            container.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">No donation initiatives yet. Click "Add Initiative" to create one.</div>';
+            return;
+        }
+        container.innerHTML = donations.map(donation => {
+            const progress = donation.target_amount > 0 ? ((donation.current_amount || 0) / donation.target_amount * 100) : 0;
+            return `
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                ${donation.image ? `<img src="/assets/donations/${donation.image}" class="w-full h-48 object-cover" onerror="this.src='/assets/logo/dark-green-logo.png'">` : '<div class="w-full h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400">No Image</span></div>'}
+                <div class="p-4">
+                    <div class="flex items-start justify-between mb-2">
+                        <h4 class="text-lg font-semibold text-gray-900">${donation.title}</h4>
+                        <span class="px-2 py-1 text-xs rounded ${donation.status === 'active' ? 'bg-green-100 text-green-800' : donation.status === 'completed' ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}">
+                            ${donation.status || 'active'}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">${donation.tribe || 'No tribe specified'}</p>
+                    <p class="text-gray-700 text-sm mb-3 line-clamp-2">${donation.description}</p>
+                    ${donation.target_amount ? `
+                        <div class="mb-3">
+                            <div class="flex justify-between text-sm mb-1">
+                                <span class="text-gray-600">Progress</span>
+                                <span class="font-semibold text-gray-900">${progress.toFixed(1)}%</span>
+                            </div>
+                            <div class="w-full bg-gray-200 rounded-full h-2">
+                                <div class="bg-[#5B5843] h-2 rounded-full" style="width: ${Math.min(progress, 100)}%"></div>
+                            </div>
+                            <div class="flex justify-between text-xs mt-1">
+                                <span class="text-gray-600">₱${parseFloat(donation.current_amount || 0).toLocaleString('en-PH', {minimumFractionDigits: 2})}</span>
+                                <span class="text-gray-600">₱${parseFloat(donation.target_amount).toLocaleString('en-PH', {minimumFractionDigits: 2})}</span>
+                            </div>
+                        </div>
+                    ` : ''}
+                    <div class="flex gap-2">
+                        <button onclick="updateDonationProgress(${donation.id})" class="flex-1 text-green-600 hover:bg-green-50 py-2 px-3 rounded text-sm font-medium transition-colors">Update</button>
+                        <button onclick="editDonation(${donation.id})" class="flex-1 text-blue-600 hover:bg-blue-50 py-2 px-3 rounded text-sm font-medium transition-colors">Edit</button>
+                        <button onclick="deleteDonation(${donation.id})" class="flex-1 text-red-600 hover:bg-red-50 py-2 px-3 rounded text-sm font-medium transition-colors">Delete</button>
+                    </div>
+                </div>
             </div>
-        `).join('');
+        `;
+        }).join('');
     } catch (error) {
         console.error('Error loading donations:', error);
     }
@@ -650,12 +802,32 @@ async function loadFeaturedArtists() {
         const artists = await response.json();
 
         const container = document.getElementById('featured-artists-list');
+        if (artists.length === 0) {
+            container.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">No featured artists yet. Click "Add Featured Artist" to create one.</div>';
+            return;
+        }
         container.innerHTML = artists.map(artist => `
-            <div class="p-4 bg-gray-50 rounded-lg shadow">
-                <img src="/assets/artisans/${artist.image || 'default.jpg'}" class="w-full h-40 object-cover rounded-lg mb-2" onerror="this.src='/assets/logo/dark-green-logo.png'">
-                <h4 class="text-lg font-semibold">${artist.name}</h4>
-                <p class="text-gray-600">${artist.tribe} - ${artist.craft}</p>
-                <p class="text-gray-800 mt-2">${artist.description || 'No description'}</p>
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                ${artist.image ? `<img src="/assets/artisans/${artist.image}" class="w-full h-48 object-cover" onerror="this.src='/assets/logo/dark-green-logo.png'">` : '<div class="w-full h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400">No Image</span></div>'}
+                <div class="p-4">
+                    <div class="flex items-start justify-between mb-2">
+                        <h4 class="text-lg font-semibold text-gray-900">${artist.name}</h4>
+                        <span class="px-2 py-1 text-xs rounded ${artist.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                            ${artist.active ? 'Active' : 'Inactive'}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-1">${artist.tribe}</p>
+                    <p class="text-sm text-[#5B5843] font-medium mb-2">${artist.craft}</p>
+                    <p class="text-gray-700 text-sm mb-3 line-clamp-3">${artist.description || 'No description'}</p>
+                    <p class="text-xs text-gray-500 mb-3">Display Order: ${artist.display_order}</p>
+                    <div class="flex gap-2">
+                        <button onclick="toggleActiveArtist(${artist.id}, ${artist.active})" class="flex-1 text-green-600 hover:bg-green-50 py-2 px-3 rounded text-sm font-medium transition-colors">
+                            ${artist.active ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <button onclick="editFeaturedArtist(${artist.id})" class="flex-1 text-blue-600 hover:bg-blue-50 py-2 px-3 rounded text-sm font-medium transition-colors">Edit</button>
+                        <button onclick="deleteFeaturedArtist(${artist.id})" class="flex-1 text-red-600 hover:bg-red-50 py-2 px-3 rounded text-sm font-medium transition-colors">Delete</button>
+                    </div>
+                </div>
             </div>
         `).join('');
     } catch (error) {
@@ -730,6 +902,26 @@ function approveProduct(productId) {
         if (data.success) {
             alert('Product approved!');
             loadProducts();
+            loadAnalytics();
+        }
+    });
+}
+
+function rejectProduct(productId) {
+    if (!confirm('Reject this product?')) return;
+    
+    fetch(`/admin/api/products/${productId}/status`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ approval_status: 'rejected' })
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            alert('Product rejected!');
+            loadProducts();
+            loadAnalytics();
         }
     });
 }
@@ -767,13 +959,260 @@ function logoutAdmin() {
     form.submit();
 }
 
+// Modal Functions
+function openStoryModal(storyId = null) {
+    const modal = document.getElementById('story-modal');
+    const form = document.getElementById('story-form');
+    const title = modal.querySelector('h3');
+    
+    if (storyId) {
+        title.textContent = 'Edit Story';
+        // Load story data
+        fetch(`/admin/api/stories`)
+            .then(res => res.json())
+            .then(stories => {
+                const story = stories.find(s => s.id == storyId);
+                if (story) {
+                    form.querySelector('[name="title"]').value = story.title;
+                    form.querySelector('[name="author_name"]').value = story.author_name;
+                    form.querySelector('[name="tribe"]').value = story.tribe || '';
+                    form.querySelector('[name="excerpt"]').value = story.excerpt;
+                    form.querySelector('[name="content"]').value = story.content;
+                    form.querySelector('[name="published"]').checked = story.published;
+                    form.dataset.storyId = storyId;
+                }
+            });
+    } else {
+        title.textContent = 'Add New Story';
+        form.reset();
+        delete form.dataset.storyId;
+    }
+    
+    modal.classList.remove('hidden');
+}
+
+function closeStoryModal() {
+    document.getElementById('story-modal').classList.add('hidden');
+    document.getElementById('story-form').reset();
+}
+
+function openDonationModal(donationId = null) {
+    const modal = document.getElementById('donation-modal');
+    const form = document.getElementById('donation-form');
+    const title = modal.querySelector('h3');
+    
+    if (donationId) {
+        title.textContent = 'Edit Donation Initiative';
+        fetch(`/admin/api/donations`)
+            .then(res => res.json())
+            .then(donations => {
+                const donation = donations.find(d => d.id == donationId);
+                if (donation) {
+                    form.querySelector('[name="title"]').value = donation.title;
+                    form.querySelector('[name="description"]').value = donation.description;
+                    form.querySelector('[name="tribe"]').value = donation.tribe || '';
+                    form.querySelector('[name="target_amount"]').value = donation.target_amount || '';
+                    if (form.querySelector('[name="current_amount"]')) {
+                        form.querySelector('[name="current_amount"]').value = donation.current_amount || 0;
+                    }
+                    if (form.querySelector('[name="status"]')) {
+                        form.querySelector('[name="status"]').value = donation.status || 'active';
+                    }
+                    form.dataset.donationId = donationId;
+                }
+            });
+    } else {
+        title.textContent = 'Add Donation Initiative';
+        form.reset();
+        delete form.dataset.donationId;
+    }
+    
+    modal.classList.remove('hidden');
+}
+
 function closeDonationModal() {
     document.getElementById('donation-modal').classList.add('hidden');
+    document.getElementById('donation-form').reset();
+}
+
+function openFeaturedArtistModal(artistId = null) {
+    const modal = document.getElementById('featured-artist-modal');
+    const form = document.getElementById('featured-artist-form');
+    const title = modal.querySelector('h3');
+    
+    if (artistId) {
+        title.textContent = 'Edit Featured Artist';
+        fetch(`/admin/api/featured-artists`)
+            .then(res => res.json())
+            .then(artists => {
+                const artist = artists.find(a => a.id == artistId);
+                if (artist) {
+                    form.querySelector('[name="name"]').value = artist.name;
+                    form.querySelector('[name="tribe"]').value = artist.tribe;
+                    form.querySelector('[name="craft"]').value = artist.craft;
+                    form.querySelector('[name="description"]').value = artist.description || '';
+                    form.querySelector('[name="display_order"]').value = artist.display_order || 0;
+                    form.dataset.artistId = artistId;
+                }
+            });
+    } else {
+        title.textContent = 'Add Featured Artist';
+        form.reset();
+        delete form.dataset.artistId;
+    }
+    
+    modal.classList.remove('hidden');
 }
 
 function closeFeaturedArtistModal() {
     document.getElementById('featured-artist-modal').classList.add('hidden');
+    document.getElementById('featured-artist-form').reset();
 }
+
+// Load Featured Communities
+async function loadFeaturedCommunities() {
+    try {
+        const response = await fetch('/admin/api/featured-communities');
+        if (!response.ok) {
+            console.error('Featured Communities API Error:', response.status);
+            return;
+        }
+        const communities = await response.json();
+
+        const container = document.getElementById('featured-communities-list');
+        if (communities.length === 0) {
+            container.innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">No featured communities yet. Click "Add Featured Community" to create one.</div>';
+            return;
+        }
+        container.innerHTML = communities.map(community => `
+            <div class="bg-white rounded-lg shadow overflow-hidden">
+                ${community.image ? `<img src="/assets/tribes/${community.image}" class="w-full h-48 object-cover" onerror="this.src='/assets/logo/dark-green-logo.png'">` : '<div class="w-full h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400">No Image</span></div>'}
+                <div class="p-4">
+                    <div class="flex items-start justify-between mb-2">
+                        <h4 class="text-lg font-semibold text-gray-900">${community.name}</h4>
+                        <span class="px-2 py-1 text-xs rounded ${community.active ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'}">
+                            ${community.active ? 'Active' : 'Inactive'}
+                        </span>
+                    </div>
+                    <p class="text-sm text-gray-600 mb-2">${community.region}</p>
+                    <p class="text-gray-700 text-sm mb-3 line-clamp-3">${community.description || 'No description'}</p>
+                    <p class="text-xs text-gray-500 mb-3">Display Order: ${community.display_order}</p>
+                    <div class="flex gap-2">
+                        <button onclick="toggleActiveCommunity(${community.id}, ${community.active})" class="flex-1 text-green-600 hover:bg-green-50 py-2 px-3 rounded text-sm font-medium transition-colors">
+                            ${community.active ? 'Deactivate' : 'Activate'}
+                        </button>
+                        <button onclick="editFeaturedCommunity(${community.id})" class="flex-1 text-blue-600 hover:bg-blue-50 py-2 px-3 rounded text-sm font-medium transition-colors">Edit</button>
+                        <button onclick="deleteFeaturedCommunity(${community.id})" class="flex-1 text-red-600 hover:bg-red-50 py-2 px-3 rounded text-sm font-medium transition-colors">Delete</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        console.error('Error loading featured communities:', error);
+    }
+}
+
+function openFeaturedCommunityModal(communityId = null) {
+    const modal = document.getElementById('featured-community-modal');
+    const form = document.getElementById('community-form');
+    const title = modal.querySelector('h3');
+    
+    if (communityId) {
+        title.textContent = 'Edit Featured Community';
+        fetch('/admin/api/featured-communities')
+            .then(res => res.json())
+            .then(communities => {
+                const community = communities.find(c => c.id == communityId);
+                if (community) {
+                    form.querySelector('[name="name"]').value = community.name;
+                    form.querySelector('[name="region"]').value = community.region;
+                    form.querySelector('[name="description"]').value = community.description || '';
+                    form.querySelector('[name="display_order"]').value = community.display_order;
+                    form.dataset.communityId = communityId;
+                }
+            });
+    } else {
+        title.textContent = 'Add Featured Community';
+        form.reset();
+        delete form.dataset.communityId;
+    }
+    
+    modal.classList.remove('hidden');
+}
+
+function closeFeaturedCommunityModal() {
+    document.getElementById('featured-community-modal').classList.add('hidden');
+    document.getElementById('community-form').reset();
+}
+
+function editFeaturedCommunity(communityId) {
+    openFeaturedCommunityModal(communityId);
+}
+
+function toggleActiveCommunity(communityId, currentStatus) {
+    const newStatus = !currentStatus;
+    
+    fetch(`/admin/api/featured-communities/${communityId}`, {
+        method: 'POST',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ active: newStatus })
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            loadFeaturedCommunities();
+        }
+    });
+}
+
+function deleteFeaturedCommunity(communityId) {
+    if (!confirm('Delete this community? This action cannot be undone.')) return;
+    
+    fetch(`/admin/api/featured-communities/${communityId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            alert('Community deleted!');
+            loadFeaturedCommunities();
+        }
+    });
+}
+
+// Handle community form submission
+document.getElementById('community-form').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    
+    const formData = new FormData(this);
+    const communityId = this.dataset.communityId;
+    const url = communityId ? `/admin/api/featured-communities/${communityId}` : '/admin/api/featured-communities';
+    
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+            },
+            body: formData
+        });
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(communityId ? 'Community updated!' : 'Community created!');
+            closeFeaturedCommunityModal();
+            loadFeaturedCommunities();
+        } else {
+            alert('Error: ' + (data.message || 'Unknown error'));
+        }
+    } catch (error) {
+        console.error('Error:', error);
+        alert('An error occurred while saving the community');
+    }
+});
 
 function viewSeller(sellerId) {
     alert('Seller details view to be implemented');
@@ -842,6 +1281,190 @@ function filterProducts(status) {
         });
 }
 
+// Story CRUD Functions
+function editStory(storyId) {
+    openStoryModal(storyId);
+}
+
+function deleteStory(storyId) {
+    if (!confirm('Delete this story? This action cannot be undone.')) return;
+    
+    fetch(`/admin/api/stories/${storyId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            alert('Story deleted successfully!');
+            loadStories();
+        } else {
+            alert('Error deleting story');
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('Error deleting story');
+    });
+}
+
+function togglePublishStory(storyId, currentStatus) {
+    const action = currentStatus ? 'unpublish' : 'publish';
+    if (!confirm(`${action.charAt(0).toUpperCase() + action.slice(1)} this story?`)) return;
+    
+    fetch(`/admin/api/stories`)
+        .then(res => res.json())
+        .then(stories => {
+            const story = stories.find(s => s.id == storyId);
+            if (story) {
+                const formData = new FormData();
+                formData.append('title', story.title);
+                formData.append('author_name', story.author_name);
+                formData.append('excerpt', story.excerpt);
+                formData.append('content', story.content);
+                formData.append('tribe', story.tribe || '');
+                formData.append('published', !currentStatus ? '1' : '0');
+                
+                fetch(`/admin/api/stories/${storyId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: formData
+                }).then(res => res.json()).then(data => {
+                    if (data.success) {
+                        alert(`Story ${action}ed successfully!`);
+                        loadStories();
+                    }
+                });
+            }
+        });
+}
+
+// Donation CRUD Functions
+function editDonation(donationId) {
+    openDonationModal(donationId);
+}
+
+function deleteDonation(donationId) {
+    if (!confirm('Delete this donation initiative? This action cannot be undone.')) return;
+    
+    fetch(`/admin/api/donations/${donationId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            alert('Donation initiative deleted successfully!');
+            loadDonations();
+        } else {
+            alert('Error deleting donation initiative');
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('Error deleting donation initiative');
+    });
+}
+
+function updateDonationProgress(donationId) {
+    const newAmount = prompt('Enter the current donation amount:');
+    if (newAmount === null) return;
+    
+    const amount = parseFloat(newAmount);
+    if (isNaN(amount) || amount < 0) {
+        alert('Please enter a valid amount');
+        return;
+    }
+    
+    fetch(`/admin/api/donations`)
+        .then(res => res.json())
+        .then(donations => {
+            const donation = donations.find(d => d.id == donationId);
+            if (donation) {
+                const formData = new FormData();
+                formData.append('title', donation.title);
+                formData.append('description', donation.description);
+                formData.append('target_amount', donation.target_amount || 0);
+                formData.append('current_amount', amount);
+                formData.append('tribe', donation.tribe || '');
+                formData.append('status', donation.status || 'active');
+                
+                fetch(`/admin/api/donations/${donationId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: formData
+                }).then(res => res.json()).then(data => {
+                    if (data.success) {
+                        alert('Donation progress updated successfully!');
+                        loadDonations();
+                    }
+                });
+            }
+        });
+}
+
+// Featured Artist CRUD Functions
+function editFeaturedArtist(artistId) {
+    openFeaturedArtistModal(artistId);
+}
+
+function deleteFeaturedArtist(artistId) {
+    if (!confirm('Delete this featured artist? This action cannot be undone.')) return;
+    
+    fetch(`/admin/api/featured-artists/${artistId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            alert('Featured artist deleted successfully!');
+            loadFeaturedArtists();
+        } else {
+            alert('Error deleting featured artist');
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('Error deleting featured artist');
+    });
+}
+
+function toggleActiveArtist(artistId, currentStatus) {
+    const action = currentStatus ? 'deactivate' : 'activate';
+    if (!confirm(`${action.charAt(0).toUpperCase() + action.slice(1)} this featured artist?`)) return;
+    
+    fetch(`/admin/api/featured-artists`)
+        .then(res => res.json())
+        .then(artists => {
+            const artist = artists.find(a => a.id == artistId);
+            if (artist) {
+                const formData = new FormData();
+                formData.append('name', artist.name);
+                formData.append('tribe', artist.tribe);
+                formData.append('craft', artist.craft);
+                formData.append('description', artist.description || '');
+                formData.append('display_order', artist.display_order || 0);
+                formData.append('active', !currentStatus ? '1' : '0');
+                if (artist.seller_id) formData.append('seller_id', artist.seller_id);
+                
+                fetch(`/admin/api/featured-artists/${artistId}`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    },
+                    body: formData
+                }).then(res => res.json()).then(data => {
+                    if (data.success) {
+                        alert(`Featured artist ${action}d successfully!`);
+                        loadFeaturedArtists();
+                    }
+                });
+            }
+        });
+}
+
 // Form Submit Handlers
 document.addEventListener('DOMContentLoaded', function() {
     // Story Form
@@ -850,9 +1473,11 @@ document.addEventListener('DOMContentLoaded', function() {
         storyForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(storyForm);
+            const storyId = storyForm.dataset.storyId;
             
             try {
-                const response = await fetch('/admin/api/stories', {
+                const url = storyId ? `/admin/api/stories/${storyId}` : '/admin/api/stories';
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
@@ -861,12 +1486,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 const data = await response.json();
                 if (data.success) {
-                    alert('Story created successfully!');
+                    alert(storyId ? 'Story updated successfully!' : 'Story created successfully!');
                     storyForm.reset();
+                    closeStoryModal();
                     loadStories();
+                } else {
+                    alert('Error saving story');
                 }
             } catch (error) {
-                console.error('Error creating story:', error);
+                console.error('Error creating/updating story:', error);
+                alert('Error saving story');
             }
         });
     }
@@ -877,9 +1506,11 @@ document.addEventListener('DOMContentLoaded', function() {
         donationForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(donationForm);
+            const donationId = donationForm.dataset.donationId;
             
             try {
-                const response = await fetch('/admin/api/donations', {
+                const url = donationId ? `/admin/api/donations/${donationId}` : '/admin/api/donations';
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
@@ -888,13 +1519,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 const data = await response.json();
                 if (data.success) {
-                    alert('Donation initiative created successfully!');
+                    alert(donationId ? 'Donation initiative updated successfully!' : 'Donation initiative created successfully!');
                     donationForm.reset();
                     closeDonationModal();
                     loadDonations();
+                } else {
+                    alert('Error saving donation initiative');
                 }
             } catch (error) {
-                console.error('Error creating donation:', error);
+                console.error('Error creating/updating donation:', error);
+                alert('Error saving donation initiative');
             }
         });
     }
@@ -905,9 +1539,11 @@ document.addEventListener('DOMContentLoaded', function() {
         artistForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(artistForm);
+            const artistId = artistForm.dataset.artistId;
             
             try {
-                const response = await fetch('/admin/api/featured-artists', {
+                const url = artistId ? `/admin/api/featured-artists/${artistId}` : '/admin/api/featured-artists';
+                const response = await fetch(url, {
                     method: 'POST',
                     headers: {
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
@@ -916,13 +1552,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
                 const data = await response.json();
                 if (data.success) {
-                    alert('Featured artist added successfully!');
+                    alert(artistId ? 'Featured artist updated successfully!' : 'Featured artist added successfully!');
                     artistForm.reset();
                     closeFeaturedArtistModal();
                     loadFeaturedArtists();
+                } else {
+                    alert('Error saving featured artist');
                 }
             } catch (error) {
-                console.error('Error creating featured artist:', error);
+                console.error('Error creating/updating featured artist:', error);
+                alert('Error saving featured artist');
             }
         });
     }

@@ -10,6 +10,7 @@ use App\Models\OrderItem;
 use App\Models\Story;
 use App\Models\Donation;
 use App\Models\FeaturedArtist;
+use App\Models\FeaturedCommunity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 
@@ -57,10 +58,10 @@ class AdminController extends Controller
                 // Order Analytics
                 'total_orders' => Order::count(),
                 'orders_this_month' => Order::whereMonth('created_at', now()->month)->count(),
-                'total_revenue' => Order::where('payment_status', 'paid')->sum('total_amount') ?? 0,
-                'revenue_this_month' => Order::whereMonth('created_at', now()->month)
-                    ->where('payment_status', 'paid')
-                    ->sum('total_amount') ?? 0,
+                'total_revenue' => OrderItem::sum('subtotal') ?? 0,
+                'revenue_this_month' => OrderItem::whereHas('order', function($q) {
+                    $q->whereMonth('created_at', now()->month);
+                })->sum('subtotal') ?? 0,
                 
                 // Homepage Stats
                 'artisans_supported' => Seller::where('verification_status', 'approved')->count(),
@@ -519,5 +520,102 @@ class AdminController extends Controller
 
         $artist->delete();
         return response()->json(['success' => true, 'message' => 'Featured artist deleted successfully']);
+    }
+
+    // Featured Communities Management
+    public function getFeaturedCommunities()
+    {
+        try {
+            $communities = FeaturedCommunity::orderBy('display_order')->orderBy('created_at', 'desc')->get();
+            return response()->json($communities);
+        } catch (\Exception $e) {
+            \Log::error('Get Featured Communities Error: ' . $e->getMessage());
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    public function createFeaturedCommunity(Request $request)
+    {
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'region' => 'required|string|max:255',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'display_order' => 'nullable|integer',
+        ]);
+
+        $imagePath = null;
+        if ($request->hasFile('image')) {
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('assets/tribes'), $filename);
+            $imagePath = $filename;
+        }
+
+        $community = FeaturedCommunity::create([
+            'name' => $request->name,
+            'region' => $request->region,
+            'description' => $request->description,
+            'image' => $imagePath,
+            'display_order' => $request->display_order ?? 0,
+            'active' => false,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Featured community created successfully',
+            'community' => $community
+        ]);
+    }
+
+    public function updateFeaturedCommunity(Request $request, $id)
+    {
+        $community = FeaturedCommunity::findOrFail($id);
+
+        $request->validate([
+            'name' => 'sometimes|required|string|max:255',
+            'region' => 'sometimes|required|string|max:255',
+            'description' => 'nullable|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
+            'display_order' => 'nullable|integer',
+        ]);
+
+        if ($request->hasFile('image')) {
+            // Delete old image
+            if ($community->image && file_exists(public_path('assets/tribes/' . $community->image))) {
+                unlink(public_path('assets/tribes/' . $community->image));
+            }
+
+            $file = $request->file('image');
+            $filename = time() . '_' . $file->getClientOriginalName();
+            $file->move(public_path('assets/tribes'), $filename);
+            $community->image = $filename;
+        }
+
+        $community->update([
+            'name' => $request->name ?? $community->name,
+            'region' => $request->region ?? $community->region,
+            'description' => $request->description,
+            'display_order' => $request->display_order ?? $community->display_order,
+            'active' => $request->active ?? $community->active,
+        ]);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Featured community updated successfully',
+            'community' => $community
+        ]);
+    }
+
+    public function deleteFeaturedCommunity($id)
+    {
+        $community = FeaturedCommunity::findOrFail($id);
+        
+        if ($community->image && file_exists(public_path('assets/tribes/' . $community->image))) {
+            unlink(public_path('assets/tribes/' . $community->image));
+        }
+
+        $community->delete();
+        return response()->json(['success' => true, 'message' => 'Featured community deleted successfully']);
     }
 }
