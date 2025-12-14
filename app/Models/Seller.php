@@ -9,6 +9,23 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 /**
+ * Seller model properties
+ *
+ * @property int $id
+ * @property string|null $artisan_name
+ * @property string $email
+ * @property string|null $phone_number
+ * @property string|null $indigenous_tribe
+ * @property string|null $seller_type
+ * @property string|null $shop_name
+ * @property string|null $shop_description
+ * @property string|null $profile_picture
+ * @property string|null $banner_image
+ * @property string|null $verification_status
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ *
+ * Relationships
  * @property-read HasMany $products
  * @property-read HasMany $approvedProducts
  * @property-read HasMany $pendingProducts

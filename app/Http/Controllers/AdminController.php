@@ -13,6 +13,8 @@ use App\Models\FeaturedArtist;
 use App\Models\FeaturedCommunity;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class AdminController extends Controller
 {
@@ -68,11 +70,37 @@ class AdminController extends Controller
                 'products_sold' => OrderItem::sum('quantity') ?? 0,
                 'income_provided' => OrderItem::sum('subtotal') ?? 0,
                 'orders_count' => Order::count(),
+                'artists_onboarded' => FeaturedArtist::count(),
+                // Time series (last 6 months)
+                'monthly_revenue' => [],
+                'monthly_orders' => [],
             ];
 
+            // Build last 6 months series
+            $monthlyRevenue = [];
+            $monthlyOrders = [];
+            for ($i = 5; $i >= 0; $i--) {
+                $m = now()->subMonths($i);
+                $label = $m->format('M Y');
+
+                $revenue = Order::whereYear('created_at', $m->year)
+                    ->whereMonth('created_at', $m->month)
+                    ->where('status', 'completed')
+                    ->sum('total_amount');
+
+                $orders = Order::whereYear('created_at', $m->year)
+                    ->whereMonth('created_at', $m->month)
+                    ->count();
+
+                $monthlyRevenue[] = ['label' => $label, 'value' => (float) $revenue];
+                $monthlyOrders[] = ['label' => $label, 'value' => (int) $orders];
+            }
+
+            $analytics['monthly_revenue'] = $monthlyRevenue;
+            $analytics['monthly_orders'] = $monthlyOrders;
             return response()->json($analytics);
         } catch (\Exception $e) {
-            \Log::error('Analytics Error: ' . $e->getMessage());
+            Log::error('Analytics Error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -84,7 +112,7 @@ class AdminController extends Controller
             $users = User::orderBy('created_at', 'desc')->get();
             return response()->json($users);
         } catch (\Exception $e) {
-            \Log::error('Get Users Error: ' . $e->getMessage());
+            Log::error('Get Users Error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -113,7 +141,7 @@ class AdminController extends Controller
             $sellers = $query->orderBy('created_at', 'desc')->get();
             return response()->json($sellers);
         } catch (\Exception $e) {
-            \Log::error('Get Sellers Error: ' . $e->getMessage());
+            Log::error('Get Sellers Error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -154,7 +182,7 @@ class AdminController extends Controller
             $products = $query->orderBy('created_at', 'desc')->get();
             return response()->json($products);
         } catch (\Exception $e) {
-            \Log::error('Get Products Error: ' . $e->getMessage());
+            Log::error('Get Products Error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -216,7 +244,7 @@ class AdminController extends Controller
             $stories = Story::orderBy('created_at', 'desc')->get();
             return response()->json($stories);
         } catch (\Exception $e) {
-            \Log::error('Get Stories Error: ' . $e->getMessage());
+            Log::error('Get Stories Error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -321,7 +349,7 @@ class AdminController extends Controller
             $donations = Donation::orderBy('created_at', 'desc')->get();
             return response()->json($donations);
         } catch (\Exception $e) {
-            \Log::error('Get Donations Error: ' . $e->getMessage());
+            Log::error('Get Donations Error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -423,7 +451,7 @@ class AdminController extends Controller
                 ->get();
             return response()->json($artists);
         } catch (\Exception $e) {
-            \Log::error('Get Featured Artists Error: ' . $e->getMessage());
+            Log::error('Get Featured Artists Error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
@@ -529,7 +557,7 @@ class AdminController extends Controller
             $communities = FeaturedCommunity::orderBy('display_order')->orderBy('created_at', 'desc')->get();
             return response()->json($communities);
         } catch (\Exception $e) {
-            \Log::error('Get Featured Communities Error: ' . $e->getMessage());
+            Log::error('Get Featured Communities Error: ' . $e->getMessage());
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }

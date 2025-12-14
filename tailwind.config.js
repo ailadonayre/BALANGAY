@@ -8,11 +8,13 @@ export default {
   theme: {
     extend: {
       colors: {
-        cream: '#F8F4EE',
-        dark: '#252525',
+        'bal-cream': '#F8F4EE',
+        'bal-sand': '#E4DDCC',
+        'bal-green': '#5B5843',
+        'bal-dark': '#443A35',
       },
       fontFamily: {
-        futura: ['Futura', 'system-ui', '-apple-system', 'sans-serif'],
+        dmsans: ['"DM Sans"', 'system-ui', '-apple-system', 'sans-serif'],
         elinga: ['Elinga', 'serif'],
       },
     },

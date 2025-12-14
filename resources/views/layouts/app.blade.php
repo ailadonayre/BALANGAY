@@ -40,52 +40,29 @@
             font-display: swap;
         }
 
-        /* FUTURA FONT */
-        @font-face {
-            font-family: 'Futura';
-            src: url('{{ asset('assets/fonts/FuturaLight.ttf') }}') format('truetype');
-            font-weight: 100;
-            font-style: normal;
-            font-display: swap;
-            unicode-range: U+0-10FFFF;
+        /* DM SANS (replaces Futura) - loaded via Google Fonts */
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@100;400;500;700;900&display=swap');
+
+        :root {
+            --font-dmsans: 'DM Sans', sans-serif;
         }
-        @font-face {
-            font-family: 'Futura';
-            src: url('{{ asset('assets/fonts/FuturaTMed.ttf') }}') format('truetype');
-            font-weight: 400;
-            font-style: normal;
-            font-display: swap;
-            unicode-range: U+0-10FFFF;
+
+        body {
+            font-family: var(--font-dmsans);
+            background-color: #F8F4EE;
+            color: #5B5843;
         }
-        @font-face {
-            font-family: 'Futura';
-            src: url('{{ asset('assets/fonts/FuturaMedium.ttf') }}') format('truetype');
-            font-weight: 500;
-            font-style: normal;
-            font-display: swap;
-            unicode-range: U+0-10FFFF;
-        }
-        @font-face {
-            font-family: 'Futura';
-            src: url('{{ asset('assets/fonts/FuturaT_Bold.ttf') }}') format('truetype');
-            font-weight: 700;
-            font-style: normal;
-            font-display: swap;
-            unicode-range: U+0-10FFFF;
-        }
-        @font-face {
-            font-family: 'Futura';
-            src: url('{{ asset('assets/fonts/FuturaHeavy.ttf') }}') format('truetype');
-            font-weight: 900;
-            font-style: normal;
-            font-display: swap;
-            unicode-range: U+0-10FFFF;
-        }
+
+        /* Keep existing class names for compatibility - map to DM Sans */
+        .futura-400 { font-family: 'DM Sans', sans-serif; font-weight: 400; }
+        .futura-500 { font-family: 'DM Sans', sans-serif; font-weight: 500; }
+        .futura-700 { font-family: 'DM Sans', sans-serif; font-weight: 700; }
+        .futura-900 { font-family: 'DM Sans', sans-serif; font-weight: 900; }
     </style>
 
     @stack('styles')
 </head>
-<body class="bg-[#F8F4EE] text-[#252525] font-[Futura] overflow-x-hidden">
+<body class="bg-[#F8F4EE] text-[#5B5843] font-dmsans overflow-x-hidden">
 
     {{-- Navigation --}}
     @include('components.navigation')
@@ -161,7 +138,7 @@
                     </div>
 
                     <div class="space-y-3">
-                        <button onclick="processDonation()" class="w-full bg-[#5B5843] text-white py-3 rounded-full hover:bg-[#252525] transition-all duration-300 font-medium tracking-wide">
+                        <button onclick="processDonation()" class="w-full bg-[#5B5843] text-white py-3 rounded-full hover:bg-[#5B5843] transition-all duration-300 font-medium tracking-wide">
                             Donate Now
                         </button>
                         <button onclick="closeDonationModal()" class="w-full bg-gray-200 text-gray-800 py-3 rounded-full hover:bg-gray-300 transition-all duration-300 font-medium">
@@ -195,7 +172,7 @@
                 <!-- Modal Body -->
                 <div class="p-8">
                     <div class="mb-6">
-                        <img id="hero-modal-story-image" src="" alt="" class="w-full h-96 object-cover rounded-xl mb-6">
+                        <img id="hero-modal-story-image" data-src="" loading="lazy" decoding="async" src="" alt="" class="w-full h-96 object-cover rounded-xl mb-6 lazy">
                         <h2 id="hero-modal-story-title" class="text-3xl font-bold mb-2" style="font-family: 'Elinga', serif;"></h2>
                         <p id="hero-modal-story-author" class="text-lg text-[#5B5843] futura-500 mb-4"></p>
                     </div>

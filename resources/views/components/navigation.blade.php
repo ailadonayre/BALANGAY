@@ -12,7 +12,7 @@
             <!-- Center Logo -->
             <div class="flex-1 flex justify-center px-6">
                 <a href="/" class="block">
-                    <img src="{{ asset('assets/logo/dark-green-logo.png') }}" alt="BALANGAY" class="h-10 w-auto transition-transform duration-300 hover:scale-105">
+                    <img data-src="{{ asset('assets/logo/dark-green-logo.png') }}" loading="lazy" decoding="async" src="{{ asset('assets/logo/dark-green-logo.png') }}" alt="BALANGAY" class="h-10 w-auto transition-transform duration-300 hover:scale-105 lazy">
                 </a>
             </div>
 

@@ -3,7 +3,7 @@
 @section('content')
 <div class="min-h-screen bg-white">
     <!-- Hero Section -->
-    <section class="py-16 md:py-20 lg:py-24 bg-gradient-to-b from-[#F8F4EE] to-white">
+    <section class="py-16 md:py-20 lg:py-24 bg-gradient-to-b from-[#F8F4EE] to-white reveal">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div class="text-center mb-12">
                 <h1 class="text-4xl md:text-5xl lg:text-6xl mb-6" style="font-family: 'Elinga', serif;">Stories of Heritage</h1>
@@ -16,7 +16,7 @@
     </section>
 
     <!-- Stories Grid -->
-    <section class="py-16 md:py-20 lg:py-24">
+    <section class="py-16 md:py-20 lg:py-24 reveal">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div id="stories-container" class="grid sm:grid-cols-2 md:grid-cols-3 gap-8 lg:gap-10">
                 <!-- Stories will be loaded here -->
@@ -43,7 +43,7 @@
             <!-- Modal Body -->
             <div class="p-8">
                 <div class="mb-6">
-                    <img id="modal-story-image" src="" alt="" class="w-full h-96 object-cover rounded-xl mb-6">
+                    <img id="modal-story-image" data-src="" loading="lazy" decoding="async" src="" alt="" class="w-full h-96 object-cover rounded-xl mb-6 lazy">
                     <h2 id="modal-story-title" class="text-3xl font-bold mb-2" style="font-family: 'Elinga', serif;"></h2>
                     <p id="modal-story-author" class="text-lg text-[#5B5843] futura-500 mb-4"></p>
                 </div>
@@ -70,10 +70,9 @@ async function loadStories() {
         container.innerHTML = stories.map(story => `
             <div class="group cursor-pointer transition-transform duration-300 hover:-translate-y-2" onclick="openStoryModal(${story.id})">
                 <div class="relative overflow-hidden rounded-2xl aspect-[4/3] mb-6">
-                    <img src="/assets/stories/${story.image || 'default.jpg'}" 
+                    <img data-src="/assets/stories/${story.image || 'default.jpg'}" loading="lazy" decoding="async" src="/assets/logo/dark-green-logo.png" 
                          alt="${story.title}" 
-                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
-                         onerror="this.src='/assets/logo/dark-green-logo.png'">
+                         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 lazy" onerror="this.src='/assets/logo/dark-green-logo.png'">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
                 </div>
                 <h3 class="text-2xl font-bold mb-2" style="font-family: 'Elinga', serif;">${story.title}</h3>

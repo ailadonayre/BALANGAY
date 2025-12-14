@@ -105,7 +105,7 @@
                         <span id="checkout-total">₱0.00</span>
                     </div>
                     
-                    <button type="submit" form="checkout-form" class="w-full bg-[#5B5843] text-white py-4 rounded-full hover:bg-[#252525] transition-all duration-300 font-medium tracking-wide">
+                    <button type="submit" form="checkout-form" class="w-full bg-[#5B5843] text-white py-4 rounded-full hover:bg-[#5B5843] transition-all duration-300 font-medium tracking-wide">
                         Place Order
                     </button>
                 </div>
@@ -126,7 +126,7 @@
         <p class="text-gray-600 mb-2">Thank you for your order.</p>
         <p class="text-sm text-gray-500 mb-6">Order ID: <span id="success-order-id" class="font-mono font-bold"></span></p>
         <p class="text-gray-600 mb-6">We've received your order and will process it shortly. You'll receive an email confirmation with tracking information.</p>
-        <button onclick="window.location.href='/orders'" class="w-full bg-[#5B5843] text-white py-3 rounded-full hover:bg-[#252525] transition-all duration-300 font-medium">
+        <button onclick="window.location.href='/orders'" class="w-full bg-[#5B5843] text-white py-3 rounded-full hover:bg-[#5B5843] transition-all duration-300 font-medium">
             View My Orders
         </button>
     </div>

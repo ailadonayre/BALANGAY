@@ -73,7 +73,7 @@
                             </div>
                         </div>
 
-                        <button type="submit" class="bg-[#5B5843] text-white px-8 py-3 rounded-lg hover:bg-[#252525] transition-all duration-300 font-medium">
+                        <button type="submit" class="bg-[#5B5843] text-white px-8 py-3 rounded-lg hover:bg-[#5B5843] transition-all duration-300 font-medium">
                             Save Changes
                         </button>
                     </form>
@@ -101,7 +101,7 @@
                             <input type="password" id="password_confirmation" name="password_confirmation" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent">
                         </div>
 
-                        <button type="submit" class="bg-[#5B5843] text-white px-8 py-3 rounded-lg hover:bg-[#252525] transition-all duration-300 font-medium">
+                        <button type="submit" class="bg-[#5B5843] text-white px-8 py-3 rounded-lg hover:bg-[#5B5843] transition-all duration-300 font-medium">
                             Update Password
                         </button>
                     </form>
@@ -265,26 +265,17 @@ async function loadOrders() {
                             </span>
                         </div>
                     </div>
-                    <div class="p-4">
-                        <div class="space-y-2 mb-3">
-                            ${order.items.slice(0, 2).map(item => `
-                                <div class="flex items-center gap-3">
-                                    <img src="/assets/products/${item.product.image}" alt="${item.product.name}" class="w-12 h-12 object-cover rounded">
-                                    <div class="flex-1 min-w-0">
-                                        <p class="text-sm font-medium truncate">${item.product.name}</p>
-                                        <p class="text-xs text-gray-500">Qty: ${item.quantity}</p>
-                                    </div>
-                                </div>
-                            `).join('')}
-                            ${order.items.length > 2 ? `<p class="text-xs text-gray-500">+${order.items.length - 2} more items</p>` : ''}
-                        </div>
-                        <div class="flex justify-between items-center pt-3 border-t border-gray-200">
-                            <p class="text-lg font-bold text-[#5B5843]">₱${parseFloat(order.total_amount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-                            <a href="/order-invoice?order=${order.id}" class="text-sm text-[#5B5843] hover:text-[#252525] font-medium">
-                                View Details →
-                            </a>
-                        </div>
-                    </div>
+                    <span class="px-3 py-1 rounded-full text-sm font-medium ${
+                        order.status === 'completed' ? 'bg-green-100 text-green-800' :
+                        order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                        'bg-blue-100 text-blue-800'
+                    }">
+                        ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                    </span>
+                </div>
+                <div class="text-right">
+                    <p class="text-lg font-bold">₱${parseFloat(order.total_amount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                    <a href="/orders/${order.id}" class="text-sm text-[#5B5843] hover:text-[#5B5843]">View Details →</a>
                 </div>
             `;
         }).join('');

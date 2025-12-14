@@ -18,7 +18,7 @@
                 <div class="grid md:grid-cols-2 gap-8 mb-6">
                     <!-- Product Image -->
                     <div>
-                        <img id="modal-product-image" src="" alt="" class="w-full rounded-xl mb-4">
+                        <img id="modal-product-image" data-src="" loading="lazy" decoding="async" src="" alt="" class="w-full rounded-xl mb-4 lazy">
                     </div>
 
                     <!-- Product Info -->
@@ -26,7 +26,7 @@
                         <h2 id="modal-product-name" class="text-3xl font-bold mb-2" style="font-family: 'Elinga', serif;"></h2>
                         <p id="modal-product-community" class="text-lg text-[#5B5843] futura-500 mb-2"></p>
                         <p id="modal-product-category" class="text-sm text-gray-600 mb-4"></p>
-                        <p id="modal-product-price" class="text-2xl font-bold text-[#252525] mb-6"></p>
+                        <p id="modal-product-price" class="text-2xl font-bold text-[#5B5843] mb-6"></p>
                         
                         <p id="modal-product-description" class="text-gray-600 leading-relaxed mb-6"></p>
 
@@ -44,7 +44,7 @@
                             </div>
 
                             <!-- Add to Cart Button -->
-                            <button type="button" id="modal-add-to-cart-btn" class="w-full bg-[#5B5843] text-white py-3 rounded-full hover:bg-[#252525] transition-all duration-300 tracking-wide font-medium">
+                            <button id="modal-add-to-cart-btn" class="w-full bg-[#5B5843] text-white py-3 rounded-full hover:bg-[#5B5843] transition-all duration-300 tracking-wide font-medium">
                                 Add to Cart
                             </button>
                         </div>
@@ -52,7 +52,7 @@
                         <!-- Seller Info -->
                         <div class="pt-6 border-t border-gray-200">
                             <p class="text-sm text-gray-600 mb-1">Sold by:</p>
-                            <p id="modal-product-seller" class="text-lg font-semibold text-[#252525]"></p>
+                            <p id="modal-product-seller" class="text-lg font-semibold text-[#5B5843]"></p>
                         </div>
                     </div>
                 </div>

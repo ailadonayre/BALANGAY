@@ -1,4 +1,4 @@
-<section class="py-16 md:py-20 lg:py-24 bg-white" id="artisans">
+<section class="py-16 md:py-20 lg:py-24 bg-white reveal" id="artisans">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="text-center mb-12 md:mb-16">
             <h2 class="text-3xl md:text-4xl lg:text-5xl mb-4 md:mb-6">Featured Artisans</h2>
@@ -36,10 +36,9 @@ async function loadHeroArtisans() {
         grid.innerHTML = displayArtists.map((artist, index) => `
             <div class="group loading" style="animation-delay: ${index * 0.2}s">
                 <div class="relative overflow-hidden rounded-xl aspect-[4/5] mb-5">
-                    <img src="/assets/artisans/${artist.image || 'default.jpg'}" 
+                    <img data-src="/assets/artisans/${artist.image || 'default.jpg'}" loading="lazy" decoding="async" src="/assets/logo/dark-green-logo.png" 
                          alt="${artist.name}" 
-                         class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
-                         onerror="this.src='/assets/logo/dark-green-logo.png'">
+                         class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110 lazy" onerror="this.src='/assets/logo/dark-green-logo.png'">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
                 </div>
                 <div class="text-center">
