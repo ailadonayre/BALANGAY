@@ -67,7 +67,7 @@ async function loadHeroStories() {
         const displayStories = stories.slice(0, 3);
         
         grid.innerHTML = displayStories.map((story, index) => `
-            <article class="group cursor-pointer loading story-card" data-story-index="${index}" style="animation-delay: ${index * 0.2}s" onclick="openHeroStoryModalFromDB(${story.id})">
+            <article class="group cursor-pointer loading story-card" data-story-id="${story.id}" style="animation-delay: ${index * 0.2}s">
                 <div class="overflow-hidden rounded-xl aspect-[4/3] mb-5">
                     <img src="/assets/stories/${story.image || 'default.jpg'}" 
                          alt="${story.title}" 
@@ -76,39 +76,48 @@ async function loadHeroStories() {
                 </div>
                 <h3 class="text-xl md:text-2xl mb-3 futura-500 group-hover:text-[#5B5843] transition-colors duration-300">${story.title}</h3>
                 <p class="text-sm md:text-base text-gray-600 futura-400 mb-4">${story.excerpt}</p>
-                <a href="#" class="inline-flex items-center gap-2 text-[#5B5843] futura-500 text-sm tracking-wide uppercase hover:gap-4 transition-all duration-300">
+                <div class="inline-flex items-center gap-2 text-[#5B5843] futura-500 text-sm tracking-wide uppercase hover:gap-4 transition-all duration-300">
                     Read More
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                     </svg>
-                </a>
+                </div>
             </article>
         `).join('');
         
         // Store stories globally for modal access
         window.heroStoriesFromDB = stories;
+        
+        // Add click handlers to story cards
+        document.querySelectorAll('.story-card').forEach(card => {
+            card.addEventListener('click', function(e) {
+                e.preventDefault();
+                const storyId = parseInt(this.getAttribute('data-story-id'));
+                openHeroStoryModalFromDB(storyId);
+            });
+        });
     } catch (error) {
         console.error('Error loading hero stories:', error);
         document.getElementById('hero-stories-grid').innerHTML = '<div class="col-span-full text-center py-12 text-gray-500">Error loading stories.</div>';
     }
 }
 
-// Open modal with database story
-function openHeroStoryModalFromDB(storyId) {
-    event.preventDefault();
-    event.stopPropagation();
-    
+// Open modal with database story - GLOBAL function
+window.openHeroStoryModalFromDB = function(storyId) {
     const story = window.heroStoriesFromDB?.find(s => s.id === storyId);
     if (story) {
         document.getElementById('hero-modal-story-title').textContent = story.title;
+        document.getElementById('hero-modal-story-author').textContent = `By ${story.author_name}${story.tribe ? ' - ' + story.tribe : ''}`;
         document.getElementById('hero-modal-story-image').src = `/assets/stories/${story.image || 'default.jpg'}`;
         document.getElementById('hero-modal-story-image').alt = story.title;
         document.getElementById('hero-modal-story-content').innerHTML = story.content.split('\n').map(p => `<p class="mb-4">${p}</p>`).join('');
         
         document.getElementById('hero-story-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
     }
-}
+};
 
 // Load stories when page loads
 document.addEventListener('DOMContentLoaded', loadHeroStories);
+</script>
 </script>

@@ -748,6 +748,144 @@
 
     // ===== UPDATE STATS =====
     function updateStats(products) {
+
+    // ===== LOAD ORDERS =====
+    async function loadOrders() {
+        try {
+            const response = await fetch('/seller/api/orders', {
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                }
+            });
+            
+            const orders = await response.json();
+            const container = document.getElementById('orders-list');
+            
+            if (!orders || orders.length === 0) {
+                container.innerHTML = `
+                    <div class="px-6 py-12 text-center text-gray-500">
+                        <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                        </svg>
+                        <p>No orders yet</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = orders.map(order => {
+                const statusMap = {
+                    'pending': { label: 'Pending', class: 'bg-yellow-100 text-yellow-800' },
+                    'to_ship': { label: 'To Ship', class: 'bg-blue-100 text-blue-800' },
+                    'shipped': { label: 'Shipped', class: 'bg-purple-100 text-purple-800' },
+                    'to_receive': { label: 'To Receive', class: 'bg-indigo-100 text-indigo-800' },
+                    'completed': { label: 'Completed', class: 'bg-green-100 text-green-800' },
+                    'cancelled': { label: 'Cancelled', class: 'bg-red-100 text-red-800' }
+                };
+                const status = statusMap[order.order_status] || statusMap['pending'];
+                
+                return `
+                    <div class="p-6 border-b border-gray-200">
+                        <div class="flex justify-between items-start mb-4">
+                            <div>
+                                <h3 class="text-lg font-semibold text-gray-900">Order #${order.order_number}</h3>
+                                <p class="text-sm text-gray-600">${new Date(order.created_at).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+                            </div>
+                            <div class="text-right">
+                                <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${status.class}">
+                                    ${status.label}
+                                </span>
+                                <p class="text-lg font-bold text-[#5B5843] mt-2">₱${parseFloat(order.total_amount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-gray-50 rounded-lg p-4 mb-4">
+                            <h4 class="font-medium text-gray-900 mb-2">Customer Information</h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <p class="text-gray-600">Name</p>
+                                    <p class="font-medium">${order.customer_name}</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-600">Email</p>
+                                    <p class="font-medium">${order.customer_email}</p>
+                                </div>
+                                <div class="col-span-2">
+                                    <p class="text-gray-600">Shipping Address</p>
+                                    <p class="font-medium">${order.shipping_address}</p>
+                                </div>
+                                <div>
+                                    <p class="text-gray-600">Payment Method</p>
+                                    <p class="font-medium">${order.payment_method.toUpperCase()}</p>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="space-y-2 mb-4">
+                            <h4 class="font-medium text-gray-900">Items</h4>
+                            ${order.items.map(item => `
+                                <div class="flex items-center gap-3 p-2 bg-white rounded">
+                                    <img src="/assets/products/${item.product_image}" alt="${item.product_name}" class="w-12 h-12 object-cover rounded">
+                                    <div class="flex-1">
+                                        <p class="font-medium text-sm">${item.product_name}</p>
+                                        <p class="text-xs text-gray-600">Qty: ${item.quantity} × ₱${parseFloat(item.unit_price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                                    </div>
+                                    <p class="font-semibold">₱${parseFloat(item.subtotal).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                        
+                        <div class="flex gap-2">
+                            <select onchange="updateOrderStatus(${order.order_id}, this.value)" class="flex-1 px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent">
+                                <option value="pending" ${order.order_status === 'pending' ? 'selected' : ''}>Pending</option>
+                                <option value="to_ship" ${order.order_status === 'to_ship' ? 'selected' : ''}>To Ship</option>
+                                <option value="shipped" ${order.order_status === 'shipped' ? 'selected' : ''}>Shipped</option>
+                                <option value="to_receive" ${order.order_status === 'to_receive' ? 'selected' : ''}>To Receive</option>
+                                <option value="completed" ${order.order_status === 'completed' ? 'selected' : ''}>Completed</option>
+                                <option value="cancelled" ${order.order_status === 'cancelled' ? 'selected' : ''}>Cancelled</option>
+                            </select>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            
+        } catch (error) {
+            console.error('Error loading orders:', error);
+            document.getElementById('orders-list').innerHTML = `
+                <div class="px-6 py-12 text-center text-red-500">
+                    Error loading orders. Please refresh the page.
+                </div>
+            `;
+        }
+    }
+
+    // ===== UPDATE ORDER STATUS =====
+    async function updateOrderStatus(orderId, status) {
+        try {
+            const response = await fetch(`/seller/api/orders/${orderId}/status`, {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                },
+                body: JSON.stringify({ status })
+            });
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                showNotification('Order status updated successfully!');
+                loadOrders();
+            } else {
+                showNotification(data.message || 'Error updating order status', 'error');
+            }
+        } catch (error) {
+            console.error('Error updating order status:', error);
+            showNotification('Error updating order status', 'error');
+        }
+    }
+
+
         const totalProducts = products.length;
         const approvedProducts = products.filter(p => p.approval_status === 'approved').length;
         const pendingProducts = products.filter(p => p.approval_status === 'pending').length;

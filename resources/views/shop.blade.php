@@ -76,7 +76,8 @@
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    console.log('DOMContentLoaded fired');
+    console.log('Shop page DOMContentLoaded');
+    console.log('openShopProductModal available?', typeof window.openShopProductModal);
     loadProducts();
     loadFilters();
     setupEventListeners();
@@ -84,7 +85,6 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function loadProducts(params = {}) {
-    console.log('loadProducts called with params:', params);
     const queryString = new URLSearchParams(params).toString();
     const url = `/api/products/search?${queryString}`;
     console.log('Fetching from URL:', url);
@@ -147,12 +147,49 @@ function loadProducts(params = {}) {
                 `;
                 grid.appendChild(productCard);
                 
-                // Add click handler to open modal
+                // Add click handler to card (with retry logic for modal function)
                 productCard.addEventListener('click', (e) => {
-                    if (!e.target.closest('button')) {
-                        openShopProductModal(product.id);
-                    }
+                    console.log('Product card clicked, ID:', product.id);
+                    console.log('openShopProductModal exists?', typeof window.openShopProductModal);
+                    
+                    // Retry mechanism if function not ready yet
+                    let attempts = 0;
+                    const tryOpenModal = () => {
+                        if (typeof window.openShopProductModal === 'function') {
+                            window.openShopProductModal(product.id);
+                        } else if (attempts < 10) {
+                            attempts++;
+                            setTimeout(tryOpenModal, 100);
+                        } else {
+                            console.error('openShopProductModal is not available after retries');
+                        }
+                    };
+                    tryOpenModal();
                 });
+                
+                // Add specific click handler to view button
+                const viewBtn = productCard.querySelector('.view-product-btn');
+                if (viewBtn) {
+                    viewBtn.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        console.log('View button clicked, ID:', product.id);
+                        
+                        // Retry mechanism if function not ready yet
+                        let attempts = 0;
+                        const tryOpenModal = () => {
+                            if (typeof window.openShopProductModal === 'function') {
+                                window.openShopProductModal(product.id);
+                            } else if (attempts < 10) {
+                                attempts++;
+                                setTimeout(tryOpenModal, 100);
+                            } else {
+                                console.error('openShopProductModal is not available after retries');
+                            }
+                        };
+                        tryOpenModal();
+                    });
+                }
             });
         })
         .catch(error => console.error('Error loading products:', error));
@@ -298,5 +335,176 @@ function addToCart(productId) {
         document.getElementById('auth-modal').classList.remove('hidden');
     @endauth
 }
+
+// Define modal functions BEFORE DOMContentLoaded
+window.openShopProductModal = async function(productId) {
+    console.log('Opening modal for product:', productId);
+    try {
+        const response = await fetch(`/api/products/${productId}`);
+        const product = await response.json();
+        
+        document.getElementById('modal-product-name').textContent = product.name;
+        document.getElementById('modal-product-price').textContent = `₱${parseFloat(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+        document.getElementById('modal-product-description').textContent = product.description;
+        document.getElementById('modal-product-community').textContent = product.community;
+        document.getElementById('modal-product-category').textContent = `Category: ${product.category}`;
+        document.getElementById('modal-product-image').src = `/assets/products/${product.image}`;
+        document.getElementById('modal-product-image').alt = product.name;
+        document.getElementById('modal-product-seller').textContent = `By ${product.seller.artisan_name}`;
+        document.getElementById('modal-product-stock').textContent = `${product.stock} items available`;
+        
+        const quantityInput = document.getElementById('modal-quantity');
+        quantityInput.value = 1;
+        quantityInput.max = product.stock;
+        quantityInput.setAttribute('data-product-id', productId);
+        
+        document.getElementById('shop-product-modal').classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+        
+    } catch (error) {
+        console.error('Error loading product:', error);
+        alert('Failed to load product details');
+    }
+};
+
+window.closeShopProductModal = function() {
+    document.getElementById('shop-product-modal').classList.add('hidden');
+    document.body.style.overflow = '';
+};
+
+console.log('Modal functions defined:', typeof window.openShopProductModal);
 </script>
+
+<!-- Product Modal HTML -->
+<div id="shop-product-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+    <div class="fixed inset-0 bg-black/50 backdrop-blur-sm transition-opacity duration-300" onclick="closeShopProductModal()"></div>
+    <div class="flex min-h-screen items-center justify-center p-4">
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl transform transition-all duration-300 overflow-hidden">
+            <button onclick="closeShopProductModal()" class="absolute top-4 right-4 z-10 text-gray-400 hover:text-gray-600 transition-colors duration-300">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+            <div class="p-8">
+                <div class="grid md:grid-cols-2 gap-8 mb-6">
+                    <div>
+                        <img id="modal-product-image" src="" alt="" class="w-full rounded-xl mb-4">
+                    </div>
+                    <div>
+                        <h2 id="modal-product-name" class="text-3xl font-bold mb-2" style="font-family: 'Elinga', serif;"></h2>
+                        <p id="modal-product-community" class="text-lg text-[#5B5843] futura-500 mb-2"></p>
+                        <p id="modal-product-category" class="text-sm text-gray-600 mb-4"></p>
+                        <p id="modal-product-price" class="text-2xl font-bold text-[#252525] mb-6"></p>
+                        <p id="modal-product-description" class="text-gray-600 leading-relaxed mb-6"></p>
+                        <div class="mb-6">
+                            <p id="modal-product-stock" class="text-sm text-gray-600 mb-4"></p>
+                            <div class="flex items-center gap-4 mb-6">
+                                <span class="text-sm font-medium">Quantity:</span>
+                                <div class="flex items-center border border-gray-300 rounded-lg">
+                                    <button type="button" id="modal-decrease-qty" class="px-3 py-2 text-gray-600 hover:bg-gray-100">−</button>
+                                    <input id="modal-quantity" type="number" min="1" value="1" class="w-12 text-center border-l border-r border-gray-300 py-2" readonly>
+                                    <button type="button" id="modal-increase-qty" class="px-3 py-2 text-gray-600 hover:bg-gray-100">+</button>
+                                </div>
+                            </div>
+                            <button type="button" id="modal-add-to-cart-btn" class="w-full bg-[#5B5843] text-white py-3 rounded-full hover:bg-[#252525] transition-all duration-300 tracking-wide font-medium">
+                                Add to Cart
+                            </button>
+                        </div>
+                        <div class="pt-6 border-t border-gray-200">
+                            <p class="text-sm text-gray-600 mb-1">Sold by:</p>
+                            <p id="modal-product-seller" class="text-lg font-semibold text-[#252525]"></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Modal event listeners
+document.addEventListener('DOMContentLoaded', function() {
+    const decreaseBtn = document.getElementById('modal-decrease-qty');
+    const increaseBtn = document.getElementById('modal-increase-qty');
+    const quantityInput = document.getElementById('modal-quantity');
+    const addToCartBtn = document.getElementById('modal-add-to-cart-btn');
+    
+    if (decreaseBtn) {
+        decreaseBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const currentVal = parseInt(quantityInput.value);
+            if (currentVal > 1) {
+                quantityInput.value = currentVal - 1;
+            }
+        });
+    }
+    
+    if (increaseBtn) {
+        increaseBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            const currentVal = parseInt(quantityInput.value);
+            const maxVal = parseInt(quantityInput.max);
+            if (currentVal < maxVal) {
+                quantityInput.value = currentVal + 1;
+            }
+        });
+    }
+    
+    if (addToCartBtn) {
+        addToCartBtn.addEventListener('click', async function(e) {
+            e.preventDefault();
+            
+            const quantity = parseInt(quantityInput.value);
+            const productName = document.getElementById('modal-product-name').textContent;
+            
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            if (!csrfToken) {
+                alert('Please sign in to add items to cart');
+                document.getElementById('auth-modal')?.classList.remove('hidden');
+                return;
+            }
+            
+            // Get product ID from the last opened modal
+            const productId = quantityInput.getAttribute('data-product-id');
+            if (!productId) {
+                console.error('No product ID found');
+                return;
+            }
+            
+            try {
+                const response = await fetch('/api/cart/add', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRF-TOKEN': csrfToken.content
+                    },
+                    body: JSON.stringify({
+                        product_id: parseInt(productId),
+                        quantity: quantity
+                    })
+                });
+                
+                const data = await response.json();
+                
+                if (response.ok && data.success) {
+                    alert('Product added to cart!');
+                    if (typeof window.updateCartCount === 'function') {
+                        window.updateCartCount();
+                    }
+                    setTimeout(() => window.closeShopProductModal(), 500);
+                } else if (response.status === 401 || response.status === 419) {
+                    alert('Please sign in to add items to cart');
+                    document.getElementById('auth-modal')?.classList.remove('hidden');
+                } else {
+                    alert(data.message || 'Failed to add to cart');
+                }
+            } catch (error) {
+                console.error('Error adding to cart:', error);
+                alert('Error adding to cart');
+            }
+        });
+    }
+});
+</script>
+
 @endsection

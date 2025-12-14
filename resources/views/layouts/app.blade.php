@@ -197,6 +197,7 @@
                     <div class="mb-6">
                         <img id="hero-modal-story-image" src="" alt="" class="w-full h-96 object-cover rounded-xl mb-6">
                         <h2 id="hero-modal-story-title" class="text-3xl font-bold mb-2" style="font-family: 'Elinga', serif;"></h2>
+                        <p id="hero-modal-story-author" class="text-lg text-[#5B5843] futura-500 mb-4"></p>
                     </div>
                     <div id="hero-modal-story-content" class="text-gray-600 leading-relaxed space-y-4"></div>
                 </div>
@@ -326,29 +327,18 @@
         }
     ];
 
-    function openHeroStoryModal(event, storyIndex) {
-        event.preventDefault();
-        event.stopPropagation();
-        
-        if (heroStories[storyIndex]) {
-            const story = heroStories[storyIndex];
-            document.getElementById('hero-modal-story-title').textContent = story.title;
-            document.getElementById('hero-modal-story-image').src = `/assets/artisans/${story.image}`;
-            document.getElementById('hero-modal-story-image').alt = story.title;
-            document.getElementById('hero-modal-story-content').innerHTML = `<p>${story.content}</p>`;
-            
-            document.getElementById('hero-story-modal').classList.remove('hidden');
+    // Close hero story modal - defined globally for access from all pages
+    function closeHeroStoryModal() {
+        const modal = document.getElementById('hero-story-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+            document.body.style.overflow = '';
         }
     }
 
-    function closeHeroStoryModal() {
-        document.getElementById('hero-story-modal').classList.add('hidden');
-    }
-
-    // Close modal when clicking outside
-    document.addEventListener('click', function(event) {
-        const modal = document.getElementById('hero-story-modal');
-        if (event.target === modal) {
+    // Close modal when escape key is pressed
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
             closeHeroStoryModal();
         }
     });

@@ -78,25 +78,42 @@
 <script>
 // Initialize shop section product modals
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Shop section: DOMContentLoaded');
     initializeShopSectionProducts();
 });
 
 function initializeShopSectionProducts() {
     const productCards = document.querySelectorAll('.product-card.shop-product-hero');
-    productCards.forEach(card => {
-        card.removeEventListener('click', handleShopProductCardClick);
-        card.addEventListener('click', handleShopProductCardClick);
+    console.log('Found product cards:', productCards.length);
+    
+    productCards.forEach((card, index) => {
+        const productId = card.getAttribute('data-product-id');
+        console.log(`Card ${index}: product ID = ${productId}`);
+        
+        card.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            if (e.target.closest('button')) {
+                console.log('Button clicked, ignoring');
+                return;
+            }
+            
+            const id = this.getAttribute('data-product-id');
+            console.log('Opening modal for product:', id);
+            
+            if (typeof window.openShopProductModal === 'function') {
+                window.openShopProductModal(id);
+            } else {
+                console.error('openShopProductModal is not defined');
+            }
+        });
     });
 }
 
-function handleShopProductCardClick(e) {
-    if (e.target.closest('button')) return; // Don't trigger if button clicked
-    const productId = this.getAttribute('data-product-id');
-    if (productId) {
-        openShopProductModal(productId);
-    }
-}
-
 // Re-initialize after page content loads
-window.addEventListener('load', initializeShopSectionProducts);
+window.addEventListener('load', function() {
+    console.log('Window loaded, re-initializing');
+    initializeShopSectionProducts();
+});
 </script>

@@ -237,27 +237,57 @@ async function loadOrders() {
             return;
         }
         
-        container.innerHTML = orders.map(order => `
-            <div class="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-                <div class="flex justify-between items-start mb-3">
-                    <div>
-                        <h3 class="font-medium text-gray-900">Order #${order.id}</h3>
-                        <p class="text-sm text-gray-500">${new Date(order.created_at).toLocaleDateString()}</p>
+        container.innerHTML = orders.map(order => {
+            const statusMap = {
+                'pending': { label: 'Pending', class: 'bg-yellow-100 text-yellow-800' },
+                'to_ship': { label: 'To Ship', class: 'bg-blue-100 text-blue-800' },
+                'shipped': { label: 'Shipped', class: 'bg-purple-100 text-purple-800' },
+                'to_receive': { label: 'To Receive', class: 'bg-indigo-100 text-indigo-800' },
+                'completed': { label: 'Completed', class: 'bg-green-100 text-green-800' },
+                'cancelled': { label: 'Cancelled', class: 'bg-red-100 text-red-800' }
+            };
+            const status = statusMap[order.status] || statusMap['pending'];
+            
+            return `
+                <div class="border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
+                    <div class="p-4 bg-gray-50 border-b border-gray-200">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <h3 class="font-semibold text-gray-900">Order #${order.id}</h3>
+                                <p class="text-sm text-gray-600">${new Date(order.created_at).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: 'long',
+                                    day: 'numeric'
+                                })}</p>
+                            </div>
+                            <span class="px-3 py-1 rounded-full text-sm font-medium ${status.class}">
+                                ${status.label}
+                            </span>
+                        </div>
                     </div>
-                    <span class="px-3 py-1 rounded-full text-sm font-medium ${
-                        order.status === 'completed' ? 'bg-green-100 text-green-800' :
-                        order.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
-                        'bg-blue-100 text-blue-800'
-                    }">
-                        ${order.status.charAt(0).toUpperCase() + order.status.slice(1)}
-                    </span>
+                    <div class="p-4">
+                        <div class="space-y-2 mb-3">
+                            ${order.items.slice(0, 2).map(item => `
+                                <div class="flex items-center gap-3">
+                                    <img src="/assets/products/${item.product.image}" alt="${item.product.name}" class="w-12 h-12 object-cover rounded">
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-sm font-medium truncate">${item.product.name}</p>
+                                        <p class="text-xs text-gray-500">Qty: ${item.quantity}</p>
+                                    </div>
+                                </div>
+                            `).join('')}
+                            ${order.items.length > 2 ? `<p class="text-xs text-gray-500">+${order.items.length - 2} more items</p>` : ''}
+                        </div>
+                        <div class="flex justify-between items-center pt-3 border-t border-gray-200">
+                            <p class="text-lg font-bold text-[#5B5843]">₱${parseFloat(order.total_amount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                            <a href="/order-invoice?order=${order.id}" class="text-sm text-[#5B5843] hover:text-[#252525] font-medium">
+                                View Details →
+                            </a>
+                        </div>
+                    </div>
                 </div>
-                <div class="text-right">
-                    <p class="text-lg font-bold">₱${parseFloat(order.total_amount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-                    <a href="/orders/${order.id}" class="text-sm text-[#5B5843] hover:text-[#252525]">View Details →</a>
-                </div>
-            </div>
-        `).join('');
+            `;
+        }).join('');
     } catch (error) {
         console.error('Error loading orders:', error);
     }
@@ -283,6 +313,22 @@ function showNotification(message, type = 'success') {
     }, 3000);
 }
 
-document.addEventListener('DOMContentLoaded', loadProfile);
+// Handle URL hash for direct tab access
+function handleHashNav() {
+    const hash = window.location.hash.substring(1);
+    if (hash) {
+        const tab = document.querySelector(`[data-tab="${hash}"]`);
+        if (tab) {
+            tab.click();
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    loadProfile();
+    handleHashNav();
+});
+
+window.addEventListener('hashchange', handleHashNav);
 </script>
 @endsection

@@ -11,34 +11,34 @@ class FeaturedCommunitySeeder extends Seeder
     {
         $communities = [
             [
-                'name' => 'Ifugao',
-                'region' => 'Cordillera Administrative Region',
-                'description' => 'The Ifugao people are renowned for their ancient rice terraces, carved into the mountains over 2,000 years ago. These terraces are a testament to their engineering prowess and sustainable agricultural practices.',
-                'image' => 'tribe1.jpg',
+                'name' => 'Ati',
+                'region' => 'Panay Island',
+                'description' => 'The Ati are one of the oldest indigenous groups in the Philippines. Known as skilled hunters and gatherers, they have maintained their unique cultural traditions and ancestral knowledge of medicinal plants and traditional hunting techniques.',
+                'image' => 'ati.png',
                 'active' => true,
                 'display_order' => 1
             ],
             [
-                'name' => 'T\'boli',
-                'region' => 'South Cotabato, Mindanao',
-                'description' => 'The T\'boli are known for their vibrant traditional clothing and intricate brassware. Their artistry is showcased in the famous t\'nalak cloth, woven from abaca fibers and dyed with natural colors.',
-                'image' => 'tribe2.jpg',
+                'name' => 'Igorot',
+                'region' => 'Cordillera',
+                'description' => 'The Igorot people are renowned for their engineering prowess, particularly in rice terracing. Their intricate knowledge has created agricultural marvels and they are famous for their elaborate textiles and metalwork.',
+                'image' => 'igorot.png',
                 'active' => true,
                 'display_order' => 2
+            ],
+            [
+                'name' => 'Lumad',
+                'region' => 'Mindanao',
+                'description' => 'The Lumad of Mindanao are skilled in weaving, beadwork, and traditional medicine. They have developed sophisticated irrigation systems and sustainable forest management practices that reflect their deep understanding of nature.',
+                'image' => 'lumad.png',
+                'active' => true,
+                'display_order' => 3
             ],
             [
                 'name' => 'Mangyan',
                 'region' => 'Mindoro',
                 'description' => 'The Mangyan people have preserved their ancient script and traditional way of life. They are skilled in basket weaving and creating intricate beadwork, maintaining their cultural heritage through generations.',
-                'image' => 'tribe3.jpg',
-                'active' => true,
-                'display_order' => 3
-            ],
-            [
-                'name' => 'Yakan',
-                'region' => 'Basilan, Mindanao',
-                'description' => 'The Yakan are master weavers known for their colorful textiles featuring geometric patterns. Their traditional face decorations and vibrant clothing make them one of the most visually distinctive indigenous groups.',
-                'image' => 'tribe4.jpg',
+                'image' => 'mangyan.png',
                 'active' => true,
                 'display_order' => 4
             ]

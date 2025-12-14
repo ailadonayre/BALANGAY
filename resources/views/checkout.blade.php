@@ -164,8 +164,8 @@ document.getElementById('checkout-form').addEventListener('submit', async (e) =>
     // Combine address fields
     const shipping_address = `${data.address}, ${data.city}, ${data.province} ${data.postal_code}`;
     
-    // Show loading state
-    const submitBtn = e.target.querySelector('button[type="submit"]');
+    // Show loading state - button is outside form, use document.querySelector
+    const submitBtn = document.querySelector('button[type="submit"][form="checkout-form"]');
     const originalText = submitBtn.textContent;
     submitBtn.disabled = true;
     submitBtn.textContent = 'Processing...';
@@ -187,18 +187,15 @@ document.getElementById('checkout-form').addEventListener('submit', async (e) =>
         });
         
         const result = await response.json();
+        console.log('Order response:', result);
         
-        if (result.success) {
-            // Show success modal
-            document.getElementById('success-order-id').textContent = `#${result.order_id}`;
-            document.getElementById('order-success-modal').classList.remove('hidden');
-            
-            // Redirect after 3 seconds
-            setTimeout(() => {
-                window.location.href = '/orders';
-            }, 3000);
+        if (response.ok && result.success) {
+            // Redirect to invoice page
+            window.location.href = `/order-invoice?order=${result.order_id}`;
         } else {
-            alert(result.message || 'Order failed. Please try again.');
+            const errorMsg = result.message || result.error || 'Order failed. Please try again.';
+            alert(errorMsg);
+            console.error('Order failed:', result);
             submitBtn.disabled = false;
             submitBtn.textContent = originalText;
         }

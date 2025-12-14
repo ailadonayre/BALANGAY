@@ -61,7 +61,12 @@ Route::middleware('auth')->group(function () {
     Route::get('/checkout', function () {
         return view('checkout');
     })->name('checkout');
+    Route::get('/order-invoice', function () {
+        return view('order-invoice');
+    })->name('order.invoice');
     Route::post('/api/orders/checkout', [OrderController::class, 'checkout'])->name('api.orders.checkout');
+    Route::get('/api/orders', [OrderController::class, 'getOrders'])->name('api.orders.list');
+    Route::get('/api/orders/{id}', [OrderController::class, 'getOrder'])->name('api.orders.show');
     
     Route::get('/orders', function () {
         return view('orders');
@@ -98,6 +103,10 @@ Route::middleware(['auth:seller'])->prefix('seller')->group(function () {
     Route::post('/api/products', [SellerController::class, 'createProduct'])->name('api.seller.create.product');
     Route::put('/api/products/{id}', [SellerController::class, 'updateProduct'])->name('api.seller.update.product');
     Route::delete('/api/products/{id}', [SellerController::class, 'deleteProduct'])->name('api.seller.delete.product');
+    
+    // Seller Order API Routes
+    Route::get('/api/orders', [SellerController::class, 'getSellerOrders'])->name('api.seller.orders');
+    Route::put('/api/orders/{id}/status', [SellerController::class, 'updateOrderStatus'])->name('api.seller.update.order.status');
 });
 
 // Seller API Routes (Protected)

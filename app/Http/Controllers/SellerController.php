@@ -381,4 +381,76 @@ class SellerController extends Controller
             ], 500);
         }
     }
+
+    // Get seller orders
+    public function getSellerOrders()
+    {
+        $seller = Auth::guard('seller')->user();
+        
+        $orders = OrderItem::where('seller_id', $seller->id)
+            ->with(['order.user', 'product'])
+            ->orderBy('created_at', 'desc')
+            ->get()
+            ->groupBy('order_id')
+            ->map(function ($items) {
+                $firstItem = $items->first();
+                return [
+                    'order_id' => $firstItem->order_id,
+                    'order_number' => $firstItem->order_id,
+                    'customer_name' => $firstItem->order->user->full_name,
+                    'customer_email' => $firstItem->order->user->email,
+                    'shipping_address' => $firstItem->order->shipping_address,
+                    'payment_method' => $firstItem->order->payment_method,
+                    'order_status' => $firstItem->order->status,
+                    'payment_status' => $firstItem->order->payment_status,
+                    'created_at' => $firstItem->created_at,
+                    'total_amount' => $items->sum('subtotal'),
+                    'items' => $items->map(function ($item) {
+                        return [
+                            'id' => $item->id,
+                            'product_name' => $item->product->name,
+                            'product_image' => $item->product->image,
+                            'quantity' => $item->quantity,
+                            'unit_price' => $item->unit_price,
+                            'subtotal' => $item->subtotal,
+                        ];
+                    })
+                ];
+            })
+            ->values();
+        
+        return response()->json($orders);
+    }
+
+    // Update order status
+    public function updateOrderStatus(Request $request, $orderId)
+    {
+        $request->validate([
+            'status' => 'required|in:pending,to_ship,shipped,to_receive,completed,cancelled'
+        ]);
+
+        $seller = Auth::guard('seller')->user();
+        
+        // Find the order and verify seller has items in it
+        $orderItems = OrderItem::where('order_id', $orderId)
+            ->where('seller_id', $seller->id)
+            ->get();
+        
+        if ($orderItems->isEmpty()) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Order not found or unauthorized'
+            ], 404);
+        }
+
+        // Update the main order status
+        $order = Order::findOrFail($orderId);
+        $order->status = $request->status;
+        $order->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Order status updated successfully'
+        ]);
+    }
 }

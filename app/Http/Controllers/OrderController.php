@@ -39,7 +39,6 @@ class OrderController extends Controller
             'status' => 'pending',
             'shipping_address' => $request->shipping_address,
             'payment_method' => $request->payment_method,
-            'payment_status' => $request->payment_method === 'cod' ? 'pending' : 'pending',
         ]);
 
         foreach ($cartItems as $cartItem) {

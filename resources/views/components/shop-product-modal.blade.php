@@ -37,14 +37,14 @@
                             <div class="flex items-center gap-4 mb-6">
                                 <span class="text-sm font-medium">Quantity:</span>
                                 <div class="flex items-center border border-gray-300 rounded-lg">
-                                    <button id="modal-decrease-qty" class="px-3 py-2 text-gray-600 hover:bg-gray-100">−</button>
+                                    <button type="button" id="modal-decrease-qty" class="px-3 py-2 text-gray-600 hover:bg-gray-100">−</button>
                                     <input id="modal-quantity" type="number" min="1" value="1" class="w-12 text-center border-l border-r border-gray-300 py-2" readonly>
-                                    <button id="modal-increase-qty" class="px-3 py-2 text-gray-600 hover:bg-gray-100">+</button>
+                                    <button type="button" id="modal-increase-qty" class="px-3 py-2 text-gray-600 hover:bg-gray-100">+</button>
                                 </div>
                             </div>
 
                             <!-- Add to Cart Button -->
-                            <button id="modal-add-to-cart-btn" class="w-full bg-[#5B5843] text-white py-3 rounded-full hover:bg-[#252525] transition-all duration-300 tracking-wide font-medium">
+                            <button type="button" id="modal-add-to-cart-btn" class="w-full bg-[#5B5843] text-white py-3 rounded-full hover:bg-[#252525] transition-all duration-300 tracking-wide font-medium">
                                 Add to Cart
                             </button>
                         </div>
@@ -62,142 +62,203 @@
 </div>
 
 <script>
-let currentShopProductId = null;
-
-// Open shop product modal
-async function openShopProductModal(productId) {
-    try {
-        const response = await fetch(`/api/products/${productId}`);
-        const product = await response.json();
-        
-        currentShopProductId = productId;
-        
-        document.getElementById('modal-product-name').textContent = product.name;
-        document.getElementById('modal-product-price').textContent = `₱${parseFloat(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
-        document.getElementById('modal-product-description').textContent = product.description;
-        document.getElementById('modal-product-community').textContent = product.community;
-        document.getElementById('modal-product-category').textContent = `Category: ${product.category}`;
-        document.getElementById('modal-product-image').src = `/assets/products/${product.image}`;
-        document.getElementById('modal-product-image').alt = product.name;
-        document.getElementById('modal-product-seller').textContent = `By ${product.seller.artisan_name}`;
-        document.getElementById('modal-product-stock').textContent = `${product.stock} items available`;
-        
-        // Reset quantity
-        document.getElementById('modal-quantity').value = 1;
-        document.getElementById('modal-quantity').max = product.stock;
-        
-        document.getElementById('shop-product-modal').classList.remove('hidden');
-    } catch (error) {
-        console.error('Error loading product:', error);
-    }
-}
-
-// Close shop product modal
-function closeShopProductModal() {
-    document.getElementById('shop-product-modal').classList.add('hidden');
-    currentShopProductId = null;
-}
-
-// Quantity controls for modal
-document.addEventListener('DOMContentLoaded', () => {
-    const decreaseBtn = document.getElementById('modal-decrease-qty');
-    const increaseBtn = document.getElementById('modal-increase-qty');
-    const quantityInput = document.getElementById('modal-quantity');
-    const addToCartBtn = document.getElementById('modal-add-to-cart-btn');
-
-    if (decreaseBtn) {
-        decreaseBtn.addEventListener('click', () => {
-            if (quantityInput.value > 1) {
-                quantityInput.value = parseInt(quantityInput.value) - 1;
-            }
-        });
-    }
-
-    if (increaseBtn) {
-        increaseBtn.addEventListener('click', () => {
-            const max = parseInt(quantityInput.max);
-            if (quantityInput.value < max) {
-                quantityInput.value = parseInt(quantityInput.value) + 1;
-            }
-        });
-    }
-
-    if (addToCartBtn) {
-        addToCartBtn.addEventListener('click', async () => {
-            if (!currentShopProductId) return;
-            
-            const quantity = parseInt(document.getElementById('modal-quantity').value);
-            
-            try {
-                const response = await fetch('/api/cart/add', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
-                    },
-                    body: JSON.stringify({
-                        product_id: currentShopProductId,
-                        quantity: quantity
-                    })
-                });
-                
-                const data = await response.json();
-                
-                if (data.success) {
-                    showShopNotification('Product added to cart!');
-                    updateCartCount();
-                    closeShopProductModal();
-                } else {
-                    showShopNotification(data.message, 'error');
-                }
-            } catch (error) {
-                showShopNotification('Please sign in to add items to cart', 'error');
-            }
-        });
-    }
-});
-
-// Show notification for shop
-function showShopNotification(message, type = 'success') {
-    // Check if notification exists, if not create it
-    let notification = document.getElementById('shop-notification');
-    if (!notification) {
-        notification = document.createElement('div');
-        notification.id = 'shop-notification';
-        notification.className = 'fixed bottom-4 right-4 bg-[#5B5843] text-white px-6 py-4 rounded-lg shadow-lg transform translate-y-24 transition-transform duration-300 z-50';
-        document.body.appendChild(notification);
-    }
-    
+// UTILITY FUNCTIONS
+function showNotification(message, type = 'success') {
+    const notification = document.createElement('div');
+    notification.className = `fixed top-4 right-4 z-50 px-6 py-3 rounded-lg shadow-lg text-white ${type === 'error' ? 'bg-red-500' : 'bg-green-500'} transform transition-all duration-300`;
     notification.textContent = message;
-    notification.style.transform = 'translateY(0)';
-    
-    if (type === 'error') {
-        notification.classList.remove('bg-[#5B5843]');
-        notification.classList.add('bg-red-600');
-    } else {
-        notification.classList.remove('bg-red-600');
-        notification.classList.add('bg-[#5B5843]');
-    }
+    document.body.appendChild(notification);
     
     setTimeout(() => {
-        notification.style.transform = 'translateY(8rem)';
+        notification.style.opacity = '0';
+        setTimeout(() => notification.remove(), 300);
     }, 3000);
 }
 
-// Update cart count
 async function updateCartCount() {
     try {
-        const response = await fetch('/api/cart');
+        const csrfToken = document.querySelector('meta[name="csrf-token"]');
+        if (!csrfToken) return;
+        
+        const response = await fetch('/api/cart', {
+            headers: {
+                'X-CSRF-TOKEN': csrfToken.content
+            }
+        });
+        
         if (response.ok) {
             const data = await response.json();
-            const cartCountEl = document.getElementById('cart-count');
-            if (cartCountEl) {
-                cartCountEl.textContent = data.count || 0;
+            const badge = document.getElementById('cart-count');
+            if (badge && data.items) {
+                const totalItems = data.items.reduce((sum, item) => sum + item.quantity, 0);
+                badge.textContent = totalItems;
+                badge.style.display = totalItems > 0 ? 'flex' : 'none';
             }
         }
     } catch (error) {
         console.error('Error updating cart count:', error);
     }
 }
-}
-</script>
+
+// GLOBAL FUNCTIONS - For external access
+window.showShopNotification = showNotification;
+window.updateCartCount = updateCartCount;
+
+// Modal functionality
+(function() {
+    'use strict';
+    
+    let currentShopProductId = null;
+    let currentMaxStock = 0;
+
+    // Open shop product modal
+    window.openShopProductModal = async function(productId) {
+        try {
+            const response = await fetch(`/api/products/${productId}`);
+            const product = await response.json();
+            
+            currentShopProductId = productId;
+            currentMaxStock = product.stock;
+            
+            // Update modal content
+            document.getElementById('modal-product-name').textContent = product.name;
+            document.getElementById('modal-product-price').textContent = `₱${parseFloat(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}`;
+            document.getElementById('modal-product-description').textContent = product.description;
+            document.getElementById('modal-product-community').textContent = product.community;
+            document.getElementById('modal-product-category').textContent = `Category: ${product.category}`;
+            document.getElementById('modal-product-image').src = `/assets/products/${product.image}`;
+            document.getElementById('modal-product-image').alt = product.name;
+            document.getElementById('modal-product-seller').textContent = `By ${product.seller.artisan_name}`;
+            document.getElementById('modal-product-stock').textContent = `${product.stock} items available`;
+            
+            // Reset quantity
+            const quantityInput = document.getElementById('modal-quantity');
+            quantityInput.value = 1;
+            quantityInput.max = product.stock;
+            
+            // Show modal
+            document.getElementById('shop-product-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+            
+        } catch (error) {
+            console.error('Error loading product:', error);
+            showNotification('Failed to load product details', 'error');
+        }
+    };
+
+    // Close shop product modal
+    window.closeShopProductModal = function() {
+        document.getElementById('shop-product-modal').classList.add('hidden');
+        document.body.style.overflow = '';
+        currentShopProductId = null;
+        currentMaxStock = 0;
+    };
+    
+    // Set up quantity controls and add to cart button
+    function setupModalEventListeners() {
+        const decreaseBtn = document.getElementById('modal-decrease-qty');
+        const increaseBtn = document.getElementById('modal-increase-qty');
+        const quantityInput = document.getElementById('modal-quantity');
+        const addToCartBtn = document.getElementById('modal-add-to-cart-btn');
+        
+        // Decrease quantity
+        if (decreaseBtn) {
+            decreaseBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const currentVal = parseInt(quantityInput.value);
+                if (currentVal > 1) {
+                    quantityInput.value = currentVal - 1;
+                }
+            });
+        }
+        
+        // Increase quantity
+        if (increaseBtn) {
+            increaseBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                const currentVal = parseInt(quantityInput.value);
+                const maxVal = parseInt(quantityInput.max);
+                if (currentVal < maxVal) {
+                    quantityInput.value = currentVal + 1;
+                }
+            });
+        }
+        
+        // Add to cart
+        if (addToCartBtn) {
+            addToCartBtn.addEventListener('click', async function(e) {
+                e.preventDefault();
+                
+                if (!currentShopProductId) {
+                    console.error('No product selected');
+                    return;
+                }
+                
+                const quantity = parseInt(quantityInput.value);
+                
+                // Check authentication
+                const csrfToken = document.querySelector('meta[name="csrf-token"]');
+                if (!csrfToken) {
+                    showNotification('Please sign in to add items to cart', 'error');
+                    setTimeout(() => {
+                        const authModal = document.getElementById('auth-modal');
+                        if (authModal) authModal.classList.remove('hidden');
+                    }, 1000);
+                    return;
+                }
+                
+                // Add to cart
+                try {
+                    const response = await fetch('/api/cart/add', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': csrfToken.content
+                        },
+                        body: JSON.stringify({
+                            product_id: parseInt(currentShopProductId),
+                            quantity: quantity
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok && data.success) {
+                        showNotification('Product added to cart!');
+                        updateCartCount();
+                        setTimeout(() => window.closeShopProductModal(), 500);
+                    } else if (response.status === 401 || response.status === 419) {
+                        showNotification('Please sign in to add items to cart', 'error');
+                        setTimeout(() => {
+                            const authModal = document.getElementById('auth-modal');
+                            if (authModal) authModal.classList.remove('hidden');
+                        }, 1000);
+                    } else {
+                        showNotification(data.message || 'Failed to add to cart', 'error');
+                    }
+                } catch (error) {
+                    console.error('Error adding to cart:', error);
+                    showNotification('Error adding to cart', 'error');
+                }
+            });
+        }
+    }
+    
+    // Initialize event listeners when safe
+    function initModal() {
+        if (document.getElementById('modal-decrease-qty')) {
+            setupModalEventListeners();
+        } else {
+            // Elements not ready yet, wait a bit
+            setTimeout(initModal, 50);
+        }
+    }
+    
+    // Start initialization
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initModal);
+    } else {
+        initModal();
+    }
+})();
+
