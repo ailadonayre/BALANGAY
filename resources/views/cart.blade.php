@@ -19,7 +19,7 @@
                     </svg>
                     <h2 class="text-2xl mb-2">Your cart is empty</h2>
                     <p class="text-gray-600 mb-6">Add some beautiful handcrafted items to get started</p>
-                    <a href="/shop" class="inline-block bg-[#5B5843] text-white px-8 py-3 rounded-full hover:bg-[#252525] transition-all duration-300">
+                    <a href="/shop" class="inline-block bg-[#5B5843] text-white px-8 py-3 rounded-full hover:bg-[#5B5843] transition-all duration-300">
                         Continue Shopping
                     </a>
                 </div>
@@ -46,11 +46,11 @@
                         <span id="total">₱0.00</span>
                     </div>
                     
-                    <button id="checkout-btn" class="w-full bg-[#5B5843] text-white py-4 rounded-full hover:bg-[#252525] transition-all duration-300 font-medium tracking-wide mb-3">
+                    <button id="checkout-btn" class="w-full bg-[#5B5843] text-white py-4 rounded-full hover:bg-[#5B5843] transition-all duration-300 font-medium tracking-wide mb-3">
                         Proceed to Checkout
                     </button>
                     
-                    <a href="/shop" class="block text-center text-[#5B5843] hover:text-[#252525] transition-colors">
+                    <a href="/shop" class="block text-center text-[#5B5843] hover:text-[#5B5843] transition-colors">
                         Continue Shopping
                     </a>
                 </div>
@@ -78,12 +78,12 @@ async function loadCart() {
         const container = document.getElementById('cart-items');
         container.innerHTML = data.items.map(item => `
             <div class="bg-white rounded-xl p-6 shadow-md flex gap-6" data-cart-id="${item.id}">
-                <img src="/assets/products/${item.product.image}" alt="${item.product.name}" class="w-24 h-24 object-cover rounded-lg">
+                <img data-src="/assets/products/${item.product.image}" loading="lazy" decoding="async" src="/assets/logo/dark-green-logo.png" alt="${item.product.name}" class="w-24 h-24 object-cover rounded-lg lazy" onerror="this.src='/assets/logo/dark-green-logo.png'">
                 
                 <div class="flex-1">
                     <h3 class="text-lg font-medium mb-2">${item.product.name}</h3>
                     <p class="text-gray-600 text-sm mb-3">${item.product.community}</p>
-                    <p class="text-xl font-bold text-[#252525]">₱${parseFloat(item.product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                    <p class="text-xl font-bold text-[#5B5843]">₱${parseFloat(item.product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
                 </div>
                 
                 <div class="flex flex-col items-end justify-between">

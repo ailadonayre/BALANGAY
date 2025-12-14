@@ -40,5 +40,7 @@ class DatabaseSeeder extends Seeder
         
         // Run hero stories seeder
         $this->call(HeroStoriesSeeder::class);
+        // Run order seeder (populate sample orders + order items)
+        $this->call(OrderSeeder::class);
     }
 }

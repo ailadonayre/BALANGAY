@@ -1,4 +1,4 @@
-<section class="py-16 md:py-20 lg:py-24 bg-white" id="stories">
+<section class="py-16 md:py-20 lg:py-24 bg-white reveal" id="stories">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <!-- Left Content -->
@@ -13,7 +13,7 @@
                     From the mountains of Cordillera to the shores of Mindanao, each community brings 
                     unique artistry that reflects their deep connection to the land and their ancestors.
                 </p>
-                <a href="/stories" class="inline-block bg-[#5B5843] text-white px-10 py-4 rounded-full text-sm tracking-widest uppercase futura-500 hover:bg-[#252525] transition-all duration-300 transform hover:scale-105">
+                <a href="/stories" class="inline-block bg-[#5B5843] text-white px-10 py-4 rounded-full text-sm tracking-widest uppercase futura-500 hover:bg-[#5B5843] transition-all duration-300 transform hover:scale-105">
                     Read Their Stories
                 </a>
             </div>
@@ -22,18 +22,18 @@
             <div class="grid grid-cols-2 gap-4 lg:gap-6 loading" style="animation-delay: 0.3s">
                 <div class="space-y-4 lg:space-y-6">
                     <div class="overflow-hidden rounded-xl aspect-[4/5]">
-                        <img src="{{ asset('assets/artisans/Amparo-Balansi-Mabanag.jpg') }}" alt="Artisan Story" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700">
+                        <img data-src="{{ asset('assets/artisans/Amparo-Balansi-Mabanag.jpg') }}" loading="lazy" decoding="async" alt="Artisan Story" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700 lazy">
                     </div>
                     <div class="overflow-hidden rounded-xl aspect-square">
-                        <img src="{{ asset('assets/products/Itneg-Hand-Embroidered-Cropped-Jacket.webp') }}" alt="Craft Detail" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700">
+                        <img data-src="{{ asset('assets/products/Itneg-Hand-Embroidered-Cropped-Jacket.webp') }}" loading="lazy" decoding="async" alt="Craft Detail" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700 lazy">
                     </div>
                 </div>
                 <div class="space-y-4 lg:space-y-6 pt-8 lg:pt-12">
                     <div class="overflow-hidden rounded-xl aspect-square">
-                        <img src="{{ asset('assets/products/Fresh-Water-Pearl-Necklace.webp') }}" alt="Heritage Craft" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700">
+                        <img data-src="{{ asset('assets/products/Fresh-Water-Pearl-Necklace.webp') }}" loading="lazy" decoding="async" alt="Heritage Craft" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700 lazy">
                     </div>
                     <div class="overflow-hidden rounded-xl aspect-[4/5]">
-                        <img src="{{ asset('assets/artisans/Magdalena-Gamayo.jpeg') }}" alt="Master Artisan" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700">
+                        <img data-src="{{ asset('assets/artisans/Magdalena-Gamayo.jpeg') }}" loading="lazy" decoding="async" alt="Master Artisan" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700 lazy">
                     </div>
                 </div>
             </div>
@@ -69,10 +69,9 @@ async function loadHeroStories() {
         grid.innerHTML = displayStories.map((story, index) => `
             <article class="group cursor-pointer loading story-card" data-story-index="${index}" style="animation-delay: ${index * 0.2}s" onclick="openHeroStoryModalFromDB(${story.id})">
                 <div class="overflow-hidden rounded-xl aspect-[4/3] mb-5">
-                    <img src="/assets/stories/${story.image || 'default.jpg'}" 
+                    <img data-src="/assets/stories/${story.image || 'default.jpg'}" loading="lazy" decoding="async" src="/assets/logo/dark-green-logo.png" 
                          alt="${story.title}" 
-                         class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
-                         onerror="this.src='/assets/logo/dark-green-logo.png'">
+                         class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110 lazy" onerror="this.src='/assets/logo/dark-green-logo.png'">
                 </div>
                 <h3 class="text-xl md:text-2xl mb-3 futura-500 group-hover:text-[#5B5843] transition-colors duration-300">${story.title}</h3>
                 <p class="text-sm md:text-base text-gray-600 futura-400 mb-4">${story.excerpt}</p>

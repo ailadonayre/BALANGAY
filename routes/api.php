@@ -17,6 +17,8 @@ Route::get('/products', [ProductController::class, 'index']);
 Route::get('/products/search', [ProductController::class, 'search']);
 Route::get('/products/category/{category}', [ProductController::class, 'byCategory']);
 Route::get('/products/{id}', [ProductController::class, 'show']);
+// Public analytics
+Route::get('/public/analytics', [\App\Http\Controllers\AdminController::class, 'getAnalytics']);
 
 // Cart (requires authentication)
 Route::middleware('auth')->group(function () {

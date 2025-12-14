@@ -1,9 +1,9 @@
-<footer class="bg-[#252525] text-white py-16">
+<footer class="bg-[#5B5843] text-white py-16">
     <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <div class="grid md:grid-cols-4 gap-12 mb-12">
             <!-- Brand Column -->
             <div class="md:col-span-2">
-                <img src="{{ asset('assets/logo/cream-logo.png') }}" alt="BALANGAY" class="h-12 mb-6">
+                <img data-src="{{ asset('assets/logo/cream-logo.png') }}" loading="lazy" decoding="async" src="{{ asset('assets/logo/cream-logo.png') }}" alt="BALANGAY" class="h-12 mb-6 lazy">
                 <p class="text-white/70 futura-400 leading-relaxed mb-6 max-w-md">
                     Empowering indigenous communities through ethical e-commerce. 
                     Connecting authentic Filipino craftsmanship with conscious consumers worldwide.

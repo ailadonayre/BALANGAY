@@ -19,13 +19,13 @@
         color: #5B5843 !important;
     }
 </style>
-<div class="min-h-screen bg-gray-50 pt-24 pb-8">
+<div class="min-h-screen bg-[#F8F4EE] pt-24 pb-8">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <!-- Header -->
         <div class="flex justify-between items-center mb-8">
             <div>
-                <h1 class="text-4xl font-bold text-gray-900" style="font-family: 'Elinga', serif;">Admin Dashboard</h1>
-                <p class="text-gray-600 mt-2">Manage BALANGAY platform</p>
+                <h1 class="text-4xl font-bold text-[#443A35]" style="font-family: 'Elinga', serif;">Admin Dashboard</h1>
+                <p class="text-[#5B5843] mt-2">Manage BALANGAY platform</p>
             </div>
             <button onclick="logoutAdmin()" class="bg-red-600 text-white px-6 py-3 rounded-lg hover:bg-red-700 transition-colors">
                 Logout
@@ -33,12 +33,12 @@
         </div>
 
         <!-- Stats Overview -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-            <div class="bg-white rounded-lg shadow p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 reveal">
+            <div class="bg-white rounded-lg shadow p-6 reveal">
                 <div class="flex items-center justify-between">
                     <div>
-                        <p class="text-gray-600 text-sm">Total Users</p>
-                        <p id="stat-users" class="text-3xl font-bold text-gray-900 mt-2">0</p>
+                        <p class="text-[#5B5843] text-sm">Total Users</p>
+                        <p id="stat-users" class="text-3xl font-bold text-[#443A35] mt-2">0</p>
                     </div>
                     <div class="bg-blue-100 rounded-lg p-3">
                         <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -135,6 +135,10 @@
                             <span id="homepage-artisans" class="text-2xl font-bold text-[#5B5843]">0</span>
                         </div>
                         <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Artists Onboarded</span>
+                            <span id="homepage-artists-onboarded" class="text-2xl font-bold text-[#5B5843]">0</span>
+                        </div>
+                        <div class="flex justify-between items-center">
                             <span class="text-gray-600">Products Sold</span>
                             <span id="homepage-products-sold" class="text-2xl font-bold text-[#5B5843]">0</span>
                         </div>
@@ -166,6 +170,24 @@
                                 <p class="text-sm text-gray-600">Awaiting approval</p>
                             </div>
                             <span id="pending-products-count" class="text-2xl font-bold text-blue-600">0</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Charts -->
+                <div class="bg-white rounded-lg shadow p-6 lg:col-span-2">
+                    <h3 class="text-xl font-semibold mb-4">Recent Trends</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div class="p-4 bg-gray-50 rounded">
+                            <h4 class="text-sm text-gray-600 mb-2">Monthly Revenue</h4>
+                            <canvas id="chart-revenue" height="140"></canvas>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded">
+                            <h4 class="text-sm text-gray-600 mb-2">Products Status</h4>
+                            <canvas id="chart-products" height="140"></canvas>
+                        </div>
+                        <div class="p-4 bg-gray-50 rounded">
+                            <h4 class="text-sm text-gray-600 mb-2">Sellers by Tribe</h4>
+                            <canvas id="chart-tribe" height="140"></canvas>
                         </div>
                     </div>
                 </div>
@@ -568,6 +590,9 @@ async function loadAnalytics() {
         
         document.getElementById('homepage-artisans').textContent = analytics.artisans_supported;
         document.getElementById('homepage-products-sold').textContent = analytics.products_sold;
+        if (document.getElementById('homepage-artists-onboarded')) {
+            document.getElementById('homepage-artists-onboarded').textContent = analytics.artists_onboarded;
+        }
         document.getElementById('homepage-income').textContent = '₱' + parseFloat(analytics.income_provided).toLocaleString('en-PH', { minimumFractionDigits: 2 });
         document.getElementById('homepage-orders').textContent = analytics.orders_count;
         
@@ -669,7 +694,7 @@ async function loadProducts() {
         const grid = document.getElementById('products-grid');
         grid.innerHTML = products.map(product => `
             <div class="bg-white rounded-lg shadow p-4">
-                <img src="/assets/products/${product.image || 'default.jpg'}" class="w-full h-48 object-cover rounded-lg mb-2" onerror="this.src='/assets/logo/dark-green-logo.png'">
+                <img data-src="/assets/products/${product.image || 'default.jpg'}" loading="lazy" decoding="async" src="/assets/logo/dark-green-logo.png" class="w-full h-48 object-cover rounded-lg mb-2 lazy" onerror="this.src='/assets/logo/dark-green-logo.png'">
                 <h4 class="text-lg font-semibold text-gray-900">${product.name}</h4>
                 <p class="text-gray-600">${product.category}</p>
                 <p class="text-gray-800 font-bold mt-2">₱${parseFloat(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
@@ -707,7 +732,7 @@ async function loadStories() {
         }
         container.innerHTML = stories.map(story => `
             <div class="bg-white rounded-lg shadow overflow-hidden">
-                ${story.image ? `<img src="/assets/stories/${story.image}" class="w-full h-48 object-cover" onerror="this.src='/assets/logo/dark-green-logo.png'">` : '<div class="w-full h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400">No Image</span></div>'}
+                ${story.image ? `<img data-src="/assets/stories/${story.image}" loading="lazy" decoding="async" src="/assets/logo/dark-green-logo.png" class="w-full h-48 object-cover lazy" onerror="this.src='/assets/logo/dark-green-logo.png'">` : '<div class="w-full h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400">No Image</span></div>'}
                 <div class="p-4">
                     <div class="flex items-start justify-between mb-2">
                         <h4 class="text-lg font-semibold text-gray-900">${story.title}</h4>
@@ -752,7 +777,7 @@ async function loadDonations() {
             const progress = donation.target_amount > 0 ? ((donation.current_amount || 0) / donation.target_amount * 100) : 0;
             return `
             <div class="bg-white rounded-lg shadow overflow-hidden">
-                ${donation.image ? `<img src="/assets/donations/${donation.image}" class="w-full h-48 object-cover" onerror="this.src='/assets/logo/dark-green-logo.png'">` : '<div class="w-full h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400">No Image</span></div>'}
+                ${donation.image ? `<img data-src="/assets/donations/${donation.image}" loading="lazy" decoding="async" src="/assets/logo/dark-green-logo.png" class="w-full h-48 object-cover lazy" onerror="this.src='/assets/logo/dark-green-logo.png'">` : '<div class="w-full h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400">No Image</span></div>'}
                 <div class="p-4">
                     <div class="flex items-start justify-between mb-2">
                         <h4 class="text-lg font-semibold text-gray-900">${donation.title}</h4>
@@ -808,7 +833,7 @@ async function loadFeaturedArtists() {
         }
         container.innerHTML = artists.map(artist => `
             <div class="bg-white rounded-lg shadow overflow-hidden">
-                ${artist.image ? `<img src="/assets/artisans/${artist.image}" class="w-full h-48 object-cover" onerror="this.src='/assets/logo/dark-green-logo.png'">` : '<div class="w-full h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400">No Image</span></div>'}
+                ${artist.image ? `<img data-src="/assets/artisans/${artist.image}" loading="lazy" decoding="async" src="/assets/logo/dark-green-logo.png" class="w-full h-48 object-cover lazy" onerror="this.src='/assets/logo/dark-green-logo.png'">` : '<div class="w-full h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400">No Image</span></div>'}
                 <div class="p-4">
                     <div class="flex items-start justify-between mb-2">
                         <h4 class="text-lg font-semibold text-gray-900">${artist.name}</h4>
@@ -1086,7 +1111,7 @@ async function loadFeaturedCommunities() {
         }
         container.innerHTML = communities.map(community => `
             <div class="bg-white rounded-lg shadow overflow-hidden">
-                ${community.image ? `<img src="/assets/tribes/${community.image}" class="w-full h-48 object-cover" onerror="this.src='/assets/logo/dark-green-logo.png'">` : '<div class="w-full h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400">No Image</span></div>'}
+                ${community.image ? `<img data-src="/assets/tribes/${community.image}" loading="lazy" decoding="async" src="/assets/logo/dark-green-logo.png" class="w-full h-48 object-cover lazy" onerror="this.src='/assets/logo/dark-green-logo.png'">` : '<div class="w-full h-48 bg-gray-200 flex items-center justify-center"><span class="text-gray-400">No Image</span></div>'}
                 <div class="p-4">
                     <div class="flex items-start justify-between mb-2">
                         <h4 class="text-lg font-semibold text-gray-900">${community.name}</h4>
@@ -1266,7 +1291,7 @@ function filterProducts(status) {
             const grid = document.getElementById('products-grid');
             grid.innerHTML = products.map(product => `
                 <div class="bg-white rounded-lg shadow p-4">
-                    <img src="/assets/products/${product.image || 'default.jpg'}" class="w-full h-48 object-cover rounded-lg mb-2" onerror="this.src='/assets/logo/dark-green-logo.png'">
+                    <img data-src="/assets/products/${product.image || 'default.jpg'}" loading="lazy" decoding="async" src="/assets/logo/dark-green-logo.png" class="w-full h-48 object-cover rounded-lg mb-2 lazy" onerror="this.src='/assets/logo/dark-green-logo.png'">
                     <h4 class="text-lg font-semibold text-gray-900">${product.name}</h4>
                     <p class="text-gray-600">${product.category}</p>
                     <p class="text-gray-800 font-bold mt-2">₱${parseFloat(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>

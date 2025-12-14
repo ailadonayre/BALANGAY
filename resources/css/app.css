@@ -17,72 +17,54 @@
     font-display: swap;
 }
 
-/* Futura Font */
-@font-face {
-    font-family: 'Futura';
-    src: url('/assets/fonts/FuturaLight.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Futura';
-    src: url('/assets/fonts/FuturaTMed.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Futura';
-    src: url('/assets/fonts/FuturaMedium.ttf') format('truetype');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Futura';
-    src: url('/assets/fonts/FuturaT_Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Futura';
-    src: url('/assets/fonts/FuturaHeavy.ttf') format('truetype');
-    font-weight: 900;
-    font-style: normal;
-    font-display: swap;
-}
+/* DM Sans is loaded via Google Fonts in layout */
 
 body {
-    font-family: 'Futura', system-ui, -apple-system, sans-serif;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
     background-color: #F8F4EE;
-    color: #252525;
+    color: #5B5843;
     line-height: 1.6;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Elinga', 'Futura', serif;
+    font-family: 'Elinga', serif;
     font-weight: normal;
     line-height: 1.2;
 }
 
-.futura-100 { font-family: 'Futura'; font-weight: 300; }
-.futura-400 { font-family: 'Futura'; font-weight: 400; }
-.futura-500 { font-family: 'Futura'; font-weight: 500; }
-.futura-700 { font-family: 'Futura'; font-weight: 700; }
-.futura-900 { font-family: 'Futura'; font-weight: 900; }
+.futura-100 { font-family: 'DM Sans', sans-serif; font-weight: 300; }
+.futura-400 { font-family: 'DM Sans', sans-serif; font-weight: 400; }
+.futura-500 { font-family: 'DM Sans', sans-serif; font-weight: 500; }
+.futura-700 { font-family: 'DM Sans', sans-serif; font-weight: 700; }
+.futura-900 { font-family: 'DM Sans', sans-serif; font-weight: 900; }
 
 @keyframes fadeIn {
     from { opacity: 0; transform: translateY(20px); }
     to { opacity: 1; transform: translateY(0); }
 }
 
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(18px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
 .fade-in { animation: fadeIn 1s ease-in; }
+
+/* Reveal for scroll animations */
+.reveal { opacity: 0; transform: translateY(18px); transition: opacity .6s ease, transform .6s ease; will-change: opacity, transform; }
+.reveal.active { opacity: 1; transform: translateY(0); }
+
+/* Lazy image blur-up */
+img.lazy, img[data-src] { filter: blur(8px); transition: filter .5s ease, opacity .5s ease; opacity: .9; }
+img.lazy.loaded, img[data-src].loaded { filter: blur(0); opacity: 1; }
+
+/* Ensure images smoothly transform when hovered */
+img { transition: transform .45s ease, opacity .35s ease; will-change: transform; }
+
+/* Page transitions */
+.page-enter { opacity: 0; transform: translateY(6px); }
+.page-exit { opacity: 0; transform: translateY(-6px); transition: opacity .28s ease, transform .28s ease; }
+
 .loading { opacity: 0; animation: fadeIn 0.8s ease-in forwards; }
 
 html { scroll-behavior: smooth; }

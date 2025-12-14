@@ -5,9 +5,17 @@
 
     <!-- Modal Content -->
     <div class="flex min-h-screen items-center justify-center p-4">
-        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md transform transition-all duration-300 scale-100 opacity-100">
+        <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-3xl transform transition-all duration-300 scale-100 opacity-100">
+            <div class="grid grid-cols-1 md:grid-cols-2">
+                <div class="hidden md:flex flex-col items-center justify-center p-8 bg-[#F8F4EE] rounded-l-2xl">
+                    <img data-src="{{ asset('assets/logo/dark-green-logo.png') }}" loading="lazy" decoding="async" src="{{ asset('assets/logo/dark-green-logo.png') }}" alt="BALANGAY" class="h-14 mb-4 lazy">
+                    <h3 class="text-2xl font-semibold text-[#443A35] mb-2" style="font-family: 'Elinga', serif;">Welcome to BALANGAY</h3>
+                    <p class="text-sm text-[#5B5843] max-w-xs text-center">A platform connecting communities with culturally-authentic crafts and makers.</p>
+                </div>
+                <div class="p-6 md:p-8">
+
             <!-- Close Button -->
-            <button onclick="document.getElementById('auth-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors duration-300">
+            <button onclick="document.getElementById('auth-modal').classList.add('hidden')" class="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors duration-300 bg-white rounded-full p-1">
                 <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
@@ -16,7 +24,7 @@
             <!-- Modal Header -->
             <div class="p-8 pb-6">
                 <div class="text-center mb-6">
-                    <img src="{{ asset('assets/logo/dark-green-logo.png') }}" alt="BALANGAY" class="h-10 mx-auto mb-4">
+                    <img data-src="{{ asset('assets/logo/dark-green-logo.png') }}" loading="lazy" decoding="async" src="{{ asset('assets/logo/dark-green-logo.png') }}" alt="BALANGAY" class="h-10 mx-auto mb-4 lazy">
                     <h2 class="text-2xl mb-2" style="font-family: 'Elinga', serif;">Welcome to BALANGAY</h2>
                     <p class="text-gray-600 text-sm">Join our community of conscious consumers</p>
                 </div>
@@ -38,9 +46,14 @@
                         <label class="block text-sm font-medium text-gray-700 mb-2" id="email-label">Email Address</label>
                         <input type="text" name="email" id="email-input" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent transition-all duration-300" placeholder="your@email.com">
                     </div>
-                    <div>
+                    <div class="relative">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                        <input type="password" name="password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent transition-all duration-300" placeholder="••••••••">
+                        <div class="relative">
+                            <input id="signin-password" type="password" name="password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent transition-all duration-300" placeholder="••••••••">
+                            <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 toggle-password" data-target="signin-password" aria-label="Show password">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            </button>
+                        </div>
                     </div>
                     <div>
                         <label class="block text-sm font-medium text-gray-700 mb-3">I am a:</label>
@@ -62,9 +75,9 @@
                             <input type="checkbox" name="remember" class="rounded border-gray-300 text-[#5B5843] focus:ring-[#5B5843]">
                             <span class="ml-2 text-gray-600">Remember me</span>
                         </label>
-                        <a href="#" class="text-[#5B5843] hover:text-[#252525]">Forgot password?</a>
+                        <a href="#" class="text-[#5B5843] hover:text-[#5B5843]">Forgot password?</a>
                     </div>
-                    <button type="submit" class="w-full bg-[#5B5843] text-white py-3 rounded-full hover:bg-[#252525] transition-all duration-300 tracking-wide">
+                    <button type="submit" class="w-full bg-[#5B5843] text-white py-3 rounded-full hover:bg-[#5B5843] transition-all duration-300 tracking-wide">
                         Sign In
                     </button>
                     <div id="signin-error" class="hidden text-red-600 text-sm text-center"></div>
@@ -135,13 +148,23 @@
                             <input type="text" name="shop_name" class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent transition-all duration-300" placeholder="Your Shop Name">
                         </div>
                     </div>
-                    <div>
+                    <div class="relative">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Password</label>
-                        <input type="password" name="password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent transition-all duration-300" placeholder="••••••••">
+                        <div class="relative">
+                            <input id="signup-password" type="password" name="password" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent transition-all duration-300" placeholder="••••••••">
+                            <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 toggle-password" data-target="signup-password" aria-label="Show password">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            </button>
+                        </div>
                     </div>
-                    <div>
+                    <div class="relative">
                         <label class="block text-sm font-medium text-gray-700 mb-2">Confirm Password</label>
-                        <input type="password" name="password_confirmation" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent transition-all duration-300" placeholder="••••••••">
+                        <div class="relative">
+                            <input id="signup-password-confirm" type="password" name="password_confirmation" required class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#5B5843] focus:border-transparent transition-all duration-300" placeholder="••••••••">
+                            <button type="button" class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-500 toggle-password" data-target="signup-password-confirm" aria-label="Show confirm password">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>
+                            </button>
+                        </div>
                     </div>
                     <div class="text-xs text-gray-600">
                         <label class="flex items-start">
@@ -149,7 +172,7 @@
                             <span class="ml-2">I agree to the Terms of Service and Privacy Policy</span>
                         </label>
                     </div>
-                    <button type="submit" class="w-full bg-[#5B5843] text-white py-3 rounded-full hover:bg-[#252525] transition-all duration-300 tracking-wide">
+                    <button type="submit" class="w-full bg-[#5B5843] text-white py-3 rounded-full hover:bg-[#5B5843] transition-all duration-300 tracking-wide">
                         Create Account
                     </button>
                     <div id="signup-error" class="hidden text-red-600 text-sm text-center"></div>
@@ -338,10 +361,64 @@ document.getElementById('signup-form').addEventListener('submit', async (e) => {
     }
 });
 
-// Auto-open modal after 20 seconds if not logged in
-@guest
-setTimeout(() => {
-    document.getElementById('auth-modal').classList.remove('hidden');
-}, 20000);
-@endguest
+// Password toggle handlers
+document.querySelectorAll('.toggle-password').forEach(btn => {
+    btn.setAttribute('aria-pressed', 'false');
+    btn.addEventListener('click', function() {
+        const targetId = this.dataset.target;
+        const input = document.getElementById(targetId);
+        if (!input) return;
+        if (input.type === 'password') {
+            input.type = 'text';
+            this.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.269-2.943-9.543-7a9.958 9.958 0 012.223-3.428M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3l18 18"/></svg>';
+            this.setAttribute('aria-pressed', 'true');
+            this.setAttribute('aria-label', 'Hide password');
+            input.focus();
+        } else {
+            input.type = 'password';
+            this.innerHTML = '<svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/></svg>';
+            this.setAttribute('aria-pressed', 'false');
+            this.setAttribute('aria-label', 'Show password');
+            input.focus();
+        }
+    });
+});
+
+// Basic focus trap for modal
+(function() {
+    const modal = document.getElementById('auth-modal');
+    if (!modal) return;
+
+    modal.addEventListener('keydown', function(e) {
+        if (e.key !== 'Tab') return;
+        const focusable = modal.querySelectorAll('a[href], button:not([disabled]), textarea, input, select');
+        const first = focusable[0];
+        const last = focusable[focusable.length - 1];
+        if (e.shiftKey) {
+            if (document.activeElement === first) {
+                e.preventDefault();
+                last.focus();
+            }
+        } else {
+            if (document.activeElement === last) {
+                e.preventDefault();
+                first.focus();
+            }
+        }
+    });
+
+    // When showing modal, focus first input
+    const observer = new MutationObserver(muts => {
+        muts.forEach(m => {
+            if (m.attributeName === 'class') {
+                const isHidden = modal.classList.contains('hidden');
+                if (!isHidden) {
+                    const firstInput = modal.querySelector('input, button, textarea, select');
+                    if (firstInput) firstInput.focus();
+                }
+            }
+        });
+    });
+    observer.observe(modal, { attributes: true });
+})();
 </script>

@@ -15,6 +15,7 @@ class SellerController extends Controller
     public function dashboard()
     {
         /** @var Seller $seller */
+        /** @var Seller $seller */
         $seller = Auth::guard('seller')->user();
         
         $stats = [
@@ -52,6 +53,7 @@ class SellerController extends Controller
             'image' => 'nullable|image|mimes:jpeg,png,jpg,gif,webp|max:2048',
         ]);
 
+        /** @var Seller $seller */
         $seller = Auth::guard('seller')->user();
 
         try {
@@ -279,7 +281,25 @@ class SellerController extends Controller
                 ->orderBy('total_sold', 'desc')
                 ->take(5)
                 ->get(),
+            'monthly_sales' => [],
         ];
+
+        // Build last 6 months sales series for this seller
+        $monthlySales = [];
+        for ($i = 5; $i >= 0; $i--) {
+            $m = now()->subMonths($i);
+            $label = $m->format('M Y');
+
+            $sales = $seller->orderItems()
+                ->whereHas('order', function($q) use ($m) {
+                    $q->whereYear('created_at', $m->year)->whereMonth('created_at', $m->month);
+                })
+                ->sum('subtotal');
+
+            $monthlySales[] = ['label' => $label, 'value' => (float) $sales];
+        }
+
+        $analytics['monthly_sales'] = $monthlySales;
 
         return response()->json($analytics);
     }
@@ -310,6 +330,7 @@ class SellerController extends Controller
             'banner_image' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
+        /** @var \App\Models\Seller $seller */
         $seller = Auth::guard('seller')->user();
 
         try {
@@ -349,6 +370,7 @@ class SellerController extends Controller
             'profile_picture' => 'required|image|mimes:jpeg,png,jpg,webp|max:2048',
         ]);
 
+        /** @var \App\Models\Seller $seller */
         $seller = Auth::guard('seller')->user();
 
         try {

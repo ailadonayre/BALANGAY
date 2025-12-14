@@ -18,7 +18,7 @@
             <!-- Product Image -->
             <div class="space-y-4">
                 <div class="aspect-square rounded-xl overflow-hidden bg-gray-100">
-                    <img id="product-image" src="" alt="" class="w-full h-full object-cover">
+                    <img id="product-image" data-src="" loading="lazy" decoding="async" src="" alt="" class="w-full h-full object-cover lazy">
                 </div>
                 
                 <!-- Thumbnail Gallery (Optional) -->
@@ -34,7 +34,7 @@
                 <div class="mb-4">
                     <p id="product-community" class="text-[#5B5843] text-sm mb-2 uppercase tracking-wide"></p>
                     <h1 id="product-name" class="text-4xl mb-4" style="font-family: 'Elinga', serif;"></h1>
-                    <p id="product-price" class="text-3xl text-[#252525] font-bold mb-6"></p>
+                    <p id="product-price" class="text-3xl text-[#5B5843] font-bold mb-6"></p>
                 </div>
 
                 <div class="mb-6 pb-6 border-b border-gray-200">
@@ -68,7 +68,7 @@
 
                 <!-- Action Buttons -->
                 <div class="flex gap-4 mb-6">
-                    <button id="add-to-cart-btn" class="flex-1 bg-[#5B5843] text-white py-4 rounded-full hover:bg-[#252525] transition-all duration-300 font-medium tracking-wide">
+                    <button id="add-to-cart-btn" class="flex-1 bg-[#5B5843] text-white py-4 rounded-full hover:bg-[#5B5843] transition-all duration-300 font-medium tracking-wide">
                         Add to Cart
                     </button>
                     <button class="w-14 h-14 border-2 border-gray-300 rounded-full hover:border-[#5B5843] flex items-center justify-center transition-colors">
@@ -162,10 +162,10 @@ async function loadRelatedProducts(category, currentProductId) {
         container.innerHTML = relatedProducts.map(product => `
             <a href="/product/${product.id}" class="group">
                 <div class="relative overflow-hidden rounded-xl bg-white aspect-square mb-4 shadow-md">
-                    <img src="/assets/products/${product.image}" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
+                    <img data-src="/assets/products/${product.image}" loading="lazy" decoding="async" src="/assets/logo/dark-green-logo.png" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 lazy" onerror="this.src='/assets/logo/dark-green-logo.png'">
                 </div>
                 <h3 class="text-base mb-2 group-hover:text-[#5B5843] transition-colors">${product.name}</h3>
-                <p class="text-[#252525] text-lg font-bold">₱${parseFloat(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                <p class="text-[#5B5843] text-lg font-bold">₱${parseFloat(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
             </a>
         `).join('');
     } catch (error) {

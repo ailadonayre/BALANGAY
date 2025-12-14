@@ -16,7 +16,7 @@
                 </svg>
                 <h2 class="text-2xl mb-2 text-gray-900">No orders yet</h2>
                 <p class="text-gray-600 mb-6">You haven't placed any orders yet.</p>
-                <a href="/shop" class="inline-block bg-[#5B5843] text-white px-8 py-3 rounded-full hover:bg-[#252525] transition-all duration-300">
+                <a href="/shop" class="inline-block bg-[#5B5843] text-white px-8 py-3 rounded-full hover:bg-[#5B5843] transition-all duration-300">
                     Start Shopping
                 </a>
             </div>
@@ -63,8 +63,8 @@ async function loadOrders() {
                     </div>
                     <div class="text-right">
                         <p class="text-sm text-gray-600 mb-1">Total</p>
-                        <p class="text-2xl font-bold text-[#252525]">₱${parseFloat(order.total_amount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
-                        <a href="#order-${order.id}" class="text-sm text-[#5B5843] hover:text-[#252525] transition-colors mt-2 inline-block">View Details →</a>
+                        <p class="text-2xl font-bold text-[#5B5843]">₱${parseFloat(order.total_amount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                        <a href="#order-${order.id}" class="text-sm text-[#5B5843] hover:text-[#5B5843] transition-colors mt-2 inline-block">View Details →</a>
                     </div>
                 </div>
                 
@@ -72,7 +72,7 @@ async function loadOrders() {
                     <h4 class="font-medium mb-3">Order Items</h4>
                     ${order.items.map(item => `
                         <div class="flex gap-4 p-3 bg-gray-50 rounded-lg">
-                            <img src="/assets/products/${item.product.image}" alt="${item.product.name}" class="w-16 h-16 object-cover rounded">
+                            <img data-src="/assets/products/${item.product.image}" loading="lazy" decoding="async" src="/assets/logo/dark-green-logo.png" alt="${item.product.name}" class="w-16 h-16 object-cover rounded lazy" onerror="this.src='/assets/logo/dark-green-logo.png'">
                             <div class="flex-1">
                                 <p class="font-medium">${item.product.name}</p>
                                 <p class="text-sm text-gray-600">Qty: ${item.quantity}</p>

@@ -6,11 +6,12 @@
         <!-- Header with Profile Banner -->
         <div class="relative mb-8 rounded-2xl overflow-hidden shadow-xl">
             <!-- Banner Image -->
-            <div class="h-48 md:h-64 bg-gradient-to-r from-[#5B5843] to-[#252525] relative">
+            <div class="h-48 md:h-64 bg-gradient-to-r from-[#5B5843] to-[#5B5843] relative">
                 <img id="banner-preview" 
                      src="{{ Auth::guard('seller')->user()->banner_image ? asset('assets/sellers/banners/' . Auth::guard('seller')->user()->banner_image) : asset('assets/hero/hero.png') }}" 
+                     loading="lazy" decoding="async" 
                      alt="Shop Banner" 
-                     class="w-full h-full object-cover opacity-60">
+                     class="w-full h-full object-cover opacity-60 lazy">
                 
                 <!-- Edit Banner Button -->
                 <label for="banner-upload" class="absolute top-4 right-4 bg-white/90 hover:bg-white text-gray-800 px-4 py-2 rounded-lg cursor-pointer transition-all duration-300 flex items-center gap-2 shadow-lg backdrop-blur-sm">
@@ -31,10 +32,11 @@
                         <div class="w-24 h-24 md:w-32 md:h-32 rounded-full border-4 border-white shadow-xl overflow-hidden bg-white">
                             <img id="profile-preview" 
                                  src="{{ Auth::guard('seller')->user()->profile_picture ? asset('assets/sellers/profiles/' . Auth::guard('seller')->user()->profile_picture) : asset('assets/logo/dark-green-logo.png') }}" 
+                                 loading="lazy" decoding="async" 
                                  alt="Profile" 
-                                 class="w-full h-full object-cover">
+                                 class="w-full h-full object-cover lazy">
                         </div>
-                        <label for="profile-upload" class="absolute bottom-0 right-0 bg-[#5B5843] hover:bg-[#252525] text-white p-2 rounded-full cursor-pointer transition-all duration-300 shadow-lg">
+                        <label for="profile-upload" class="absolute bottom-0 right-0 bg-[#5B5843] hover:bg-[#5B5843] text-white p-2 rounded-full cursor-pointer transition-all duration-300 shadow-lg">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"></path>
                             </svg>
@@ -174,7 +176,7 @@
             <div class="bg-white rounded-xl shadow-lg overflow-hidden">
                 <div class="px-6 py-4 border-b border-gray-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                     <h2 class="text-xl font-semibold text-gray-900">My Products</h2>
-                    <button onclick="openAddProductModal()" class="bg-[#5B5843] hover:bg-[#252525] text-white px-6 py-3 rounded-lg transition-all duration-300 flex items-center gap-2 shadow-md">
+                    <button onclick="openAddProductModal()" class="bg-[#5B5843] hover:bg-[#5B5843] text-white px-6 py-3 rounded-lg transition-all duration-300 flex items-center gap-2 shadow-md">
                         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
                         </svg>
@@ -215,9 +217,7 @@
                 <!-- Sales Chart -->
                 <div class="bg-white rounded-xl shadow-lg p-6">
                     <h3 class="text-lg font-semibold mb-4">Sales Overview</h3>
-                    <div class="h-64 flex items-center justify-center text-gray-400">
-                        <p>Sales chart will be displayed here</p>
-                    </div>
+                    <canvas id="seller-sales-chart" height="200"></canvas>
                 </div>
                 
                 <!-- Best Selling Products -->
@@ -306,7 +306,7 @@
                 </div>
                 
                 <div class="flex gap-4 pt-4">
-                    <button type="submit" class="flex-1 bg-[#5B5843] hover:bg-[#252525] text-white py-3 rounded-lg transition-all duration-300 font-medium">
+                    <button type="submit" class="flex-1 bg-[#5B5843] hover:bg-[#5B5843] text-white py-3 rounded-lg transition-all duration-300 font-medium">
                         Save Product
                     </button>
                     <button type="button" onclick="closeProductModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-lg transition-all duration-300 font-medium">
@@ -329,7 +329,7 @@
                 </svg>
             </button>
             
-            <h3 class="text-2xl font-bold mb-6">Edit Profile</h3>
+            <h3 class="text-2xl font-bold mb-6 text-[#443A35]">Edit Profile</h3>
             
             <form id="edit-profile-form" class="space-y-4">
                 <div>
@@ -365,7 +365,7 @@
                 </div>
                 
                 <div class="flex gap-4 pt-4">
-                    <button type="submit" class="flex-1 bg-[#5B5843] hover:bg-[#252525] text-white py-3 rounded-lg transition-all duration-300 font-medium">
+                    <button type="submit" class="flex-1 bg-[#5B5843] hover:bg-[#5B5843] text-white py-3 rounded-lg transition-all duration-300 font-medium">
                         Save Changes
                     </button>
                     <button type="button" onclick="closeEditProfileModal()" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 py-3 rounded-lg transition-all duration-300 font-medium">
@@ -663,7 +663,7 @@
                     <tr class="hover:bg-gray-50 transition-colors">
                         <td class="px-6 py-4">
                             <div class="flex items-center gap-3">
-                                <img src="/assets/products/${product.image || 'default.jpg'}" alt="${product.name}" class="w-10 h-10 rounded object-cover bg-gray-100" onerror="this.src='/assets/logo/dark-green-logo.png'">
+                                <img data-src="/assets/products/${product.image || 'default.jpg'}" loading="lazy" decoding="async" src="/assets/logo/dark-green-logo.png" alt="${product.name}" class="w-10 h-10 rounded object-cover bg-gray-100 lazy" onerror="this.src='/assets/logo/dark-green-logo.png'">
                                 <span class="font-medium text-gray-900">${product.name}</span>
                             </div>
                         </td>
@@ -776,7 +776,7 @@
                 bestSellingContainer.innerHTML += `
                     <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
                         <div class="flex items-center gap-3">
-                            <img src="/assets/products/${product.image || 'default.jpg'}" alt="${product.name}" class="w-8 h-8 rounded object-cover" onerror="this.src='/assets/logo/dark-green-logo.png'">
+                            <img data-src="/assets/products/${product.image || 'default.jpg'}" loading="lazy" decoding="async" src="/assets/logo/dark-green-logo.png" alt="${product.name}" class="w-8 h-8 rounded object-cover lazy" onerror="this.src='/assets/logo/dark-green-logo.png'">
                             <span class="text-sm font-medium text-gray-900">${product.name}</span>
                         </div>
                         <span class="text-sm text-gray-600">${product.total_sold || 0} sold</span>
