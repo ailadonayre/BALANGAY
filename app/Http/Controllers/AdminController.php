@@ -583,7 +583,7 @@ class AdminController extends Controller
             'description' => $request->description,
             'image' => $imagePath,
             'display_order' => $request->display_order ?? 0,
-            'active' => false,
+            'active' => true,
         ]);
 
         return response()->json([

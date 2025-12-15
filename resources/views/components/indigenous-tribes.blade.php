@@ -23,7 +23,7 @@
 </section>
 
 <script>
-// Load active featured communities from database
+// Load active featured communities from database (limit to 4 for hero section)
 async function loadHeroCommunities() {
     try {
         const response = await fetch('/api/public/featured-communities');
@@ -36,7 +36,10 @@ async function loadHeroCommunities() {
             return;
         }
         
-        grid.innerHTML = communities.map((community, index) => `
+        // Limit to 4 communities for the hero section
+        const displayCommunities = communities.slice(0, 4);
+        
+        grid.innerHTML = displayCommunities.map((community, index) => `
             <div class="group cursor-pointer loading tribe-card" data-community-id="${community.id}" style="animation-delay: ${index * 0.15}s">
                 <div class="relative overflow-hidden rounded-xl aspect-[3/4] mb-4">
                     <img src="/assets/tribes/${community.image || 'default.png'}" 
