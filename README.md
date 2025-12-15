@@ -10,11 +10,11 @@
   <img src="https://img.shields.io/badge/License-MIT-green" alt="MIT License">
 </p>
 
-## About BALANGAY
+## 🧺About BALANGAY
 
 **BALANGAY** is a comprehensive e-commerce platform dedicated to promoting and selling authentic indigenous Philippine crafts. The platform connects indigenous artisans with customers worldwide, providing a marketplace that celebrates Filipino cultural heritage while empowering local communities.
 
-### Key Features
+### 🧺Key Features
 
 - **Multi-vendor Marketplace** - Sellers can register, manage products, and track orders
 - **Admin Dashboard** - Complete administrative control over users, sellers, products, and content
@@ -26,7 +26,7 @@
 
 ---
 
-## System Architecture
+## 🧺System Architecture
 
 ### User Roles
 
@@ -58,7 +58,7 @@ The platform supports three distinct user roles:
 
 ---
 
-## Installation & Setup
+## 🧺Installation & Setup
 
 ### Prerequisites
 
@@ -140,7 +140,7 @@ The platform supports three distinct user roles:
 
 ---
 
-## Default Credentials
+## 🧺Default Credentials
 
 ### Admin Access
 - **Email:** `admin@balangay.com`
@@ -157,7 +157,7 @@ The platform supports three distinct user roles:
 
 ---
 
-## Project Structure
+## 🧺Project Structure
 
 ```
 BALANGAY/
@@ -206,7 +206,7 @@ BALANGAY/
 
 ---
 
-## Core Features
+## 🧺Core Features
 
 ### 1. **Customer Features**
 
@@ -306,7 +306,7 @@ BALANGAY/
 
 ---
 
-## Workflow Integration
+## 🧺Workflow Integration
 
 ### Product Approval Workflow
 
@@ -337,7 +337,7 @@ BALANGAY/
 
 ---
 
-## Database Schema
+## 🧺Database Schema
 
 ### Core Tables
 
@@ -380,7 +380,7 @@ BALANGAY/
 
 ---
 
-## API Routes
+## 🧺API Routes
 
 ### Public APIs
 
@@ -454,7 +454,7 @@ DELETE /admin/api/featured-artists/{id}     # Delete featured artist
 
 ---
 
-## Testing
+## 🧺Testing
 
 Run the test suite:
 
@@ -471,7 +471,7 @@ php artisan test --coverage
 
 ---
 
-## Available Composer Scripts
+## 🧺Available Composer Scripts
 
 ```bash
 # Full setup (install, migrate, seed, build)
@@ -486,7 +486,7 @@ composer test
 
 ---
 
-## Frontend Development
+## 🧺Frontend Development
 
 ### Build Commands
 
@@ -503,7 +503,7 @@ The project uses TailwindCSS 4.1 with custom configuration. Modify `tailwind.con
 
 ---
 
-## Asset Management
+## 🧺Asset Management
 
 ### Directory Structure
 
@@ -523,7 +523,7 @@ public/assets/
 
 ---
 
-## Configuration
+## 🧺Configuration
 
 ### Authentication Guards
 
@@ -547,27 +547,7 @@ SESSION_LIFETIME=120
 
 ---
 
-## Known Issues & Fixes
-
-All major issues have been resolved. See documentation files for details:
-
-- ✅ **FIXES_IMPLEMENTED.md** - UI and functionality fixes (Dec 13, 2025)
-- ✅ **ADMIN_DASHBOARD_FIXES_DEC14.md** - Admin dashboard enhancements (Dec 14, 2025)
-- ✅ **SELLER_FUNCTIONALITY_ANALYSIS.md** - Seller features documentation
-- ✅ **WORKFLOW_INTEGRATION.md** - Complete workflow documentation
-
----
-
-## Additional Documentation
-
-- **DATA_FLOW.md** - Complete data flow diagrams
-- **ADMIN_FEATURES_SUMMARY.md** - Admin dashboard features
-- **SELLER_SETUP.md** - Seller onboarding guide
-- **SELLER_TESTING.md** - Seller functionality testing guide
-
----
-
-## Deployment
+## 🧺Deployment
 
 ### Production Checklist
 
@@ -593,7 +573,7 @@ All major issues have been resolved. See documentation files for details:
 
 ---
 
-## Contributing
+## 🧺Contributing
 
 Contributions are welcome! Please follow these guidelines:
 
@@ -605,19 +585,19 @@ Contributions are welcome! Please follow these guidelines:
 
 ---
 
-## License
+## 🧺License
 
 This project is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
 
 ---
 
-## Support & Contact
+## 🧺Support & Contact
 
 For support, email your administrator or open an issue in the repository.
 
 ---
 
-## Acknowledgments
+## 🧺Acknowledgments
 
 - Laravel Framework Team
 - TailwindCSS Team
