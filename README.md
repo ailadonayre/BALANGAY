@@ -14,7 +14,7 @@
 
 **BALANGAY** is a comprehensive e-commerce platform dedicated to promoting and selling authentic indigenous Philippine crafts. The platform connects indigenous artisans with customers worldwide, providing a marketplace that celebrates Filipino cultural heritage while empowering local communities.
 
-### 🧺Key Features
+### Key Features
 
 - **Multi-vendor Marketplace** - Sellers can register, manage products, and track orders
 - **Admin Dashboard** - Complete administrative control over users, sellers, products, and content
