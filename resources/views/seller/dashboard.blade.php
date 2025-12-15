@@ -6,7 +6,7 @@
         <!-- Header with Profile Banner -->
         <div class="relative mb-8 rounded-2xl overflow-hidden shadow-xl">
             <!-- Banner Image -->
-            <div class="h-48 md:h-64 bg-gradient-to-r from-[#5B5843] to-[#252525] relative">
+            <div class="h-48 md:h-64 bg-gradient-to-r from-[#5B5843] to-[#5B5843] relative">
                 <img id="banner-preview" 
                      src="{{ Auth::guard('seller')->user()->banner_image ? asset('assets/sellers/banners/' . Auth::guard('seller')->user()->banner_image) : asset('assets/hero/hero.png') }}" 
                      alt="Shop Banner" 

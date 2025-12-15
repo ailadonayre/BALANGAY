@@ -63,7 +63,7 @@ async function loadOrders() {
                     </div>
                     <div class="text-right">
                         <p class="text-sm text-gray-600 mb-1">Total</p>
-                        <p class="text-2xl font-bold text-[#252525]">₱${parseFloat(order.total_amount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                        <p class="text-2xl font-bold text-[#5B5843]">₱${parseFloat(order.total_amount).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
                         <a href="#order-${order.id}" class="text-sm text-[#5B5843] hover:text-[#252525] transition-colors mt-2 inline-block">View Details →</a>
                     </div>
                 </div>

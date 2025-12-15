@@ -34,7 +34,7 @@
                 <div class="mb-4">
                     <p id="product-community" class="text-[#5B5843] text-sm mb-2 uppercase tracking-wide"></p>
                     <h1 id="product-name" class="text-4xl mb-4" style="font-family: 'Elinga', serif;"></h1>
-                    <p id="product-price" class="text-3xl text-[#252525] font-bold mb-6"></p>
+                    <p id="product-price" class="text-3xl text-[#5B5843] font-bold mb-6"></p>
                 </div>
 
                 <div class="mb-6 pb-6 border-b border-gray-200">
@@ -165,7 +165,7 @@ async function loadRelatedProducts(category, currentProductId) {
                     <img src="/assets/products/${product.image}" alt="${product.name}" class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110">
                 </div>
                 <h3 class="text-base mb-2 group-hover:text-[#5B5843] transition-colors">${product.name}</h3>
-                <p class="text-[#252525] text-lg font-bold">₱${parseFloat(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                <p class="text-[#5B5843] text-lg font-bold">₱${parseFloat(product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
             </a>
         `).join('');
     } catch (error) {

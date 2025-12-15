@@ -83,7 +83,7 @@ async function loadCart() {
                 <div class="flex-1">
                     <h3 class="text-lg font-medium mb-2">${item.product.name}</h3>
                     <p class="text-gray-600 text-sm mb-3">${item.product.community}</p>
-                    <p class="text-xl font-bold text-[#252525]">₱${parseFloat(item.product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
+                    <p class="text-xl font-bold text-[#5B5843]">₱${parseFloat(item.product.price).toLocaleString('en-PH', { minimumFractionDigits: 2 })}</p>
                 </div>
                 
                 <div class="flex flex-col items-end justify-between">

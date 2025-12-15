@@ -1,6 +1,6 @@
 <section class="py-16 md:py-20 lg:py-24 bg-white" id="discover">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12 md:mb-16">
+        <div class="text-center mb-12 md:mb-16 scroll-reveal">
             <h2 class="text-3xl md:text-4xl lg:text-5xl mb-4 md:mb-6">Indigenous Heritage</h2>
             <p class="text-sm md:text-base lg:text-lg text-gray-600 futura-400 max-w-2xl mx-auto">
                 Explore the rich cultural traditions of Filipino indigenous communities
@@ -14,7 +14,7 @@
             </div>
         </div>
 
-        <div class="text-center mt-12">
+        <div class="text-center mt-12 scroll-reveal">
             <a href="/communities" class="inline-block bg-[#5B5843] text-white px-10 py-4 rounded-full text-sm tracking-widest uppercase futura-500 hover:bg-[#252525] transition-all duration-300 transform hover:scale-105">
                 Show All Communities
             </a>
@@ -40,10 +40,11 @@ async function loadHeroCommunities() {
         const displayCommunities = communities.slice(0, 4);
         
         grid.innerHTML = displayCommunities.map((community, index) => `
-            <div class="group cursor-pointer loading tribe-card" data-community-id="${community.id}" style="animation-delay: ${index * 0.15}s">
+            <div class="group cursor-pointer stagger-item hover-lift tribe-card" data-community-id="${community.id}">
                 <div class="relative overflow-hidden rounded-xl aspect-[3/4] mb-4">
                     <img src="/assets/tribes/${community.image || 'default.png'}" 
                          alt="${community.name}" 
+                         loading="lazy"
                          class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
                          onerror="this.src='/assets/logo/dark-green-logo.png'">
                     <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent"></div>
@@ -54,6 +55,11 @@ async function loadHeroCommunities() {
                 </div>
             </div>
         `).join('');
+        
+        // Re-initialize scroll animator for dynamically added elements
+        if (window.scrollAnimator) {
+            window.scrollAnimator.observeElements();
+        }
         
         // Setup click handlers after rendering
         setupTribeCardHandlers();

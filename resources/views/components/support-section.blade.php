@@ -1,6 +1,6 @@
 <section class="py-16 md:py-20 lg:py-24 bg-[#5B5843] text-white" id="support">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="text-center mb-12 md:mb-16">
+        <div class="text-center mb-12 md:mb-16 scroll-reveal">
             <h2 class="text-3xl md:text-4xl lg:text-5xl mb-4 md:mb-6 text-white">Support Our Mission</h2>
             <p class="text-sm md:text-base lg:text-lg text-white/80 futura-400 max-w-3xl mx-auto leading-relaxed">
                 Every purchase, donation, and share helps preserve indigenous heritage and 
@@ -30,7 +30,7 @@
             @endphp
 
             @foreach($supportWays as $index => $way)
-            <div class="text-center loading" style="animation-delay: {{ $index * 0.2 }}s">
+            <div class="text-center stagger-item">
                 <div class="w-14 h-14 md:w-16 md:h-16 bg-white/10 rounded-full flex items-center justify-center mx-auto mb-5 md:mb-6 backdrop-blur-sm">
                     <svg class="w-7 h-7 md:w-8 md:h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         {!! $way['icon'] !!}
@@ -43,8 +43,8 @@
         </div>
 
         <!-- CTA Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center items-center loading" style="animation-delay: 0.6s">
-            <a href="/shop" class="inline-block bg-white text-[#252525] px-10 md:px-12 py-3.5 md:py-4 rounded-full text-xs md:text-sm tracking-widest uppercase futura-500 hover:bg-[#E4DDCC] transition-all duration-300 transform hover:scale-105 w-full sm:w-auto text-center">
+        <div class="flex flex-col sm:flex-row gap-4 lg:gap-6 justify-center items-center scroll-reveal">
+            <a href="/shop" class="inline-block bg-white text-[#5B5843] px-10 md:px-12 py-3.5 md:py-4 rounded-full text-xs md:text-sm tracking-widest uppercase futura-500 hover:bg-[#E4DDCC] transition-all duration-300 transform hover:scale-105 w-full sm:w-auto text-center">
                 Start Shopping
             </a>
             <button id="donate-button" class="inline-block bg-transparent border-2 border-white text-white px-10 md:px-12 py-3.5 md:py-4 rounded-full text-xs md:text-sm tracking-widest uppercase futura-500 hover:bg-white hover:text-[#252525] transition-all duration-300 transform hover:scale-105 w-full sm:w-auto text-center">

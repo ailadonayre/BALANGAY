@@ -2,7 +2,7 @@
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
             <!-- Left Content -->
-            <div>
+            <div class="scroll-reveal">
                 <h2 class="text-3xl md:text-4xl lg:text-5xl mb-6 md:mb-8">Stories of Heritage</h2>
                 <p class="text-lg text-gray-600 futura-400 leading-relaxed mb-8">
                     Behind every craft is a story of tradition, resilience, and cultural pride. 
@@ -19,21 +19,21 @@
             </div>
 
             <!-- Right Image Grid -->
-            <div class="grid grid-cols-2 gap-4 lg:gap-6 loading" style="animation-delay: 0.3s">
+            <div class="grid grid-cols-2 gap-4 lg:gap-6 scroll-reveal">
                 <div class="space-y-4 lg:space-y-6">
                     <div class="overflow-hidden rounded-xl aspect-[4/5]">
-                        <img src="{{ asset('assets/artisans/Amparo-Balansi-Mabanag.jpg') }}" alt="Artisan Story" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700">
+                        <img src="{{ asset('assets/artisans/Amparo-Balansi-Mabanag.jpg') }}" alt="Artisan Story" loading="lazy" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700">
                     </div>
                     <div class="overflow-hidden rounded-xl aspect-square">
-                        <img src="{{ asset('assets/products/Itneg-Hand-Embroidered-Cropped-Jacket.webp') }}" alt="Craft Detail" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700">
+                        <img src="{{ asset('assets/products/Itneg-Hand-Embroidered-Cropped-Jacket.webp') }}" alt="Craft Detail" loading="lazy" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700">
                     </div>
                 </div>
                 <div class="space-y-4 lg:space-y-6 pt-8 lg:pt-12">
                     <div class="overflow-hidden rounded-xl aspect-square">
-                        <img src="{{ asset('assets/products/Fresh-Water-Pearl-Necklace.webp') }}" alt="Heritage Craft" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700">
+                        <img src="{{ asset('assets/products/Fresh-Water-Pearl-Necklace.webp') }}" alt="Heritage Craft" loading="lazy" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700">
                     </div>
                     <div class="overflow-hidden rounded-xl aspect-[4/5]">
-                        <img src="{{ asset('assets/artisans/Magdalena-Gamayo.jpeg') }}" alt="Master Artisan" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700">
+                        <img src="{{ asset('assets/artisans/Magdalena-Gamayo.jpeg') }}" alt="Master Artisan" loading="lazy" class="w-full h-full object-cover object-center hover:scale-110 transition-transform duration-700">
                     </div>
                 </div>
             </div>
@@ -67,10 +67,11 @@ async function loadHeroStories() {
         const displayStories = stories.slice(0, 3);
         
         grid.innerHTML = displayStories.map((story, index) => `
-            <article class="group cursor-pointer loading story-card" data-story-id="${story.id}" style="animation-delay: ${index * 0.2}s">
+            <article class="group cursor-pointer stagger-item hover-lift story-card" data-story-id="${story.id}">
                 <div class="overflow-hidden rounded-xl aspect-[4/3] mb-5">
                     <img src="/assets/stories/${story.image || 'default.jpg'}" 
                          alt="${story.title}" 
+                         loading="lazy"
                          class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
                          onerror="this.src='/assets/logo/dark-green-logo.png'">
                 </div>
@@ -87,6 +88,11 @@ async function loadHeroStories() {
         
         // Store stories globally for modal access
         window.heroStoriesFromDB = stories;
+        
+        // Re-initialize scroll animator for dynamically added elements
+        if (window.scrollAnimator) {
+            window.scrollAnimator.observeElements();
+        }
         
         // Add click handlers to story cards
         document.querySelectorAll('.story-card').forEach(card => {

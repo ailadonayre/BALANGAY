@@ -1,22 +1,22 @@
-<section class="py-16 md:py-20 lg:py-24 bg-[#5B5843] text-white">
+<section class="py-16 md:py-20 lg:py-24 bg-[#5B5843] text-white" id="discover">
     <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-8 lg:gap-12">
-            <div class="text-center loading" style="animation-delay: 0s">
+            <div class="text-center stagger-item">
                 <div class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-3 md:mb-4 futura-700 counter" data-target="0" id="stat-artisans">0</div>
                 <div class="text-xs md:text-sm lg:text-base tracking-wider uppercase futura-400 text-white/80">Artisans Supported</div>
             </div>
             
-            <div class="text-center loading" style="animation-delay: 0.15s">
+            <div class="text-center stagger-item">
                 <div class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-3 md:mb-4 futura-700 counter" data-target="0" id="stat-onboarded">0</div>
                 <div class="text-xs md:text-sm lg:text-base tracking-wider uppercase futura-400 text-white/80">Artists Onboarded</div>
             </div>
             
-            <div class="text-center loading" style="animation-delay: 0.3s">
+            <div class="text-center stagger-item">
                 <div class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-3 md:mb-4 futura-700 counter" data-target="0" data-is-currency="true" id="stat-income">₱0</div>
                 <div class="text-xs md:text-sm lg:text-base tracking-wider uppercase futura-400 text-white/80">Income Provided</div>
             </div>
             
-            <div class="text-center loading" style="animation-delay: 0.45s">
+            <div class="text-center stagger-item">
                 <div class="text-4xl md:text-5xl lg:text-6xl xl:text-7xl mb-3 md:mb-4 futura-700 counter" data-target="0" id="stat-products">0</div>
                 <div class="text-xs md:text-sm lg:text-base tracking-wider uppercase futura-400 text-white/80">Products Sold</div>
             </div>

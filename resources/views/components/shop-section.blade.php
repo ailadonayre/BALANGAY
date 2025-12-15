@@ -1,7 +1,7 @@
 <section class="py-16 md:py-20 lg:py-24 bg-[#E4DDCC]" id="shop">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
 
-        <div class="text-center mb-12 md:mb-16">
+        <div class="text-center mb-12 md:mb-16 scroll-reveal">
             <h2 class="text-3xl md:text-4xl lg:text-5xl mb-4 md:mb-6">Shop Authentic Crafts</h2>
             <p class="text-sm md:text-base lg:text-lg text-gray-600 futura-400 max-w-2xl mx-auto">
                 Each purchase directly supports indigenous artisans and their communities
@@ -23,18 +23,19 @@
             @endphp
 
             @foreach($products as $index => $product)
-                <div class="group cursor-pointer loading product-card shop-product-hero" data-product-id="{{ $product['id'] }}" style="animation-delay: {{ $index * 0.1 }}s">
+                <div class="group cursor-pointer stagger-item hover-lift product-card shop-product-hero" data-product-id="{{ $product['id'] }}">
 
                     <div class="relative overflow-hidden rounded-lg bg-white aspect-square mb-4 shadow-md">
                         <img 
                             src="{{ asset('assets/products/' . $product['image']) }}"
                             alt="{{ $product['name'] }}"
+                            loading="lazy"
                             class="w-full h-full object-cover object-center transition-transform duration-700 group-hover:scale-110"
                         >
 
                         <!-- Quick Add Button -->
                         <div class="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 flex items-center justify-center">
-                            <button class="view-product-btn bg-white text-[#252525] px-5 py-2.5 rounded-full text-[10px] sm:text-xs tracking-wider uppercase futura-500 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 flex items-center gap-2">
+                            <button class="view-product-btn bg-white text-[#5B5843] px-5 py-2.5 rounded-full text-[10px] sm:text-xs tracking-wider uppercase futura-500 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-500 flex items-center gap-2">
                                 <svg class="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path 
                                         stroke-linecap="round" 
@@ -58,7 +59,7 @@
                         <h3 class="text-sm md:text-base mb-1.5 futura-500 group-hover:text-[#5B5843] transition-colors duration-300 line-clamp-2">
                             {{ $product['name'] }}
                         </h3>
-                        <p class="text-[#252525] text-base md:text-lg futura-700">
+                        <p class="text-[#5B5843] text-base md:text-lg futura-700">
                             {{ $product['price'] }}
                         </p>
                     </div>

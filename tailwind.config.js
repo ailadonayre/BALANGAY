@@ -12,7 +12,7 @@ export default {
         dark: '#252525',
       },
       fontFamily: {
-        futura: ['Futura', 'system-ui', '-apple-system', 'sans-serif'],
+        futura: ['DM Sans', 'system-ui', '-apple-system', 'sans-serif'],
         elinga: ['Elinga', 'serif'],
       },
     },

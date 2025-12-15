@@ -26,7 +26,7 @@
                         <h2 id="modal-product-name" class="text-3xl font-bold mb-2" style="font-family: 'Elinga', serif;"></h2>
                         <p id="modal-product-community" class="text-lg text-[#5B5843] futura-500 mb-2"></p>
                         <p id="modal-product-category" class="text-sm text-gray-600 mb-4"></p>
-                        <p id="modal-product-price" class="text-2xl font-bold text-[#252525] mb-6"></p>
+                        <p id="modal-product-price" class="text-2xl font-bold text-[#5B5843] mb-6"></p>
                         
                         <p id="modal-product-description" class="text-gray-600 leading-relaxed mb-6"></p>
 
@@ -52,7 +52,7 @@
                         <!-- Seller Info -->
                         <div class="pt-6 border-t border-gray-200">
                             <p class="text-sm text-gray-600 mb-1">Sold by:</p>
-                            <p id="modal-product-seller" class="text-lg font-semibold text-[#252525]"></p>
+                            <p id="modal-product-seller" class="text-lg font-semibold text-[#5B5843]"></p>
                         </div>
                     </div>
                 </div>

@@ -17,72 +17,195 @@
     font-display: swap;
 }
 
-/* Futura Font */
-@font-face {
-    font-family: 'Futura';
-    src: url('/assets/fonts/FuturaLight.ttf') format('truetype');
-    font-weight: 300;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Futura';
-    src: url('/assets/fonts/FuturaTMed.ttf') format('truetype');
-    font-weight: 400;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Futura';
-    src: url('/assets/fonts/FuturaMedium.ttf') format('truetype');
-    font-weight: 500;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Futura';
-    src: url('/assets/fonts/FuturaT_Bold.ttf') format('truetype');
-    font-weight: 700;
-    font-style: normal;
-    font-display: swap;
-}
-
-@font-face {
-    font-family: 'Futura';
-    src: url('/assets/fonts/FuturaHeavy.ttf') format('truetype');
-    font-weight: 900;
-    font-style: normal;
-    font-display: swap;
-}
+/* DM Sans Font - using Google Fonts */
 
 body {
-    font-family: 'Futura', system-ui, -apple-system, sans-serif;
+    font-family: 'DM Sans', system-ui, -apple-system, sans-serif;
     background-color: #F8F4EE;
-    color: #252525;
+    color: #5B5843;
     line-height: 1.6;
 }
 
 h1, h2, h3, h4, h5, h6 {
-    font-family: 'Elinga', 'Futura', serif;
+    font-family: 'Elinga', 'DM Sans', serif;
     font-weight: normal;
     line-height: 1.2;
 }
 
-.futura-100 { font-family: 'Futura'; font-weight: 300; }
-.futura-400 { font-family: 'Futura'; font-weight: 400; }
-.futura-500 { font-family: 'Futura'; font-weight: 500; }
-.futura-700 { font-family: 'Futura'; font-weight: 700; }
-.futura-900 { font-family: 'Futura'; font-weight: 900; }
+.futura-100 { font-family: 'DM Sans'; font-weight: 300; }
+.futura-400 { font-family: 'DM Sans'; font-weight: 400; }
+.futura-500 { font-family: 'DM Sans'; font-weight: 500; }
+.futura-700 { font-family: 'DM Sans'; font-weight: 700; }
+.futura-900 { font-family: 'DM Sans'; font-weight: 900; }
 
+/* Scroll Animations */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+    from { 
+        opacity: 0; 
+        transform: translateY(30px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
 }
 
-.fade-in { animation: fadeIn 1s ease-in; }
-.loading { opacity: 0; animation: fadeIn 0.8s ease-in forwards; }
+@keyframes fadeInUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(60px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
 
-html { scroll-behavior: smooth; }
+@keyframes fadeInLeft {
+    from { 
+        opacity: 0; 
+        transform: translateX(-50px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateX(0); 
+    }
+}
+
+@keyframes fadeInRight {
+    from { 
+        opacity: 0; 
+        transform: translateX(50px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateX(0); 
+    }
+}
+
+@keyframes scaleIn {
+    from { 
+        opacity: 0; 
+        transform: scale(0.9); 
+    }
+    to { 
+        opacity: 1; 
+        transform: scale(1); 
+    }
+}
+
+@keyframes slideInUp {
+    from { 
+        opacity: 0; 
+        transform: translateY(100px); 
+    }
+    to { 
+        opacity: 1; 
+        transform: translateY(0); 
+    }
+}
+
+/* Base animation classes */
+.fade-in { animation: fadeIn 0.8s ease-out forwards; }
+.fade-in-up { animation: fadeInUp 1s ease-out forwards; }
+.fade-in-left { animation: fadeInLeft 0.8s ease-out forwards; }
+.fade-in-right { animation: fadeInRight 0.8s ease-out forwards; }
+.scale-in { animation: scaleIn 0.6s ease-out forwards; }
+.slide-in-up { animation: slideInUp 0.8s ease-out forwards; }
+
+/* Scroll reveal elements - hidden by default */
+.scroll-reveal {
+    opacity: 0;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.scroll-reveal.revealed {
+    opacity: 1;
+    transform: translateY(0) !important;
+}
+
+/* Staggered animations */
+.stagger-item {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.stagger-item.revealed {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.stagger-item:nth-child(1) { transition-delay: 0.1s; }
+.stagger-item:nth-child(2) { transition-delay: 0.2s; }
+.stagger-item:nth-child(3) { transition-delay: 0.3s; }
+.stagger-item:nth-child(4) { transition-delay: 0.4s; }
+.stagger-item:nth-child(5) { transition-delay: 0.5s; }
+.stagger-item:nth-child(6) { transition-delay: 0.6s; }
+
+/* Page transitions */
+@keyframes pageEnter {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+main {
+    animation: pageEnter 0.5s ease-out;
+}
+
+/* Lazy loading skeleton */
+.lazy-loading {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+}
+
+@keyframes shimmer {
+    0% { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+}
+
+/* Image lazy load fade in */
+img[loading="lazy"] {
+    opacity: 0;
+    transition: opacity 0.5s ease-in;
+}
+
+img[loading="lazy"].loaded {
+    opacity: 1;
+}
+
+/* Smooth scroll */
+html { 
+    scroll-behavior: smooth; 
+}
+
+/* Loading state */
+.loading { 
+    opacity: 0; 
+}
+
+.loading.visible {
+    animation: fadeIn 0.8s ease-out forwards;
+}
+
+/* Hover lift effect */
+.hover-lift {
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.hover-lift:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+}
+
+/* Parallax effect */
+.parallax {
+    transition: transform 0.3s ease-out;
+}
