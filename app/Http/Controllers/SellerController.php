@@ -158,10 +158,26 @@ class SellerController extends Controller
                 ], 403);
             }
 
+            // Check if product has order items
+            if ($product->orderItems()->exists()) {
+                // Archive instead of delete
+                $product->is_active = false;
+                $product->save();
+                
+                return response()->json([
+                    'success' => true,
+                    'archived' => true,
+                    'message' => 'Product archived (has order history and cannot be permanently deleted)'
+                ]);
+            }
+
+            // Delete cart items first
+            $product->cartItems()->delete();
+
             if ($product->image && $product->image !== 'default.jpg') {
                 $imagePath = public_path('assets/products/' . $product->image);
                 if (file_exists($imagePath)) {
-                    unlink($imagePath);
+                    @unlink($imagePath);
                 }
             }
 
@@ -169,9 +185,11 @@ class SellerController extends Controller
 
             return response()->json([
                 'success' => true,
+                'archived' => false,
                 'message' => 'Product deleted successfully'
             ]);
         } catch (\Exception $e) {
+            \Log::error('Delete Product Error: ' . $e->getMessage());
             return response()->json([
                 'success' => false,
                 'message' => 'Error deleting product: ' . $e->getMessage()

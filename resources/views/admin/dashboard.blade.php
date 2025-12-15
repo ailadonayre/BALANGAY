@@ -648,6 +648,7 @@ async function loadSellers() {
                     <button class="text-blue-600 hover:underline" onclick="viewSeller(${seller.id})">View</button>
                     <button class="text-green-600 hover:underline ml-2" onclick="approveSeller(${seller.id})">Approve</button>
                     <button class="text-red-600 hover:underline ml-2" onclick="rejectSeller(${seller.id})">Reject</button>
+                    <button class="text-red-600 hover:underline ml-2" onclick="deleteSeller(${seller.id})">Delete</button>
                 </td>
             </tr>
         `).join('');
@@ -872,6 +873,28 @@ function rejectSeller(sellerId) {
     });
 }
 
+function deleteSeller(sellerId) {
+    if (!confirm('Delete this seller? This action cannot be undone.')) return;
+    
+    fetch(`/admin/api/sellers/${sellerId}`, {
+        method: 'DELETE',
+        headers: {
+            'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+        }
+    }).then(res => res.json()).then(data => {
+        if (data.success) {
+            alert('Seller deleted successfully!');
+            loadSellers();
+            loadAnalytics();
+        } else {
+            alert('Error deleting seller');
+        }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('Error deleting seller');
+    });
+}
+
 function deleteUser(userId) {
     if (!confirm('Delete this user? This action cannot be undone.')) return;
     
@@ -936,9 +959,19 @@ function deleteProduct(productId) {
         }
     }).then(res => res.json()).then(data => {
         if (data.success) {
-            alert('Product deleted!');
+            if (data.archived) {
+                alert('Product archived (has order history and cannot be permanently deleted)');
+            } else {
+                alert('Product deleted successfully!');
+            }
             loadProducts();
+            loadAnalytics();
+        } else {
+            alert('Error deleting product: ' + (data.message || 'Unknown error'));
         }
+    }).catch(error => {
+        console.error('Error:', error);
+        alert('Error deleting product');
     });
 }
 

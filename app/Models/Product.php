@@ -21,12 +21,14 @@ class Product extends Model
         'approval_status',
         'rejection_reason',
         'featured',
+        'is_active',
     ];
 
     protected $casts = [
         'price' => 'decimal:2',
         'stock' => 'integer',
         'featured' => 'boolean',
+        'is_active' => 'boolean',
     ];
 
     public function seller()

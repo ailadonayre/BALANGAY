@@ -191,22 +191,47 @@ class AdminController extends Controller
 
     public function deleteProduct($id)
     {
-        $product = Product::findOrFail($id);
-        
-        // Delete image if exists
-        if ($product->image && $product->image !== 'default.jpg') {
-            $imagePath = public_path('assets/products/' . $product->image);
-            if (file_exists($imagePath)) {
-                unlink($imagePath);
+        try {
+            $product = Product::findOrFail($id);
+            
+            // Check if product has order items
+            if ($product->orderItems()->exists()) {
+                // Archive instead of delete
+                $product->is_active = false;
+                $product->save();
+                
+                return response()->json([
+                    'success' => true,
+                    'archived' => true,
+                    'message' => 'Product archived (has order history and cannot be permanently deleted)'
+                ]);
             }
+            
+            // Delete cart items first
+            $product->cartItems()->delete();
+            
+            // Delete image if exists
+            if ($product->image && $product->image !== 'default.jpg') {
+                $imagePath = public_path('assets/products/' . $product->image);
+                if (file_exists($imagePath)) {
+                    @unlink($imagePath);
+                }
+            }
+            
+            $product->delete();
+            
+            return response()->json([
+                'success' => true,
+                'archived' => false,
+                'message' => 'Product deleted successfully'
+            ]);
+        } catch (\Exception $e) {
+            \Log::error('Delete Product Error: ' . $e->getMessage());
+            return response()->json([
+                'success' => false,
+                'message' => 'Error deleting product: ' . $e->getMessage()
+            ], 500);
         }
-        
-        $product->delete();
-        
-        return response()->json([
-            'success' => true,
-            'message' => 'Product deleted successfully'
-        ]);
     }
 
     // Story Management

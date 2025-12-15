@@ -1,4 +1,4 @@
-<footer class="bg-[#252525] text-white py-16">
+<footer class="bg-[#5B5843] text-white py-16">
     <div class="max-w-7xl mx-auto px-6 lg:px-8">
         <div class="grid md:grid-cols-4 gap-12 mb-12">
             <!-- Brand Column -->

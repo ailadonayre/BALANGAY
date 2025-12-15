@@ -15,7 +15,7 @@
         </div>
 
         <div class="text-center mt-12">
-            <a href="/communities" class="inline-block bg-[#252525] text-white px-10 py-4 rounded-full text-sm tracking-widest uppercase futura-500 hover:bg-[#5B5843] transition-all duration-300 transform hover:scale-105">
+            <a href="/communities" class="inline-block bg-[#5B5843] text-white px-10 py-4 rounded-full text-sm tracking-widest uppercase futura-500 hover:bg-[#252525] transition-all duration-300 transform hover:scale-105">
                 Show All Communities
             </a>
         </div>

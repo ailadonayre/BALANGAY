@@ -722,27 +722,33 @@
     }
 
     async function deleteProduct(productId) {
-        if (!confirm('Are you sure you want to delete this product?')) return;
+        if (!confirm('Are you sure you want to delete this product? This action cannot be undone.')) return;
 
         try {
             const response = await fetch(`/seller/api/products/${productId}`, {
                 method: 'DELETE',
                 headers: {
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Accept': 'application/json'
                 }
             });
 
             const data = await response.json();
 
             if (data.success) {
-                showNotification('Product deleted successfully!');
+                if (data.archived) {
+                    showNotification('Product archived successfully (has order history)', 'success');
+                } else {
+                    showNotification('Product deleted successfully!');
+                }
                 loadProducts();
+                loadAnalytics();
             } else {
                 showNotification(data.message || 'Error deleting product', 'error');
             }
         } catch (error) {
-            console.error('Error:', error);
-            showNotification('Error deleting product', 'error');
+            console.error('Delete Error:', error);
+            showNotification('Error deleting product: ' + error.message, 'error');
         }
     }
 

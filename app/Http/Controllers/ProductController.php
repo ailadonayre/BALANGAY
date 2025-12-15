@@ -15,6 +15,7 @@ class ProductController extends Controller
         $products = Product::with('seller')
             ->where('stock', '>', 0)
             ->where('approval_status', 'approved')
+            ->where('is_active', true)
             ->get();
         
         return response()->json($products);
@@ -24,6 +25,7 @@ class ProductController extends Controller
     {
         $product = Product::with(['seller', 'orderItems'])
             ->where('approval_status', 'approved')
+            ->where('is_active', true)
             ->findOrFail($id);
         
         return response()->json($product);
@@ -32,7 +34,8 @@ class ProductController extends Controller
     public function search(Request $request)
     {
         $query = Product::with('seller')
-            ->where('approval_status', 'approved');
+            ->where('approval_status', 'approved')
+            ->where('is_active', true);
 
         if ($request->filled('q')) {
             $query->where('name', 'like', '%' . $request->q . '%')
@@ -65,6 +68,7 @@ class ProductController extends Controller
     public function getCategories()
     {
         $categories = Product::where('approval_status', 'approved')
+            ->where('is_active', true)
             ->distinct()
             ->pluck('category');
         return response()->json($categories);
@@ -73,6 +77,7 @@ class ProductController extends Controller
     public function getCommunities()
     {
         $communities = Product::where('approval_status', 'approved')
+            ->where('is_active', true)
             ->distinct()
             ->pluck('community');
         return response()->json($communities);
@@ -84,6 +89,7 @@ class ProductController extends Controller
             ->where('category', $category)
             ->where('stock', '>', 0)
             ->where('approval_status', 'approved')
+            ->where('is_active', true)
             ->get();
         
         return response()->json(['data' => $products]);
@@ -94,6 +100,7 @@ class ProductController extends Controller
         $products = Product::with('seller')
             ->where('featured', true)
             ->where('approval_status', 'approved')
+            ->where('is_active', true)
             ->where('stock', '>', 0)
             ->get();
         
