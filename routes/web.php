@@ -86,6 +86,7 @@ Route::get('/api/products-communities', [ProductController::class, 'getCommuniti
 Route::get('/api/public/stories', [ProductController::class, 'getPublicStories'])->name('api.public.stories');
 Route::get('/api/public/featured-artists', [ProductController::class, 'getPublicFeaturedArtists'])->name('api.public.featured-artists');
 Route::get('/api/public/featured-communities', [ProductController::class, 'getPublicFeaturedCommunities'])->name('api.public.featured-communities');
+Route::get('/api/public/analytics', [ProductController::class, 'getPublicAnalytics'])->name('api.public.analytics');
 // Community API Routes (Public)
 Route::get('/api/communities/all', [CommunityController::class, 'index'])->name('api.communities.list');
 Route::get('/api/communities/{id}', [CommunityController::class, 'show'])->name('api.communities.show');

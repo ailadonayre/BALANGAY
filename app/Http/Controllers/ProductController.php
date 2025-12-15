@@ -136,4 +136,26 @@ class ProductController extends Controller
         
         return response()->json($communities);
     }
+
+    public function getPublicAnalytics()
+    {
+        try {
+            $analytics = [
+                'artisans_supported' => \App\Models\Seller::where('verification_status', 'approved')->count(),
+                'artists_onboarded' => \App\Models\Seller::count(),
+                'income_provided' => \App\Models\OrderItem::sum('subtotal') ?? 0,
+                'products_sold' => \App\Models\OrderItem::sum('quantity') ?? 0,
+            ];
+
+            return response()->json($analytics);
+        } catch (\Exception $e) {
+            \Log::error('Public Analytics Error: ' . $e->getMessage());
+            return response()->json([
+                'artisans_supported' => 0,
+                'artists_onboarded' => 0,
+                'income_provided' => 0,
+                'products_sold' => 0,
+            ]);
+        }
+    }
 }
