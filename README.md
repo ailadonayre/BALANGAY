@@ -1,8 +1,6 @@
 <p align="center">
-  <img src="public/assets/logo/cream-logo.png" alt="BALANGAY Logo" width="400">
+  <img src="public/assets/readme/readme banner.png" alt="BALANGAY Banner">
 </p>
-
-<h1 align="center">BALANGAY - Indigenous Philippine Artisan Marketplace</h1>
 
 <p align="center">
   <img src="https://img.shields.io/badge/Laravel-12.0-red" alt="Laravel 12.0">
