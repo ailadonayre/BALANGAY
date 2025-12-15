@@ -1,3 +1,6 @@
+@extends('layouts.app')
+
+@section('content')
 <!-- Hero Section -->
 <section class="relative h-[70vh] md:h-[80vh] lg:h-screen flex items-center justify-center overflow-hidden">
     <!-- Background Image -->
@@ -27,15 +30,12 @@
     </div>
 </section>
 
-@extends('layouts.app')
-
-@section('content')
-    @include('components.impact-numbers')
-    @include('components.featured-artisans')
-    @include('components.indigenous-tribes')
-    @include('components.shop-section')
-    @include('components.stories-section')
-    @include('components.support-section')
+@include('components.impact-numbers')
+@include('components.featured-artisans')
+@include('components.indigenous-tribes')
+@include('components.shop-section')
+@include('components.stories-section')
+@include('components.support-section')
 @endsection
 
 @push('scripts')
