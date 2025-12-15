@@ -110,9 +110,6 @@
                     <button onclick="switchAdminTab('stories')" class="admin-tab px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                         Stories
                     </button>
-                    <button onclick="switchAdminTab('donations')" class="admin-tab px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
-                        Donations
-                    </button>
                     <button onclick="switchAdminTab('featured')" class="admin-tab px-6 py-4 text-sm font-medium border-b-2 border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300">
                         Featured Artists
                     </button>
@@ -277,23 +274,6 @@
                 <div class="p-6">
                     <div id="stories-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                         <!-- Stories will be loaded here -->
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Donations Tab -->
-        <div id="donations-tab" class="admin-content hidden">
-            <div class="bg-white rounded-lg shadow">
-                <div class="px-6 py-4 border-b border-gray-200 flex justify-between items-center">
-                    <h3 class="text-xl font-semibold">Donation Initiatives</h3>
-                    <button onclick="openDonationModal()" class="bg-[#5B5843] text-white px-6 py-2 rounded-lg hover:bg-[#4a4735]">
-                        + Add Initiative
-                    </button>
-                </div>
-                <div class="p-6">
-                    <div id="donations-list" class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <!-- Donations will be loaded here -->
                     </div>
                 </div>
             </div>
